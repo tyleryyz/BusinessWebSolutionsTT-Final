@@ -1,0 +1,7 @@
+node_modules/
+/sample.js
+/ses_config.json
+/client/public/keys.txt
+/.env
+/server/ses_config.json
+/dist/js/app.js
