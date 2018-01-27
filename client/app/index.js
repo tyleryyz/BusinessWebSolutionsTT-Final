@@ -16,7 +16,7 @@ import Home from './components/Home/Home';
 import HelloWorld from './components/HelloWorld/HelloWorld';
 
 import Login from './components/Login/Login';
-import Signup from './components/Login/SignUp';
+import Signup from './components/SignUp/SignUp';
 import ImageUpload from './components/ImageUpload/ImageUpload';
 
 import './styles/styles.scss';

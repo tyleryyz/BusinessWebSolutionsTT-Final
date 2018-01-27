@@ -3,12 +3,12 @@
 
 import React, { Component } from 'react';
 
-/*  These imports are links from the specified folders. 
+/*  These imports are links from the specified folders.
 	These will pull data from the JS files so they can be
 	used as those tags within the App constructor. */
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
-import NavBar from '../Login/NavBar';
+import NavBar from '../NavBar/NavBar';
 
 /* IGNORE THIS BLOCK OF CODE
 var express = require('express');
