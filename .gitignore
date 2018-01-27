@@ -1,7 +1,9 @@
 node_modules/
+**/keys.txt
+keys.txt
+**/ses_config.json
+ses_config.json
 /sample.js
-/ses_config.json
-/client/public/keys.txt
 /.env
-/server/ses_config.json
 /dist/js/app.js
+/MERN-boilerplate.zip
