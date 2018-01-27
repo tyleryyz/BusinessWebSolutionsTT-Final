@@ -1,5 +1,6 @@
 node_modules/
 **/keys.txt
+keys.txt
 */ses_config.json
 /sample.js
 /.env
