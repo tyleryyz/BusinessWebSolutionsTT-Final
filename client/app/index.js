@@ -18,6 +18,7 @@ import HelloWorld from './components/HelloWorld/HelloWorld';
 import Login from './components/Login/Login';
 import Signup from './components/Login/SignUp';
 import ImageUpload from './components/ImageUpload/ImageUpload';
+import VideoPlayer from './components/VideoPlayer/VideoPlayer';
 
 import './styles/styles.scss';
 
@@ -30,6 +31,7 @@ render((
         <Route path="/signup" component={Signup}/>
         <Route path="/login" component={Login}/>
         <Route path="/imageupload" component={ImageUpload}/>
+        <Route path="/videoplayer" component={VideoPlayer}/>
         <Route component={NotFound}/>
       </Switch>
     </App>
