@@ -35,11 +35,14 @@ class NavBar extends Component {
 					<Link className="navbar-item" to="/">
       			Tech Demo Home
 					</Link>
-					<Link className="navbar-item" to="/helloworld">
+					<Link className="navbar-item" to="/emailexample">
       			Email Example
 					</Link>
 					<Link className="navbar-item" to="/imageupload">
       			Image Upload
+					</Link>
+					<Link className="navbar-item" to="/videoplayer">
+      			Video Player
 					</Link>
 					<Link className="navbar-item" to="/signup">
       			Sign Up

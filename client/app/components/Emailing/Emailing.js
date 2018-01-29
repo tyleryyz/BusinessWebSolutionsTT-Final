@@ -54,7 +54,7 @@ var email;
 var message;
 var subject;
 
-const HelloWorld = () => (
+const Emailing = () => (
   <div>
 	  <h1 className="title">Email Example</h1>
 	  <form>
@@ -177,4 +177,4 @@ function sendTheEmail()
 	);
 }
 
-export default HelloWorld;
+export default Emailing;

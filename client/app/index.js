@@ -13,7 +13,7 @@ import NotFound from './components/App/NotFound';
 
 import Home from './components/Home/Home';
 
-import HelloWorld from './components/HelloWorld/HelloWorld';
+import Emailing from './components/Emailing/Emailing';
 
 import Login from './components/Login/Login';
 import Signup from './components/Login/SignUp';
@@ -27,7 +27,7 @@ render((
     <App>
       <Switch>
         <Route exact path="/" component={Home}/>
-        <Route path="/helloworld" component={HelloWorld}/>
+        <Route path="/emailexample" component={Emailing}/>
         <Route path="/signup" component={Signup}/>
         <Route path="/login" component={Login}/>
         <Route path="/imageupload" component={ImageUpload}/>
