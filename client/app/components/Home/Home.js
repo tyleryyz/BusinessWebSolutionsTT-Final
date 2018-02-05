@@ -6,18 +6,39 @@ class Home extends Component {
     super(props);
 }
 
+  renderClasses() {
+      let classesBar = null;
+      let classesList = [{calc:'Calculus'},{hist: 'History'} , {art: 'Drawing'}]
+      if (classesList) {
+          classesBar = <div>
+                         <ul>
+                           {classesList.map(function(class, index) {
+
+                               return <li key={index}>
+                                        {class}
+                                      </li>
+
+                                  }) }
+                </ul>
+              </div>
+}
+    return (
+      <div>{classesBar}</div>
+    )
+  }
 
   render() {
-		let $userData;
+		let $userName;
 		let userObject = JSON.parse(localStorage.getItem('user'))
 		console.log(userObject);
 		if (userObject){
 			console.log(userObject.fname)
-			$userData = (<h1>Hello {userObject.fname} {userObject.lname}!</h1>)
+			$userName = (<h1>Hello {userObject.fname} {userObject.lname}!</h1>)
 		}
+
     return (
       <div>
-			{$userData}
+			{$userName}
 
       </div>
     );
