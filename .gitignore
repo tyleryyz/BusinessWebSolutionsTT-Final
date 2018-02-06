@@ -7,3 +7,4 @@ ses_config.json
 /.env
 /dist/js/app.js
 /MERN-boilerplate.zip
+/config/fbconfig.js

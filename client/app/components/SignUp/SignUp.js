@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import { withRouter } from 'react-router';
+var firebase = require('firebase');
+var firebaseui = require('firebaseui');
+
 
 
 import '../../styles/bulma.css';
@@ -19,26 +22,35 @@ class SignUp extends Component {
 		e.preventDefault();
 		const email = e.target.elements.email.value;
 		const password = e.target.elements.password.value;
-		const fname = e.target.elements.fname.value;
-		const lname = e.target.elements.lname.value;
-		const permission = e.target.elements.permission.value;
-		fetch('/api/users', {
-													method: 'POST',
-													headers: {"Content-Type": "Application/json"},
-													body: JSON.stringify({
-																									fname: fname,
-																									lname: lname,
-																									email: email,
-																									password: password,
-																									permission: permission
-
-																							})}
-			)
-      .then(res => res.json())
-      .then(json => {
-				this.props.history.push('/LogIn');
-      });
-			this.routeTo()
+		firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+  	// Handle Errors here.
+  	var errorCode = error.code;
+  	var errorMessage = error.message;
+  	// ...
+		});
+		
+		// const email = e.target.elements.email.value;
+		// const password = e.target.elements.password.value;
+		// const fname = e.target.elements.fname.value;
+		// const lname = e.target.elements.lname.value;
+		// const permission = e.target.elements.permission.value;
+		// fetch('/api/users', {
+		// 											method: 'POST',
+		// 											headers: {"Content-Type": "Application/json"},
+		// 											body: JSON.stringify({
+		// 																							fname: fname,
+		// 																							lname: lname,
+		// 																							email: email,
+		// 																							password: password,
+		// 																							permission: permission
+    //
+		// 																					})}
+		// 	)
+    //   .then(res => res.json())
+    //   .then(json => {
+		// 		this.props.history.push('/LogIn');
+    //   });
+		// 	this.routeTo()
 	}
 
 	routeTo() {

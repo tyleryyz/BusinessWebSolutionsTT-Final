@@ -14,13 +14,17 @@ const webpackHotMiddleware = require('webpack-hot-middleware');
 
 const config = require('../config/config');
 const webpackConfig = require('../webpack.config');
+const firebase = require('firebase');
+
 
 const isDev = process.env.NODE_ENV !== 'production';
 const port  = process.env.PORT || 8080;
 
-
 // Configuration
 // ================================================================================================
+
+// Initialize Firebase
+
 
 // Set up Mongoose
 mongoose.connect(isDev ? config.db_dev : config.db, {
