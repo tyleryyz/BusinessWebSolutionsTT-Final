@@ -25,8 +25,6 @@ class LogIn extends Component {
 			console.log(errorMessage)
     });
     let user = firebase.auth().currentUser
-		console.log("login user", user)
-
     this.props.update(user);
 
 	}
@@ -51,8 +49,6 @@ class LogIn extends Component {
 
 
   render() {
-    let currentUser = this.props.state.user
-
       return (<form onSubmit={this.handleLogIn}>
         <div className="container">
           <div className="box">
@@ -82,7 +78,7 @@ class LogIn extends Component {
           <p>{this.props.user}</p>
         </div>
       </form>);
-    
+
   }
 }
 

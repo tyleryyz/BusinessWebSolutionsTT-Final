@@ -19,7 +19,6 @@ import './styles/styles.scss';
 var firebase = require('firebase');
 
 
-
 firebase.initializeApp(fbconfig);
 
 
@@ -37,7 +36,8 @@ class Index extends Component {
 
 	logout() {
 		this.setState({
-			user: null
+			user: null,
+			loaded: false
 		}, () => {
 			this.setState({loaded: true});
 		})
@@ -73,21 +73,36 @@ class Index extends Component {
 
   componentWillMount() {
 
-    var user = firebase.auth().currentUser
-    if (user) {
-      this.setState({
-        user: user
-      }, () => {
-        this.setState({loaded: true})
-      })
-    } else {
-      this.setState({
-        user: null
-      }, () => {
-        this.setState({loaded: true})
-      })
-    }
-  }
+		firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+				this.setState({
+					user: user
+				}, () => {
+					this.setState({loaded: true})
+				})
+      } else {
+				this.setState({
+	        user: null
+	      }, () => {
+	        this.setState({loaded: true})
+	      })
+			}
+		})
+	}
+    // if (user) {
+		// 	this.setState({
+		// 		user: user
+		// 	}, () => {
+		// 		this.setState({loaded: true})
+		// 	})
+    // } else {
+    //   this.setState({
+    //     user: null
+    //   }, () => {
+    //     this.setState({loaded: true})
+    //   })
+    // }
+
 
   render() {
 
