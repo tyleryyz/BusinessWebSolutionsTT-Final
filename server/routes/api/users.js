@@ -20,6 +20,8 @@ module.exports = (app) => {
 		user.email=req.body.email;
 		user.password=req.body.password;
 		user.permission=req.body.permission;
+    user.school=req.body.school;
+    user.classList=req.body.classList;
     user.save()
       .then(() => res.json(user))
       .catch((err) => next(err));

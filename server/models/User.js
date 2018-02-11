@@ -15,6 +15,12 @@ const UserSchema = new mongoose.Schema({
   },
 	permission: {
     type: String
+  },
+    school: {
+    type: String
+  },
+    classList: {
+      type: Array
   }
 
 });
