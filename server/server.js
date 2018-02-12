@@ -16,24 +16,23 @@ const config = require('../config/config');
 const webpackConfig = require('../webpack.config');
 const firebase = require('firebase');
 
-
 const isDev = process.env.NODE_ENV !== 'production';
-const port  = process.env.PORT || 8080;
+const port = process.env.PORT || 8080;
 
 // Configuration
 // ================================================================================================
 
 // Initialize Firebase
 
-
 // Set up Mongoose
-mongoose.connect(isDev ? config.db_dev : config.db, {
-  useMongoClient: true,
-});
+mongoose.connect(
+  isDev
+  ? config.db_dev
+  : config.db, {useMongoClient: true});
 mongoose.Promise = global.Promise;
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 // API routes
@@ -42,9 +41,7 @@ require('./routes')(app);
 if (isDev) {
   const compiler = webpack(webpackConfig);
 
-  app.use(historyApiFallback({
-    verbose: false
-  }));
+  app.use(historyApiFallback({verbose: false}));
 
   app.use(webpackDevMiddleware(compiler, {
     publicPath: webpackConfig.output.publicPath,
@@ -63,7 +60,7 @@ if (isDev) {
   app.use(express.static(path.resolve(__dirname, '../dist')));
 } else {
   app.use(express.static(path.resolve(__dirname, '../dist')));
-  app.get('*', function (req, res) {
+  app.get('*', function(req, res) {
     res.sendFile(path.resolve(__dirname, '../dist/index.html'));
     res.end();
   });
