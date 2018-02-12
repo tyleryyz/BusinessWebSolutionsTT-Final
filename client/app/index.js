@@ -18,15 +18,6 @@ import './styles/styles.scss';
 
 var firebase = require('firebase');
 
-var fbconfig = {
-  apiKey: "AIzaSyDVVLR1UvlHbQtnSwPWqdbt_t3zZBwG3I8",
-  authDomain: "businesswebsolutionstt-final.firebaseapp.com",
-  databaseURL: "https://businesswebsolutionstt-final.firebaseio.com",
-  projectId: "businesswebsolutionstt-final",
-  storageBucket: "",
-  messagingSenderId: "103955267073"
-};
-
 firebase.initializeApp(fbconfig);
 
 class Index extends Component {
