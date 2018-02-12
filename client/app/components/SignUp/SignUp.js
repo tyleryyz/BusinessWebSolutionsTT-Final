@@ -1,62 +1,45 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
-import { withRouter } from 'react-router';
+import {withRouter} from 'react-router';
 var firebase = require('firebase');
 var firebaseui = require('firebaseui');
-
-
 
 import '../../styles/bulma.css';
 
 class SignUp extends Component {
 
-	constructor(props) {
+  constructor(props) {
     super(props);
 
-		this.handleSignUp = this.handleSignUp.bind(this);
+    this.handleSignUp = this.handleSignUp.bind(this);
 
-    this.routeTo = this.routeTo.bind(this);
   }
 
-	handleSignUp(e){
-		e.preventDefault();
-		const email = e.target.elements.email.value;
-		const password = e.target.elements.password.value;
-		firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
-  	// Handle Errors here.
-  	var errorCode = error.code;
-  	var errorMessage = error.message;
-  	// ...
-		});
-		
-		// const email = e.target.elements.email.value;
-		// const password = e.target.elements.password.value;
-		// const fname = e.target.elements.fname.value;
-		// const lname = e.target.elements.lname.value;
-		// const permission = e.target.elements.permission.value;
-		// fetch('/api/users', {
-		// 											method: 'POST',
-		// 											headers: {"Content-Type": "Application/json"},
-		// 											body: JSON.stringify({
-		// 																							fname: fname,
-		// 																							lname: lname,
-		// 																							email: email,
-		// 																							password: password,
-		// 																							permission: permission
-    //
-		// 																					})}
-		// 	)
-    //   .then(res => res.json())
-    //   .then(json => {
-		// 		this.props.history.push('/LogIn');
-    //   });
-		// 	this.routeTo()
-	}
-
-	routeTo() {
-		<Link to="/" />
-
-	}
+  handleSignUp(e) {
+    e.preventDefault();
+    const email = e.target.elements.email.value;
+    const password = e.target.elements.password.value;
+    const fname = e.target.elements.fname.value;
+    const lname = e.target.elements.lname.value;
+    firebase.auth().createUserWithEmailAndPassword(email, password).then(function(user) {
+      var newUser = firebase.auth().currentUser;
+      const uID = newUser.uid;
+      console.log("inside signup", uID);
+      fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        body: JSON.stringify({fname: fname, lname: lname, email: email, uID: uID})
+      });
+    }).catch(function(error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      console.log(errorCode);
+      console.log(errorMessage);
+    });
+  }
 
   render() {
     return (<form onSubmit={this.handleSignUp}>
@@ -89,26 +72,26 @@ class SignUp extends Component {
           </div>
 
           <div className="field">
-					<div className="control">
-						<label className="radio">
-							<input type="radio" value="student" name="permission"/>
-							Student
-						</label>
-						<label className="radio">
-							<input type="radio" value="tutor" name="permission"/>
-							Tutor
-						</label>
-						</div>
+            <div className="control">
+              <label className="radio">
+                <input type="radio" value="student" name="permission"/>
+                Student
+              </label>
+              <label className="radio">
+                <input type="radio" value="tutor" name="permission"/>
+                Tutor
+              </label>
+            </div>
           </div>
 
           <div className="field is-grouped">
             <div className="control">
               <button className="button">Submit</button>
             </div>
-						<div id="cancelButton">
-            <div className="control">
-              <Link to="/">Cancel</Link>
-							</div>
+            <div id="cancelButton">
+              <div className="control">
+                <Link to="/">Cancel</Link>
+              </div>
             </div>
           </div>
         </div>
