@@ -14,6 +14,8 @@ module.exports = (app) => {
     user.fname = req.body.fname;
     user.lname = req.body.lname;
     user.email = req.body.email;
+    user.school=req.body.school;
+    user.classList=req.body.classList;
     user.uID = req.body.uID;
     user.save().then(() => res.json(user)).catch((err) => next(err));
   });

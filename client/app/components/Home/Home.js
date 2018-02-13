@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import 'whatwg-fetch';
 var firebase = require('firebase');
 
+// Will render a profile image, user name, user class list, user school,
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -41,13 +42,17 @@ class Home extends Component {
       return (<div>
         {console.log("here!", this.state.user)}
         {this.state.user.fname}
-        <p>we made it fam desu</p>
+        <p>{this.state.user.school}</p>
+        {this.state.user.classList.map((subject, index) => (
+          <p key={index}>{subject}</p>
+        ))}
       </div>);
     } else {
       return (<div>
         <h1>Please wait</h1>
       </div>)
     }
+
   }
 }
 

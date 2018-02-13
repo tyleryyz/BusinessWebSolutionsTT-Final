@@ -14,6 +14,12 @@ const UserSchema = new mongoose.Schema({
   uID: {
     type: String,
     unique: true
+  },
+  school: {
+  type: String
+  },
+  classList: {
+    type: Array
   }
 
 });

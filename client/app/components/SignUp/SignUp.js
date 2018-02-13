@@ -21,6 +21,17 @@ class SignUp extends Component {
     const password = e.target.elements.password.value;
     const fname = e.target.elements.fname.value;
     const lname = e.target.elements.lname.value;
+    const school = e.target.elements.school.value;
+
+    var classList = [];
+    let existingClasses = ['class1', 'class2', 'class3'];
+
+    for (var i = 0; i < existingClasses.length; i++){
+      if( document.getElementById(existingClasses[i]).checked){
+        classList.push(document.getElementById(existingClasses[i]).value);
+      }
+    }
+
     firebase.auth().createUserWithEmailAndPassword(email, password).then(function(user) {
       var newUser = firebase.auth().currentUser;
       const uID = newUser.uid;
@@ -30,7 +41,7 @@ class SignUp extends Component {
         headers: {
           "Content-Type": "Application/json"
         },
-        body: JSON.stringify({fname: fname, lname: lname, email: email, uID: uID})
+        body: JSON.stringify({fname: fname, lname: lname, email: email, uID: uID, school: school, classList: classList})
       });
     }).catch(function(error) {
       // Handle Errors here.
@@ -80,6 +91,36 @@ class SignUp extends Component {
               <label className="radio">
                 <input type="radio" value="tutor" name="permission"/>
                 Tutor
+              </label>
+            </div>
+          </div>
+
+          <div className="field">
+					  <div className="control">
+						<label className="radio">
+							<input type="radio" value="Northern Arizona University" name="school"/>
+							Northern Arizona University
+						</label>
+						<label className="radio">
+							<input type="radio" value="Arizona State University" name="school"/>
+							Arizona State University
+						</label>
+						</div>
+          </div>
+
+          <div className="field">
+            <div className="control">
+              <label className="checkbox">
+                <input type="checkbox" value="Calculus" name="class1" id='class1' />
+                Calculus
+              </label>
+              <label className="checkbox">
+                <input type="checkbox" value="Biology" name="class2" id='class2' />
+                Biology
+              </label>
+              <label className="checkbox">
+                <input type="checkbox" value="Physics" name="class3" id='class3'/>
+                Physics
               </label>
             </div>
           </div>
