@@ -17,11 +17,17 @@ module.exports = (app) => {
     user.school=req.body.school;
     user.classList=req.body.classList;
     user.uID = req.body.uID;
+    user.permission = req.body.permission;
     user.save().then(() => res.json(user)).catch((err) => next(err));
   });
 
   app.delete('/api/users', function(req, res, next) {
-    User.deleteMany({}).then((user) => res.json()).catch((err) => next(err));
+
+    User.deleteOne({email: req.query.email}).then((user) => res.json()).catch((err) => next(err));
   });
+
+  app.put('/api/user', function(req, res, next) {
+    User.updateOne({email: req.query.email}, {$set: { permission: "Tutor"}}).then((user) => res.json()).catch((err) => next(err));
+  })
 
 };

@@ -14,9 +14,19 @@ import Login from './components/Login/Login';
 import SignUp from './components/SignUp/SignUp';
 import ImageUpload from './components/ImageUpload/ImageUpload';
 
+
 import './styles/styles.scss';
 
 var firebase = require('firebase');
+
+var fbconfig = {
+apiKey: "AIzaSyDVVLR1UvlHbQtnSwPWqdbt_t3zZBwG3I8",
+authDomain: "businesswebsolutionstt-final.firebaseapp.com",
+databaseURL: "https://businesswebsolutionstt-final.firebaseio.com",
+projectId: "businesswebsolutionstt-final",
+storageBucket: "",
+messagingSenderId: "103955267073"
+};
 
 firebase.initializeApp(fbconfig);
 
@@ -104,7 +114,6 @@ class Index extends Component {
     if (this.state.user && this.state.loaded) {
       return (<Router>
         <div>
-
           <NavBar auth={this.state.user} logout={this.logout}/>
           <App user={this.state.user}/>
         </div>
@@ -112,10 +121,8 @@ class Index extends Component {
     } else if (!this.state.user && this.state.loaded) {
       return (<Router>
         <div>
-
           <NavBar auth={this.state.user}/>
           <Switch>
-
             <Route path="/signup" render={() => <SignUp update={this.setAuthState}/>}/>
             <Route path="/login" render={() => <Login update={this.setAuthState}/>}/>
             <Redirect to="/login"/>

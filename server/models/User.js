@@ -20,7 +20,9 @@ const UserSchema = new mongoose.Schema({
   },
   classList: {
     type: Array
-  }
+  },
+  permission: {
+    type: String
 
 });
 

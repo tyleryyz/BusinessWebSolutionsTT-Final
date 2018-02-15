@@ -3,7 +3,6 @@ import {Link} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import '../../styles/bulma.css';
 var firebase = require('firebase');
-var firebaseui = require('firebaseui');
 
 class LogIn extends Component {
   constructor(props) {
@@ -16,7 +15,6 @@ class LogIn extends Component {
     const email = e.target.elements.email.value;
     const password = e.target.elements.password.value;
     firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
-      console.log("it broked");
       var errorCode = error.code;
       var errorMessage = error.message;
       console.log(errorCode)

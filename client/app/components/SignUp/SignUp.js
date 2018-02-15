@@ -41,7 +41,7 @@ class SignUp extends Component {
         headers: {
           "Content-Type": "Application/json"
         },
-        body: JSON.stringify({fname: fname, lname: lname, email: email, uID: uID, school: school, classList: classList})
+        body: JSON.stringify({fname: fname, lname: lname, email: email, uID: uID, school: school, classList: classList, permission: "Student"})
       });
     }).catch(function(error) {
       // Handle Errors here.

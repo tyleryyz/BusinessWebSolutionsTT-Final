@@ -12,6 +12,7 @@ import HelloWorld from '../HelloWorld/HelloWorld';
 import Login from '../Login/Login';
 import Signup from '../SignUp/SignUp';
 import ImageUpload from '../ImageUpload/ImageUpload';
+import Admin from '../Admin/Admin';
 
 import '../../styles/styles.scss';
 var firebase = require('firebase');
@@ -28,6 +29,7 @@ class App extends Component {
 
     return (<div>
       <Switch>
+        <Route path="/tt-admin" render={() => <Admin user={this.props.user}/>}/>
         <Route exact path="/" render={() => <Home user={this.props.user}/>}/>
         <Route path="/dashboard" render={() => <Dashboard/>}/>
         <Route path="/helloworld" render={() => <HelloWorld/>}/>
