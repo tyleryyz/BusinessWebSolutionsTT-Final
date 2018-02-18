@@ -13,12 +13,14 @@ class Admin extends Component {
       changeUserData: null,
       deleteUserData: null
     };
-    this.getAdminData = this.getAdminData.bind(this)
-    this.handleDelete = this.handleDelete.bind(this)
-    this.handleAddTutor = this.handleAddTutor.bind(this)
-    this.getUserData = this.getUserData.bind(this)
-    this.changePermission = this.changePermission.bind(this)
-    this.deleteUser = this.deleteUser.bind(this)
+    this.getAdminData = this.getAdminData.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+    this.handleAddTutor = this.handleAddTutor.bind(this);
+    this.getUserData = this.getUserData.bind(this);
+    this.changePermission = this.changePermission.bind(this);
+    this.deleteUser = this.deleteUser.bind(this);
+    this.cancelDelete = this.cancelDelete.bind(this);
+    this.cancelPermissionChange = this.cancelPermissionChange.bind(this);
   }
 
   getAdminData() {
@@ -117,6 +119,26 @@ class Admin extends Component {
     })
   }
 
+  cancelDelete(e){
+    e.preventDefault();
+    this.setState({
+      deleteUserData: null,
+      loaded: false
+    }, () => {
+      this.setState({loaded: true})
+    });
+  }
+
+  cancelPermissionChange(e){
+    e.preventDefault();
+    this.setState({
+      changeUserData: null,
+      loaded: false
+    }, () => {
+      this.setState({loaded: true})
+    });
+  }
+
   render() {
     let $data;
     let $deleteData;
@@ -128,8 +150,11 @@ class Admin extends Component {
           <p>Name: {this.state.changeUserData.fname} {this.state.changeUserData.lname}</p>
           <p>Email: {this.state.changeUserData.email}</p>
           <p>Permission: {this.state.changeUserData.permission}</p>
-          <button className="button is-success">
+          <button className="button is-warning">
             Confirm permission change
+          </button>
+          <button onClick={this.cancelPermissionChange} className="button is-success">
+            cancel
           </button>
           </form>
         </div>
@@ -144,8 +169,11 @@ class Admin extends Component {
           <p>Name: {this.state.deleteUserData.fname} {this.state.deleteUserData.lname}</p>
           <p>Email: {this.state.deleteUserData.email}</p>
           <p>Permission: {this.state.deleteUserData.permission}</p>
-          <button className="button is-success">
+          <button className="button is-danger">
             Confirm user deletion
+          </button>
+          <button onClick={this.cancelDelete} className="button is-success">
+            cancel
           </button>
           </form>
         </div>
@@ -168,7 +196,7 @@ class Admin extends Component {
               </div>
               <div className="field">
                 <p className="control">
-                  <button className="button is-success">
+                  <button className="button is-outlined is-danger">
                     Delete user
                   </button>
                 </p>
@@ -189,8 +217,8 @@ class Admin extends Component {
               </div>
               <div className="field">
                 <p className="control">
-                  <button className="button is-success">
-                  Get user information
+                  <button className="button is-outlined is-success">
+                  Change permission
                   </button>
                 </p>
               </div>
