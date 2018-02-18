@@ -8,15 +8,20 @@ class Admin extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: null,
-      loaded: false
+      adminUser: null,
+      loaded: false,
+      changeUserData: null,
+      deleteUserData: null
     };
-    this.getData = this.getData.bind(this)
+    this.getAdminData = this.getAdminData.bind(this)
     this.handleDelete = this.handleDelete.bind(this)
     this.handleAddTutor = this.handleAddTutor.bind(this)
+    this.getUserData = this.getUserData.bind(this)
+    this.changePermission = this.changePermission.bind(this)
+    this.deleteUser = this.deleteUser.bind(this)
   }
 
-  getData() {
+  getAdminData() {
     let uID = this.props.user.uid;
     console.log(uID)
     return (fetch(`/api/users?uID=${uID}`, {
@@ -27,11 +32,19 @@ class Admin extends Component {
     }).then(res => res.json()));
   }
 
+  getUserData(email) {
+    return (fetch(`/api/users?email=${email}`, {
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      method: 'GET'
+    }).then(res => res.json()));
+  }
+
   componentWillMount() {
-    let result = this.getData().then((user) => {
-      console.log("will mount here", user)
+    let result = this.getAdminData().then((user) => {
       this.setState({
-        user: user,
+        adminUser: user,
         loaded: false
       }, () => {
         this.setState({loaded: true})
@@ -42,13 +55,15 @@ class Admin extends Component {
   handleDelete(e){
     e.preventDefault();
     const email = e.target.elements.email.value;
-    var user = firebase.auth().currentUser;
-
-    user.delete().then(function() {
-      // User deleted.
-    }).catch(function(error) {
-      // An error happened.
-    });
+    let result = this.getUserData(email).then((user) => {
+      console.log("will mount here", user)
+      this.setState({
+        deleteUserData: user,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      });
+    })
 
 
 
@@ -57,23 +72,93 @@ class Admin extends Component {
   handleAddTutor(e){
     e.preventDefault();
     const email = e.target.elements.email.value;
-    fetch(`/api/user?email=${email}`, {
+    let result = this.getUserData(email).then((user) => {
+      console.log("will mount here", user)
+      this.setState({
+        changeUserData: user,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      });
+    })
+  }
+
+  changePermission(e) {
+    e.preventDefault();
+    const email = this.state.changeUserData.email;
+    fetch(`/api/users?email=${email}`, {
       method: 'PUT',
       headers: {
         "Content-Type": "Application/json"
       },
-    });
+      body: JSON.stringify({permission: "Tutor"})
+    }).then((user) => {
+      this.setState({
+        changeUserData: null,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      });
+    })
+  }
 
+  deleteUser(e) {
+    e.preventDefault();
+    const email = this.state.deleteUserData.email;
+    fetch(`/api/users?email=${email}`, {
+      method: 'DELETE'
+    }).then((user)=> {
+      this.setState({
+        deleteUserData: null,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      });
+    })
   }
 
   render() {
-    if (this.state.user && this.state.loaded) {
-      if (this.state.user.permission === "Admin") {
+    let $data;
+    let $deleteData;
+    if (this.state.changeUserData){
+       $data = (
+        <div className="container">
+        <br/>
+        <form onSubmit={this.changePermission}>
+          <p>Name: {this.state.changeUserData.fname} {this.state.changeUserData.lname}</p>
+          <p>Email: {this.state.changeUserData.email}</p>
+          <p>Permission: {this.state.changeUserData.permission}</p>
+          <button className="button is-success">
+            Confirm permission change
+          </button>
+          </form>
+        </div>
+      )
+    } else {$data = (<p></p>) }
+
+    if (this.state.deleteUserData){
+       $deleteData = (
+        <div className="container">
+        <br/>
+        <form onSubmit={this.deleteUser}>
+          <p>Name: {this.state.deleteUserData.fname} {this.state.deleteUserData.lname}</p>
+          <p>Email: {this.state.deleteUserData.email}</p>
+          <p>Permission: {this.state.deleteUserData.permission}</p>
+          <button className="button is-success">
+            Confirm user deletion
+          </button>
+          </form>
+        </div>
+      )
+    } else {$deleteData = (<p></p>) }
+
+    if (this.state.adminUser && this.state.loaded) {
+      if (this.state.adminUser.permission === "Admin") {
         return (
           <div>
-          <p>Delete user</p>
           <form onSubmit={this.handleDelete}>
             <div className="container">
+            <p>Delete user</p>
               <div className="box">
                 <div className="field">
                   <p className="control">
@@ -89,11 +174,12 @@ class Admin extends Component {
                 </p>
               </div>
             </div>
-
           </form>
-          <p>Add tutor</p>
+          {$deleteData}
+          <br/>
           <form onSubmit={this.handleAddTutor}>
             <div className="container">
+            <p>Add tutor</p>
               <div className="box">
                 <div className="field">
                   <p className="control">
@@ -104,17 +190,18 @@ class Admin extends Component {
               <div className="field">
                 <p className="control">
                   <button className="button is-success">
-                  Add tutor
+                  Get user information
                   </button>
                 </p>
               </div>
             </div>
-
           </form>
+          {$data}
           </div>);
-      } else if (!(this.state.user.permission === "Admin") && this.state.loaded) {
+      }
+      else if (!(this.state.adminUser.permission === "Admin") && this.state.loaded) {
         return (<p>You don't have permission to access this</p>)
-      } else { console.log(this.state.user.permission)
+      } else { console.log(this.state.adminUser.permission)
         return(<p>Inner Please wait</p>)}
     } else {
       return (<p>Outer Please wait</p>)
