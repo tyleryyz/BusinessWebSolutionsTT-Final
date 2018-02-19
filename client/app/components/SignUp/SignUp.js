@@ -83,19 +83,6 @@ class SignUp extends Component {
           </div>
 
           <div className="field">
-            <div className="control">
-              <label className="radio">
-                <input type="radio" value="student" name="permission"/>
-                Student
-              </label>
-              <label className="radio">
-                <input type="radio" value="tutor" name="permission"/>
-                Tutor
-              </label>
-            </div>
-          </div>
-
-          <div className="field">
 					  <div className="control">
 						<label className="radio">
 							<input type="radio" value="Northern Arizona University" name="school"/>

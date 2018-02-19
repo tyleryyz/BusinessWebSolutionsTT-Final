@@ -13,6 +13,7 @@ import Login from '../Login/Login';
 import Signup from '../SignUp/SignUp';
 import ImageUpload from '../ImageUpload/ImageUpload';
 import Admin from '../Admin/Admin';
+import EditProfile from '../EditProfile/EditProfile';
 
 import '../../styles/styles.scss';
 var firebase = require('firebase');
@@ -34,6 +35,7 @@ class App extends Component {
         <Route path="/dashboard" render={() => <Dashboard/>}/>
         <Route path="/helloworld" render={() => <HelloWorld/>}/>
         <Route path="/imageupload" render={() => <ImageUpload/>}/>
+        <Route path="/EditProfile" render={()=> <EditProfile user={this.props.user}/>}/>
         <Redirect to="/"/>
       </Switch>
     </div>)
