@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import 'whatwg-fetch';
+import Payment from "../Payment/Payment";
+
 var firebase = require('firebase');
 
 // Will render a profile image, user name, user class list, user school,
@@ -37,7 +39,6 @@ class Home extends Component {
   };
 
   render() {
-
     if (this.state.user) {
       return (<div>
         {console.log("here!", this.state.user)}
