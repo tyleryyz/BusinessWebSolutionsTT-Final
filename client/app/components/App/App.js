@@ -7,11 +7,12 @@ import NotFound from './NotFound';
 import Home from '../Home/Home';
 
 import Dashboard from '../Dashboard/Dashboard';
-import HelloWorld from '../HelloWorld/HelloWorld';
+import Emailing from '../Emailing/Emailing';
 
 import Login from '../Login/Login';
 import Signup from '../SignUp/SignUp';
 import ImageUpload from '../ImageUpload/ImageUpload';
+import VideoPlayer from '../VideoPlayer/VideoPlayer';
 
 import '../../styles/styles.scss';
 var firebase = require('firebase');
@@ -30,8 +31,9 @@ class App extends Component {
       <Switch>
         <Route exact path="/" render={() => <Home user={this.props.user}/>}/>
         <Route path="/dashboard" render={() => <Dashboard/>}/>
-        <Route path="/helloworld" render={() => <HelloWorld/>}/>
-        <Route path="/imageupload" render={() => <ImageUpload/>}/>
+        <Route path="/Emailing" render={() => <Emailing user={this.props.user}/>}/>
+        <Route path="/imageupload" render={() => <ImageUpload user={this.props.user}/>}/>
+        <Route path="/VideoPlayer" render={() => <VideoPlayer/>}/>
         <Redirect to="/"/>
       </Switch>
     </div>)
