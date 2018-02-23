@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import 'whatwg-fetch';
+import {Link} from 'react-router-dom';
+
 var firebase = require('firebase');
 
 // Will render a profile image, user name, user class list, user school,
@@ -46,7 +48,13 @@ class Home extends Component {
         {this.state.user.classList.map((subject, index) => (
           <p key={index}>{subject}</p>
         ))}
+      <div id="editProfileButton">
+        <div className="control">
+          <Link to="/EditProfile">Edit Profile</Link>
+        </div>
+      </div>
       </div>);
+
     } else {
       return (<div>
         <h1>Please wait</h1>

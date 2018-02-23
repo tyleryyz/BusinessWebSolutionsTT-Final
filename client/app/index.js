@@ -18,6 +18,7 @@ var firebase = require('firebase');
 
 // var fbconfig = 
 
+
 firebase.initializeApp(fbconfig);
 
 class Index extends Component {
@@ -104,7 +105,6 @@ class Index extends Component {
     if (this.state.user && this.state.loaded) {
       return (<Router>
         <div>
-
           <NavBar auth={this.state.user} logout={this.logout}/>
           <App user={this.state.user}/>
         </div>
