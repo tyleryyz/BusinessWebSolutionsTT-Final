@@ -9,3 +9,4 @@ ses_config.json
 /MERN-boilerplate.zip
 /config/fbconfig.js
 package-lock.json
+/client/app/index.js

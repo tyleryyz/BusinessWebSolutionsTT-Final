@@ -5,18 +5,19 @@ import {BrowserRouter as Router, Route, Link, Switch, Redirect} from 'react-rout
 import App from './components/App/App';
 import NotFound from './components/App/NotFound';
 import NavBar from './components/NavBar/NavBar'
-
 import Home from './components/Home/Home';
-
-import HelloWorld from './components/HelloWorld/HelloWorld';
-
+import Emailing from './components/Emailing/Emailing';
 import Login from './components/Login/Login';
 import SignUp from './components/SignUp/SignUp';
 import ImageUpload from './components/ImageUpload/ImageUpload';
+import VideoPlayer from './components/VideoPlayer/VideoPlayer';
 
 import './styles/styles.scss';
 
 var firebase = require('firebase');
+
+// var fbconfig = 
+
 
 firebase.initializeApp(fbconfig);
 
@@ -104,7 +105,6 @@ class Index extends Component {
     if (this.state.user && this.state.loaded) {
       return (<Router>
         <div>
-
           <NavBar auth={this.state.user} logout={this.logout}/>
           <App user={this.state.user}/>
         </div>

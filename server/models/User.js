@@ -16,12 +16,14 @@ const UserSchema = new mongoose.Schema({
     unique: true
   },
   school: {
-  type: String
+    type: String
   },
   classList: {
     type: Array
-  }
-
+  },
+  permission: {
+    type: String
+}
 });
 
 module.exports = mongoose.model('User', UserSchema);

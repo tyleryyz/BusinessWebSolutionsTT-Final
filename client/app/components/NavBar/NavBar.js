@@ -36,11 +36,14 @@ class NavBar extends Component {
             <Link className="navbar-item" to="/dashboard">
               Dashboard
             </Link>
-            <Link className="navbar-item" to="/helloworld">
+            <Link className="navbar-item" to="/emailing">
               Email Example
             </Link>
             <Link className="navbar-item" to="/imageupload">
               Image Upload
+            </Link>
+	    <Link className="navbar-item" to="/paypal">
+              Paypal Example
             </Link>
             <a className="navbar-item button" onClick={this.handleSignOut}>Sign Out</a>
             <button className="button navbar-burger">
