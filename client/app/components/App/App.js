@@ -1,44 +1,49 @@
-/* 	This file is the main page, so http://localhost:8080
-	Changes made here will be loaded automatically on file save */
+import React, {Component} from 'react';
+import {render} from 'react-dom';
+import {BrowserRouter as Router, Route, Link, Switch, Redirect} from 'react-router-dom'
 
-import React, { Component } from 'react';
+import NotFound from './NotFound';
 
-/*  These imports are links from the specified folders. 
-	These will pull data from the JS files so they can be
-	used as those tags within the App constructor. */
-import Header from '../Header/Header';
-import Footer from '../Footer/Footer';
-import NavBar from '../Login/NavBar';
+import Home from '../Home/Home';
 
-/* IGNORE THIS BLOCK OF CODE
-var express = require('express');
-var cors = require('cors');
-var app = express();
+import Dashboard from '../Dashboard/Dashboard';
+import Emailing from '../Emailing/Emailing';
+import PayPal from '../PayPal/PayPal';
 
-app.use(cors());
+import Login from '../Login/Login';
+import Signup from '../SignUp/SignUp';
+import ImageUpload from '../ImageUpload/ImageUpload';
+import VideoPlayer from '../VideoPlayer/VideoPlayer';
 
-app.get('/products/:id', function (req, res, next) {
-  res.json({msg: 'This is CORS-enabled for all origins!'})
-});
+import Admin from '../Admin/Admin';
+import EditProfile from '../EditProfile/EditProfile';
 
-app.listen(80, function () {
-  console.log('CORS-enabled web server listening on port 80')
-});
-*/
+import '../../styles/styles.scss';
+var firebase = require('firebase');
 
-/*  This is the template where the main page will be built from.
-	Currently, NavBar appears on EVERY PAGE, where {children}
-	can be any page that is currently being loaded. */
-const App = ({ children }) => (
-  <div>
-    <NavBar />
+class App extends Component {
+  constructor(props) {
 
-    <main>
-      {children}
-    </main>
+    super(props);
+    console.log(this.props);
+    this.children = this.props.children;
+  }
 
-    <Footer />
-  </div>
-);
+  render() {
 
+    return (<div>
+      <Switch>
+        <Route path="/tt-admin" render={() => <Admin user={this.props.user}/>}/>
+        <Route exact path="/" render={() => <Home user={this.props.user}/>}/>
+        <Route path="/dashboard" render={() => <Dashboard/>}/>
+        <Route path="/Emailing" render={() => <Emailing user={this.props.user}/>}/>
+        <Route path="/imageupload" render={() => <ImageUpload user={this.props.user}/>}/>
+		<Route path="/paypal" render={() => <PayPal user={this.props.user}/>}/>
+        <Route path="/VideoPlayer" render={() => <VideoPlayer/>}/>
+		<Route path="/EditProfile" render={()=> <EditProfile user={this.props.user}/>}/>
+        <Redirect to="/"/>
+      </Switch>
+    </div>)
+  }
+}
 export default App;

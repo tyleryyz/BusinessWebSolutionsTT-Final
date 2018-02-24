@@ -1,117 +1,66 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import 'whatwg-fetch';
+import {Link} from 'react-router-dom';
 
+var firebase = require('firebase');
+
+// Will render a profile image, user name, user class list, user school,
 class Home extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
-      counters: []
+      user: null,
+      loaded: false
     };
-
-    this.newCounter = this.newCounter.bind(this);
-    this.incrementCounter = this.incrementCounter.bind(this);
-    this.decrementCounter = this.decrementCounter.bind(this);
-    this.deleteCounter = this.deleteCounter.bind(this);
-
-    this._modifyCounter = this._modifyCounter.bind(this);
+    this.getData = this.getData.bind(this)
   }
 
-  componentDidMount() {
-    fetch('/api/counters')
-      .then(res => res.json())
-      .then(json => {
-        this.setState({
-          counters: json
-        });
+  getData() {
+    let uID = this.props.user.uid;
+    console.log(uID)
+    return (fetch(`/api/users?uID=${uID}`, {
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      method: 'GET'
+    }).then(res => res.json()));
+  }
+
+  componentWillMount() {
+    let result = this.getData().then((user) => {
+      console.log("will mount here", user)
+      this.setState({
+        user: user,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
       });
-  }
-
-  newCounter() {
-    fetch('/api/counters', { method: 'POST' })
-      .then(res => res.json())
-      .then(json => {
-				console.log(json);
-				console.log(json.count);
-        let data = this.state.counters;
-        data.push(json);
-
-        this.setState({
-          counters: data
-        });
-      });
-  }
-
-  incrementCounter(index) {
-    const id = this.state.counters[index]._id;
-
-    fetch(`/api/counters/${id}/increment`, { method: 'PUT' })
-      .then(res => res.json())
-      .then(json => {
-        this._modifyCounter(index, json);
-      });
-  }
-
-  decrementCounter(index) {
-    const id = this.state.counters[index]._id;
-
-    fetch(`/api/counters/${id}/decrement`, { method: 'PUT' })
-      .then(res => res.json())
-      .then(json => {
-        this._modifyCounter(index, json);
-      });
-  }
-
-  deleteCounter(index) {
-    const id = this.state.counters[index]._id;
-
-    fetch(`/api/counters/${id}`, { method: 'DELETE' })
-      .then(_ => {
-        this._modifyCounter(index, null);
-      });
-  }
-
-  _modifyCounter(index, data) {
-    let prevData = this.state.counters;
-
-    if (data) {
-      prevData[index] = data;
-    } else {
-      prevData.splice(index, 1);
-    }
-
-    this.setState({
-      counters: prevData
-    });
-  }
+    })
+  };
 
   render() {
-		let $userData;
-		let userObject = JSON.parse(localStorage.getItem('user'))
-		console.log(userObject);
-		if (userObject){
-			console.log(userObject.fname)
-			$userData = (<h1>Hello {userObject.fname} {userObject.lname}!</h1>)
-		}
-    return (
-      <div>
-			{$userData}
-        <p>Counters:</p>
 
-        <ul>
-          { this.state.counters.map((counter, i) => (
-            <li key={i}>
-              <span>{counter.count} </span>
-              <button onClick={() => this.incrementCounter(i)}>+</button>
-              <button onClick={() => this.decrementCounter(i)}>-</button>
-              <button onClick={() => this.deleteCounter(i)}>x</button>
-            </li>
-          )) }
-        </ul>
-
-        <button onClick={this.newCounter}>New counter</button>
+    if (this.state.user) {
+      return (<div>
+        {console.log("here!", this.state.user)}
+        {this.state.user.fname}
+        <p>{this.state.user.school}</p>
+        {this.state.user.classList.map((subject, index) => (
+          <p key={index}>{subject}</p>
+        ))}
+      <div id="editProfileButton">
+        <div className="control">
+          <Link to="/EditProfile">Edit Profile</Link>
+        </div>
       </div>
-    );
+      </div>);
+
+    } else {
+      return (<div>
+        <h1>Please wait</h1>
+      </div>)
+    }
+
   }
 }
 

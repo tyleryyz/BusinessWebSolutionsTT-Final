@@ -1,39 +1,49 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
-import { withRouter } from 'react-router';
+import {withRouter} from 'react-router';
 import '../../styles/bulma.css';
+var firebase = require('firebase');
+var firebaseui = require('firebaseui');
 
 class LogIn extends Component {
-
-	constructor(props) {
+  constructor(props) {
     super(props);
-
-    this.state = {
-      user: {}
-    };
-		this.handleLogIn = this.handleLogIn.bind(this)
-
-
+    this.handleLogIn = this.handleLogIn.bind(this)
   }
+
   handleLogIn(e) {
     e.preventDefault();
-		let apiResponse;
     const email = e.target.elements.email.value;
-		const password = e.target.elements.password.value;
-		fetch(`/api/users?email=${email}&password=${password}`, {
-													headers: {"Content-Type": "Application/json"},
-													method: 'GET'
-												})
-												.then(res => res.json())
-								       	.then(json => {
-													localStorage.setItem('user', JSON.stringify(json));
-								         this.setState({
-								           user: json
-								         });
-												 this.props.history.push('/');
-								       });
+    const password = e.target.elements.password.value;
+    firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+      console.log("it broked");
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      console.log(errorCode)
+      console.log(errorMessage)
+    });
+    let user = firebase.auth().currentUser
+    this.props.update(user);
 
-	}
+  }
+  //this.props.update(e, true, "tyler");
+
+  // 	let apiResponse;
+  //   const email = e.target.elements.email.value;
+  // 	const password = e.target.elements.password.value;
+  // 	fetch(`/api/users?email=${email}&password=${password}`, {
+  // 												headers: {"Content-Type": "Application/json"},
+  // 												method: 'GET'
+  // 											})
+  // 											.then(res => res.json())
+  // 							       	.then(json => {
+  // 												localStorage.setItem('user', JSON.stringify(json));
+  // 							         this.setState({
+  // 							           user: json
+  // 							         });
+  // 											 this.props.history.push('/');
+  // 							       });
+  //
 
   render() {
     return (<form onSubmit={this.handleLogIn}>
@@ -62,9 +72,10 @@ class LogIn extends Component {
               Sign Up!
             </Link>
         }
+        <p>{this.props.user}</p>
       </div>
-    </form>
-	);
+    </form>);
+
   }
 }
 
