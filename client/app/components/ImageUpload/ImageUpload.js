@@ -61,6 +61,16 @@ var keyName = 'hello_world.txt';
 let file;
 var filename;
 
+var params = {
+  Bucket: bucketName, /* required */
+  Prefix: 'Images'
+};
+
+s3.listObjectsV2(params, function(err, data) {
+  if (err) console.log(err, err.stack); // an error occurred
+  else     console.log(data);           // successful response
+});
+
 function sendTheEmail()
 {
 
@@ -209,7 +219,7 @@ class ImageUpload extends React.Component {
     let $imagePreview = null;
 
     if (imagePreviewUrl) {
-      $imagePreview = (<img src={imagePreviewUrl}/>)
+      $imagePreview = (<img src={imagePreviewUrl}/>);
     } else {
       $imagePreview = (<div className="previewText">Please upload your question image!
       (Acceptable formats: jpg., .jpeg, .png)</div>);
