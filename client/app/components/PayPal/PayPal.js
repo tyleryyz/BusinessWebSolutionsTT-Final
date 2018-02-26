@@ -13,8 +13,8 @@ class PayPal extends React.Component{
 
         let client = {
 			// DELETE THESE BEFORE PUSHING IF MAKING ANY CHANGES TO THIS FILE
-            sandbox: ,
-            production: 
+            sandbox: null,
+            production: null
         };
 
         let payment = (data, actions) => {
