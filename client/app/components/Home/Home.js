@@ -45,9 +45,10 @@ class Home extends Component {
         {console.log("here!", this.state.user)}
         {this.state.user.fname}
         <p>{this.state.user.school}</p>
-        {this.state.user.classList.map((subject, index) => (
-          <p key={index}>{subject}</p>
-        ))}
+        {//this.state.user.classList.map((subject, index) => (
+          //<p key={index}>{subject}</p>
+        //))
+      }
       <div id="editProfileButton">
         <div className="control">
           <Link to="/EditProfile">Edit Profile</Link>
@@ -57,6 +58,7 @@ class Home extends Component {
 
     } else {
       return (<div>
+        {console.log("here")}
         <h1>Please wait</h1>
       </div>)
     }
