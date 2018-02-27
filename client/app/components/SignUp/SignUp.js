@@ -118,7 +118,7 @@ class SignUp extends Component {
             </div>
             <div id="cancelButton">
               <div className="control">
-                <Link to="/">Cancel</Link>
+                <Link to="/login">Login</Link>
               </div>
             </div>
           </div>

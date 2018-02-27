@@ -96,7 +96,11 @@ class LogIn extends Component {
   //
 
   render() {
-    return (<div>
+    return (<div className="container">
+    <p>log in with Facebook</p>
+    <button onClick={this.handleFacebookLogin}>|F| Login with Facebook</button>
+    <p>Or email and password</p>
+    <br />
       <form onSubmit={this.handleLogIn}>
         <div className="container">
           <div className="box">
@@ -123,10 +127,9 @@ class LogIn extends Component {
                 Sign Up!
               </Link>
           }
-          <p>log in with Facebook</p>
+
         </div>
       </form>
-      <button onClick={this.handleFacebookLogin}>Sign up with Facebook</button>
     </div>);
 
   }
