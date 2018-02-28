@@ -169,6 +169,7 @@ class ImageUpload extends React.Component {
       Body: file
     };
 
+    let key = keyName+uploadName;
     s3.putObject(params, function(err, data) {
       if (err)
       {
@@ -182,8 +183,18 @@ class ImageUpload extends React.Component {
         subject = "Submission Received!";
         message = "We have received your image submission of: "+filename+"!";
         sendTheEmail();
+
       }
+    })
+
+    fetch('/api/images', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify({clientID: this.state.user.uID, imageURL: key, status: "open", tutorID: null, course: null})
     });
+  
 
     console.log('Handling uploading, data presented: ', this.state.file);
 
@@ -225,11 +236,12 @@ class ImageUpload extends React.Component {
         <button className="submitButton" type="submit" onClick={(e) => this._handleSubmit(e)}>Upload Image</button>
       </form>
     </div>)
-
+    if (this.state.user && this.state.user){
     return (<div>
       {$pageData}
     </div>)
-  }
+  } else {return (<p>Please Wait</p>)}
+}
 }
 
 export default ImageUpload;
