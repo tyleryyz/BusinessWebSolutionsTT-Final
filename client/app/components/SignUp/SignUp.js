@@ -41,7 +41,7 @@ class SignUp extends Component {
         headers: {
           "Content-Type": "Application/json"
         },
-        body: JSON.stringify({fname: fname, lname: lname, email: email, uID: uID, school: school, classList: classList})
+        body: JSON.stringify({fname: fname, lname: lname, email: email, uID: uID, school: school, permission: "Student"})
       });
     }).catch(function(error) {
       // Handle Errors here.
@@ -83,19 +83,6 @@ class SignUp extends Component {
           </div>
 
           <div className="field">
-            <div className="control">
-              <label className="radio">
-                <input type="radio" value="student" name="permission"/>
-                Student
-              </label>
-              <label className="radio">
-                <input type="radio" value="tutor" name="permission"/>
-                Tutor
-              </label>
-            </div>
-          </div>
-
-          <div className="field">
 					  <div className="control">
 						<label className="radio">
 							<input type="radio" value="Northern Arizona University" name="school"/>
@@ -131,7 +118,7 @@ class SignUp extends Component {
             </div>
             <div id="cancelButton">
               <div className="control">
-                <Link to="/">Cancel</Link>
+                <Link to="/login">Login</Link>
               </div>
             </div>
           </div>

@@ -18,6 +18,7 @@ class Admin extends Component {
     this.handleAddTutor = this.handleAddTutor.bind(this);
     this.getUserData = this.getUserData.bind(this);
     this.changePermission = this.changePermission.bind(this);
+    this.removePermission = this.removePermission.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
     this.cancelDelete = this.cancelDelete.bind(this);
     this.cancelPermissionChange = this.cancelPermissionChange.bind(this);
@@ -66,9 +67,6 @@ class Admin extends Component {
         this.setState({loaded: true})
       });
     })
-
-
-
   }
 
   handleAddTutor(e){
@@ -85,6 +83,18 @@ class Admin extends Component {
     })
   }
 
+  handleAddSchool(e){
+    e.preventDefault();
+    const name = e.target.elements.name.value;
+    fetch('/api/schools', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify({name: name})
+    });
+  }
+
   changePermission(e) {
     e.preventDefault();
     const email = this.state.changeUserData.email;
@@ -94,6 +104,25 @@ class Admin extends Component {
         "Content-Type": "Application/json"
       },
       body: JSON.stringify({permission: "Tutor"})
+    }).then((user) => {
+      this.setState({
+        changeUserData: null,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      });
+    })
+  }
+
+  removePermission(e) {
+    e.preventDefault();
+    const email = this.state.changeUserData.email;
+    fetch(`/api/users?email=${email}`, {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify({permission: "Student"})
     }).then((user) => {
       this.setState({
         changeUserData: null,
@@ -151,7 +180,10 @@ class Admin extends Component {
           <p>Email: {this.state.changeUserData.email}</p>
           <p>Permission: {this.state.changeUserData.permission}</p>
           <button className="button is-warning">
-            Confirm permission change
+            Grant tutor permission
+          </button>
+          <button onClick={this.removePermission} className="button is-danger">
+            Revoke tutor permission
           </button>
           <button onClick={this.cancelPermissionChange} className="button is-success">
             cancel
@@ -225,6 +257,26 @@ class Admin extends Component {
             </div>
           </form>
           {$data}
+          <br/>
+          <form onSubmit={this.handleAddSchool}>
+            <div className="container">
+            <p>Add school</p>
+              <div className="box">
+                <div className="field">
+                  <p className="control">
+                    <input className="input" name="name" placeholder="School Name"/>
+                  </p>
+                </div>
+              </div>
+              <div className="field">
+                <p className="control">
+                  <button className="button is-outlined is-success">
+                  Add school
+                  </button>
+                </p>
+              </div>
+            </div>
+          </form>
           </div>);
       }
       else if (!(this.state.adminUser.permission === "Admin") && this.state.loaded) {

@@ -18,9 +18,6 @@ const UserSchema = new mongoose.Schema({
   school: {
     type: String
   },
-  classList: {
-    type: Array
-  },
   permission: {
     type: String
 }
