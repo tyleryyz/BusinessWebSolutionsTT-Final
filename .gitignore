@@ -8,5 +8,6 @@ ses_config.json
 /dist/js/app.js
 /MERN-boilerplate.zip
 /config/fbconfig.js
+/config/facebookScripts.html
 package-lock.json
 /client/app/index.js
