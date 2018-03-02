@@ -1,21 +1,24 @@
 const mongoose = require('mongoose');
 
 const ImageSchema = new mongoose.Schema({
-  clientID: {
-    type: String,
-    unique: true
+  clientUID: {
+    type: String
   },
   imageURL: {
-    type: String
+    type: String,
+    unique: true
   },
   status: {
     type: String
   },
-  tutorID: {
+  tutorUID: {
     type: String
   },
   course: {
     type: String
+  },
+  timestamp: {
+    type: Number
   }
 });
 

@@ -110,9 +110,12 @@ class ImageUpload extends React.Component {
       file: '',
       imagePreviewUrl: '',
       user: null,
-      loaded: false
+      loaded: false,
+      courses: null
     };
-    this.getData = this.getData.bind(this)
+    this.getData = this.getData.bind(this);
+    this.getCourses = this.getCourses.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   getData() {
@@ -134,16 +137,29 @@ class ImageUpload extends React.Component {
         loaded: false
       }, () => {
         this.setState({loaded: true})
-      });
+      })
+      }).then(()=>{this.getCourses().then((courses) => {
+        console.log("courses", courses)
+        this.setState({
+          courses: courses,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+        })
     })
+  })
+
   };
 
   // When the Upload image button is clicked
-  _handleSubmit(e) {
+  handleSubmit(e) {
+    e.preventDefault();
+    const course = e.target.elements.course.value;
+
     filename = this.state.file.name;
     var d = new Date();
-    var n = d.getTime();
-    var uploadName = this.props.user.uid+'-'+n;
+    var timestamp = d.getTime();
+    var uploadName = this.props.user.uid+'-'+timestamp;
     email = this.props.user.email;
 
     var extension = filename.split(".");
@@ -162,7 +178,6 @@ class ImageUpload extends React.Component {
         keyName = "Videos/"
     }
 
-    e.preventDefault();
     var params = {
       Bucket: bucketName,
       Key: keyName+uploadName,
@@ -170,32 +185,32 @@ class ImageUpload extends React.Component {
     };
 
     let key = keyName+uploadName;
-    s3.putObject(params, function(err, data) {
-      if (err)
-      {
-        console.log(err)
-      }
-      else
-      {
-        console.log("Successfully uploaded data to " + bucketName + "Images/" + uploadName);
-        firstname = "this.props.user.firstname";
-        lastname = "this.props.user.lastname";
-        subject = "Submission Received!";
-        message = "We have received your image submission of: "+filename+"!";
-        sendTheEmail();
+    // s3.putObject(params, function(err, data) {
+    //   if (err)
+    //   {
+    //     console.log(err)
+    //   }
+    //   else
+    //   {
+    //     console.log("Successfully uploaded data to " + bucketName + "Images/" + uploadName);
+    //     firstname = "this.props.user.firstname";
+    //     lastname = "this.props.user.lastname";
+    //     subject = "Submission Received!";
+    //     message = "We have received your image submission of: "+filename+"!";
+    //     sendTheEmail();
+    //
+    //   }
+    // })
 
-      }
-    })
-
-    fetch('/api/images', {
+    let image = fetch(`/api/images`, {
       method: 'POST',
       headers: {
         "Content-Type": "Application/json"
       },
-      body: JSON.stringify({clientID: this.state.user.uID, imageURL: key, status: "open", tutorID: null, course: null})
+      body: JSON.stringify({clientUID: this.state.user.uID, imageURL: key, status: "open", tutorUID: null, course: course, timestamp: timestamp})
     });
-  
 
+    console.log(image)
     console.log('Handling uploading, data presented: ', this.state.file);
 
   }
@@ -214,6 +229,15 @@ class ImageUpload extends React.Component {
     reader.readAsDataURL(file)
   }
 
+  getCourses() {
+    console.log("inside courses")
+    return (fetch(`/api/courses`, {
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      method: 'GET'
+    }).then(res => res.json()));
+  }
   // Render the screen in HTML
   render() {
     let {imagePreviewUrl} = this.state;
@@ -227,16 +251,27 @@ class ImageUpload extends React.Component {
     }
 
     let $pageData;
+    if (this.state.courses){
     $pageData = (<div className="previewComponent">
-      <form onSubmit={(e) => this._handleSubmit(e)}>
+      <form onSubmit={this.handleSubmit}>
         <input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/><br /><br />
         <div className="imgPreview">
           {$imagePreview}
         </div><br />
-        <button className="submitButton" type="submit" onClick={(e) => this._handleSubmit(e)}>Upload Image</button>
+        <button className="submitButton" type="submit">Upload Image</button>
+        <p>Select course tag</p>
+        <div className="select">
+          <select name="course">
+          {this.state.courses.map((course, index) => (
+            <option key={index}>{course.name}</option>
+          ))}
+          </select>
+          <br />
+        </div>
       </form>
     </div>)
-    if (this.state.user && this.state.user){
+  } else {$pageData = (<p>Please Wait</p>)}
+    if (this.state.user && this.state.user && this.state.courses){
     return (<div>
       {$pageData}
     </div>)
