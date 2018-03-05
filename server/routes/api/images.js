@@ -35,7 +35,9 @@ module.exports = (app) => {
     }
     else if (req.query.status){
       Image.find({status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
-    }
+    } else {
+		Image.find().exec().then((image) => res.json(image)).catch((err) => next(err));
+	}
   });
 
   app.post('/api/images', function(req, res, next) {

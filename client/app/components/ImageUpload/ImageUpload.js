@@ -269,7 +269,7 @@ class ImageUpload extends React.Component {
     $pageData = (<div className="previewComponent">
       <form onSubmit={this.handleSubmit}>
         <input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/><br /><br />
-        <div className="imgPreview">
+        <div className="imgPreview" width="480" height="480">
           {$imagePreview}
         </div><br />
         <button className="submitButton" type="submit">Upload Image</button>
