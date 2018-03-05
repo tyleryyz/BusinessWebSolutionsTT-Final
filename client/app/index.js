@@ -18,7 +18,6 @@ var firebase = require('firebase');
 
 // var fbconfig = 
 
-
 firebase.initializeApp(fbconfig);
 
 class Index extends Component {

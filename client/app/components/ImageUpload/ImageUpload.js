@@ -159,6 +159,7 @@ class ImageUpload extends React.Component {
     filename = this.state.file.name;
     var d = new Date();
     var timestamp = d.getTime();
+	var timestampStr = timestamp.toString();
     var uploadName = this.props.user.uid+'-'+timestamp;
     email = this.props.user.email;
 
@@ -207,10 +208,18 @@ class ImageUpload extends React.Component {
       headers: {
         "Content-Type": "Application/json"
       },
-      body: JSON.stringify({clientUID: this.state.user.uID, imageURL: key, status: "open", tutorUID: null, course: course, timestamp: timestamp})
+      body: JSON.stringify({
+		  clientUID: this.state.user.uID,
+		  imageURL: key,
+		  status: "open",
+		  tutorUID: null,
+		  course: course,
+		  videoURL: timestampStr,
+		  purchased: 0,
+		  timestamp: timestamp})
     });
 
-    console.log(image)
+    console.log(image);
     console.log('Handling uploading, data presented: ', this.state.file);
 
   }

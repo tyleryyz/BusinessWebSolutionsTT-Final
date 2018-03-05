@@ -21,7 +21,12 @@ module.exports = (app) => {
     else if (req.query.tutorUID){
       Image.find({tutorUID: req.query.tutorUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
-
+	else if (req.query.videoURL){
+      Image.find({videoURL: req.query.videoURL}).exec().then((image) => res.json(image)).catch((err) => next(err));
+    }
+	else if (req.query.purchased){
+      Image.find({purchased: req.query.purchased}).exec().then((image) => res.json(image)).catch((err) => next(err));
+    }
     else if (req.query.status){
       Image.find({status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
@@ -35,6 +40,8 @@ module.exports = (app) => {
     image.tutorUID = req.body.tutorUID;
     image.course = req.body.course;
     image.timestamp = req.body.timestamp;
+	image.videoURL = req.body.videoURL;
+	image.purchased = req.body.purchased;
 
     image.save().then(() => res.json(image)).catch((err) => next(err));
   });
@@ -46,11 +53,17 @@ module.exports = (app) => {
 
   app.put('/api/images', function(req, res, next) {
     if (req.body.status){
-    Image.updateOne({imageURL: req.query.imageURL}, {$set: { status: req.body.status}}).then((image) => res.json()).catch((err) => next(err));
+		Image.updateOne({imageURL: req.query.imageURL}, {$set: { status: req.body.status}}).then((image) => res.json()).catch((err) => next(err));
     }
     if (req.body.tutorUID){
-      Image.updateOne({imageURL: req.query.imageURL}, {$set: { tutorUID: req.body.tutorUID}}).then((image) => res.json()).catch((err) => next(err));
+        Image.updateOne({imageURL: req.query.imageURL}, {$set: { tutorUID: req.body.tutorUID}}).then((image) => res.json()).catch((err) => next(err));
     }
-  })
+	if (req.body.videoURL){
+		Image.updateOne({imageURL: req.query.imageURL}, {$set: { videoURL: req.body.videoURL}}).then((image) => res.json()).catch((err) => next(err));
+    }
+	if (req.body.purchased){
+		Image.updateOne({imageURL: req.query.imageURL}, {$set: { purchased: req.body.purchased}}).then((image) => res.json()).catch((err) => next(err));
+    }
+  });
 
 };

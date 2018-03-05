@@ -8,6 +8,10 @@ const ImageSchema = new mongoose.Schema({
     type: String,
     unique: true
   },
+  videoURL: {
+    type: String,
+    unique: true
+  },
   status: {
     type: String
   },
@@ -16,6 +20,9 @@ const ImageSchema = new mongoose.Schema({
   },
   course: {
     type: String
+  },
+  purchased: {
+	type: Number
   },
   timestamp: {
     type: Number

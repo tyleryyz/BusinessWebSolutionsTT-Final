@@ -209,7 +209,8 @@ class Home extends Component {
           </div>
 
           {
-            this.state.images.map((image, index) => (<form onSubmit={(e) => this.handleClaim(e, image)} key={index}>
+            this.state.images.map((image, index) => (
+			<form onSubmit={(e) => this.handleClaim(e, image)} key={index}>
               <p>{$image = this.getImage(image.imageURL)}</p>
               <p>{image.clientUID}</p>
               <p>{$date = this.getDateInformation(image.timestamp)}</p>
