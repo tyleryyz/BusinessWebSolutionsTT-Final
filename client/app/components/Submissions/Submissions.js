@@ -111,7 +111,7 @@ function sendTheEmail()
 }
 
 // Will render a profile image, user name, user class list, user school,
-class Claims extends Component {
+class Submissions extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -126,7 +126,7 @@ class Claims extends Component {
     this.getData = this.getData.bind(this);
     this.getImageData = this.getImageData.bind(this);
     this.filterClaims = this.filterClaims.bind(this);
-	this.submitVideo = this.submitVideo.bind(this);
+	  this.submitVideo = this.submitVideo.bind(this);
     this.compare = this.compare.bind(this);
   }
 
@@ -196,7 +196,7 @@ class Claims extends Component {
 
   getImageData() {
     console.log("here", this.state.uID)
-    return (fetch(`/api/images?tutorUID=${this.state.user.uID}`, {
+    return (fetch(`/api/images?clientUID=${this.state.user.uID}`, {
       headers: {
         "Content-Type": "Application/json"
       },
@@ -248,9 +248,28 @@ class Claims extends Component {
           this.setState({loaded: true})
         })
       });
-    } else {
+    } else if (course === "completed"){
     console.log(course)
-    return (fetch(`/api/images?course=${course}&tutorUID=${this.state.user.uID}`, {
+    return (fetch(`/api/images?status=${ "completed"}&clientUID=${this.state.user.uID}`, {
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      method: 'GET'
+    }).then(res => res.json()).then((images) => {
+      images.sort(this.compare);
+
+      console.log(images);
+      this.setState({
+        loaded: false,
+        images: images,
+        filterVal: course
+      }, () => {
+        this.setState({loaded: true})
+      })
+    }));
+  } else {
+    console.log(course)
+    return (fetch(`/api/images?course=${course}&clientUID=${this.state.user.uID}`, {
       headers: {
         "Content-Type": "Application/json"
       },
@@ -379,6 +398,7 @@ class Claims extends Component {
           <div className="select">
             <select onChange={this.filterClaims} value={this.state.filterVal} name="course">
               <option value="select">Select</option>
+              <option value="completed">Completed</option>
               {this.state.courses.map((course, index) => (<option key={index}>{course.name}</option>))}
             </select>
           </div>
@@ -412,4 +432,4 @@ class Claims extends Component {
   
 }
 
-export default Claims;
+export default Submissions;

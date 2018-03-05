@@ -18,7 +18,7 @@ var email;
 var message;
 var subject;
 
-fetchTextFile('http://localhost:8080/keys.txt', function(data) {
+fetchTextFile('keys.txt', function(data) {
   updateVars(data)
 });
 
@@ -48,7 +48,11 @@ function updateVars(data) {
 }
 
 // Update the Access Keys
-AWS.config.update({accessKeyId: accessKey.trim(), secretAccessKey: secretAccess.trim(), region: regionArea.trim()});
+AWS.config.update({
+    accessKeyId: accessKey,
+    secretAccessKey: secretAccess,
+    region: regionArea,
+});
 
 // Create an S3 client
 var s3 = new AWS.S3();
@@ -56,8 +60,8 @@ var ses = new AWS.SES();
 
 // Create a bucket and upload something into it
 //var bucketName = 'jjg297-' + uuid.v4();
-var bucketName = 'jjg297-my-first-bucket';
-var keyName = 'hello_world.txt';
+var bucketName = 'tailored-tutoring';
+var keyName;
 let file;
 var filename;
 
@@ -170,6 +174,7 @@ class ImageUpload extends React.Component {
     extension = extension.pop();    // feel free to tack .toLowerCase() here if you want
     uploadName = uploadName+'.'+extension;
     var keyName;
+    extension = extension.toLowerCase();
 
     if(extension=="png" || extension=="jpg" || extension=="jpeg")
     {
@@ -186,22 +191,22 @@ class ImageUpload extends React.Component {
     };
 
     let key = keyName+uploadName;
-    // s3.putObject(params, function(err, data) {
-    //   if (err)
-    //   {
-    //     console.log(err)
-    //   }
-    //   else
-    //   {
-    //     console.log("Successfully uploaded data to " + bucketName + "Images/" + uploadName);
-    //     firstname = "this.props.user.firstname";
-    //     lastname = "this.props.user.lastname";
-    //     subject = "Submission Received!";
-    //     message = "We have received your image submission of: "+filename+"!";
-    //     sendTheEmail();
-    //
-    //   }
-    // })
+    s3.putObject(params, function(err, data) {
+      if (err)
+       {
+         console.log(err)
+       }
+       else
+       {
+         console.log("Successfully uploaded data to " + bucketName + uploadName);
+         firstname = "this.props.user.firstname";
+         lastname = "this.props.user.lastname";
+         subject = "Submission Received!";
+         message = "We have received your image submission of: "+filename+"!";
+         sendTheEmail();
+    
+       }
+     })
 
     let image = fetch(`/api/images`, {
       method: 'POST',

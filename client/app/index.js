@@ -2,14 +2,15 @@ import React, {Component} from 'react';
 import {render} from 'react-dom';
 import {BrowserRouter as Router, Route, Link, Switch, Redirect} from 'react-router-dom'
 
+// Most of these irrelevant?
 import App from './components/App/App';
-import NotFound from './components/App/NotFound';
-import NavBar from './components/NavBar/NavBar'
-import Home from './components/Home/Home';
 import Emailing from './components/Emailing/Emailing';
-import Login from './components/Login/Login';
-import SignUp from './components/SignUp/SignUp';
+import Home from './components/Home/Home';
 import ImageUpload from './components/ImageUpload/ImageUpload';
+import Login from './components/Login/Login';
+import NavBar from './components/NavBar/NavBar';
+import NotFound from './components/App/NotFound';
+import SignUp from './components/SignUp/SignUp';
 import VideoPlayer from './components/VideoPlayer/VideoPlayer';
 
 import './styles/styles.scss';
@@ -17,6 +18,7 @@ import './styles/styles.scss';
 var firebase = require('firebase');
 
 // var fbconfig = 
+
 
 firebase.initializeApp(fbconfig);
 

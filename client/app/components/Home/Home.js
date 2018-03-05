@@ -199,8 +199,8 @@ class Home extends Component {
         let $date;
         return (<div className="container">
           <p>tutor view</p>
-          <Link to="/Claims">View claimed clients</Link>
-
+          <Link to="/Claims">View claimed clients</Link><br />
+          <p>sort by course tag</p>
           <div className="select">
             <select onChange={this.filterImages} value={this.state.filterVal} name="course">
               <option value="select">Select</option>
@@ -212,6 +212,7 @@ class Home extends Component {
             this.state.images.map((image, index) => (
 			<form onSubmit={(e) => this.handleClaim(e, image)} key={index}>
               <p>{$image = this.getImage(image.imageURL)}</p>
+              <img src={"https://s3-us-west-2.amazonaws.com/tailored-tutoring/"+image.imageURL} width="256" height="256"/>
               <p>{image.clientUID}</p>
               <p>{$date = this.getDateInformation(image.timestamp)}</p>
               <button className="button is-success">claim</button>

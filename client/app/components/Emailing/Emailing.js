@@ -10,38 +10,40 @@ var accessKey;
 var secretAccess;
 var regionArea;
 
-fetchTextFile('http://localhost:8080/keys.txt', function(data){updateVars(data)});
+fetchTextFile('keys.txt', function(data) {
+  updateVars(data)
+});
 
-
+// This function is meant to call the server side files and will read
+// from the keys.txt file
 function fetchTextFile(path, callback) {
-    var httpRequest = new XMLHttpRequest();
-    httpRequest.open('GET', path, false);
-    httpRequest.onreadystatechange = function() {
-        if (httpRequest.readyState === 4) {
-            if (httpRequest.status === 200) {
-                var words = httpRequest.responseText.split('\n');
-                accessKey=words[0];
-                secretAccess=words[1];
-                regionArea=words[2];
-                callback(words);
-            }
-        }
-    };
-    httpRequest.send();
+  var httpRequest = new XMLHttpRequest();
+  httpRequest.open('GET', path, false);
+  httpRequest.onreadystatechange = function() {
+    if (httpRequest.readyState === 4) {
+      if (httpRequest.status === 200) {
+        var words = httpRequest.responseText.split('\n');
+        accessKey = words[0];
+        secretAccess = words[1];
+        regionArea = words[2];
+        callback(words);
+      }
+    }
+  };
+  httpRequest.send();
 }
 
-function updateVars(data)
-{
-  accessKey=data[0];
-  secretAccess=data[1];
-  regionArea=data[2];
+function updateVars(data) {
+  accessKey = data[0];
+  secretAccess = data[1];
+  regionArea = data[2];
 }
 
 // Update the Access Keys
 AWS.config.update({
-    accessKeyId: accessKey.trim(),
-    secretAccessKey: secretAccess.trim(),
-    region: regionArea.trim(),
+    accessKeyId: accessKey,
+    secretAccessKey: secretAccess,
+    region: regionArea,
 });
 
 // Create the emailer object

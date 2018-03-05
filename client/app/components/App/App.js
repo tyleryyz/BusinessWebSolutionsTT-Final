@@ -18,6 +18,7 @@ import VideoPlayer from '../VideoPlayer/VideoPlayer';
 import Admin from '../Admin/Admin';
 import EditProfile from '../EditProfile/EditProfile';
 import Claims from '../Claims/Claims';
+import Submissions from '../Submissions/Submissions';
 
 import '../../styles/styles.scss';
 var firebase = require('firebase');
@@ -37,6 +38,7 @@ class App extends Component {
         <Route path="/tt-admin" render={() => <Admin user={this.props.user}/>}/>
         <Route exact path="/" render={() => <Home user={this.props.user}/>}/>
         <Route path="/Claims" render={() => <Claims user={this.props.user}/>}/>
+        <Route path="/Submissions" render={() => <Submissions user={this.props.user}/>}/>
 
         <Route path="/Emailing" render={() => <Emailing user={this.props.user}/>}/>
         <Route path="/imageupload" render={() => <ImageUpload user={this.props.user}/>}/>

@@ -6,7 +6,13 @@ module.exports = (app) => {
   app.use(bodyParser.urlencoded({extended: false}));
 
   app.get('/api/images', function(req, res, next) {
-    if (req.query.clientUID){
+    if (req.query.course && req.query.clientUID){
+      Image.find({course: req.query.course, clientUID: req.query.clientUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
+    }
+    else if (req.query.status && req.query.clientUID){
+      Image.find({status: req.query.status, clientUID: req.query.clientUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
+    }
+    else if (req.query.clientUID){
       Image.find({clientUID: req.query.clientUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
     else if (req.query.course && req.query.tutorUID){
