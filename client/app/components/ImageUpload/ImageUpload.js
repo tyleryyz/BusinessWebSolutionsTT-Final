@@ -185,22 +185,22 @@ class ImageUpload extends React.Component {
     };
 
     let key = keyName+uploadName;
-    // s3.putObject(params, function(err, data) {
-    //   if (err)
-    //   {
-    //     console.log(err)
-    //   }
-    //   else
-    //   {
-    //     console.log("Successfully uploaded data to " + bucketName + "Images/" + uploadName);
-    //     firstname = "this.props.user.firstname";
-    //     lastname = "this.props.user.lastname";
-    //     subject = "Submission Received!";
-    //     message = "We have received your image submission of: "+filename+"!";
-    //     sendTheEmail();
-    //
-    //   }
-    // })
+    s3.putObject(params, function(err, data) {
+      if (err)
+      {
+        console.log(err)
+      }
+      else
+      {
+        console.log("Successfully uploaded data to " + bucketName + "Images/" + uploadName);
+        firstname = "this.props.user.firstname";
+        lastname = "this.props.user.lastname";
+        subject = "Submission Received!";
+        message = "We have received your image submission of: "+filename+"!";
+        sendTheEmail();
+
+      }
+    })
 
     let image = fetch(`/api/images`, {
       method: 'POST',
@@ -255,7 +255,7 @@ class ImageUpload extends React.Component {
     $pageData = (<div className="previewComponent">
       <form onSubmit={this.handleSubmit}>
         <input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/><br /><br />
-        <div className="imgPreview">
+        <div className="imgPreview image is-128x128">
           {$imagePreview}
         </div><br />
         <button className="submitButton" type="submit">Upload Image</button>

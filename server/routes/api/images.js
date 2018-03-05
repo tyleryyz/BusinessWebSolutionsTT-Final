@@ -25,6 +25,9 @@ module.exports = (app) => {
     else if (req.query.status){
       Image.find({status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
+    else {
+      Image.find().exec().then((image) => res.json(image)).catch((err) => next(err));
+    }
   });
 
   app.post('/api/images', function(req, res, next) {
@@ -46,7 +49,7 @@ module.exports = (app) => {
 
   app.put('/api/images', function(req, res, next) {
     if (req.body.status){
-    Image.updateOne({imageURL: req.query.imageURL}, {$set: { status: req.body.status}}).then((image) => res.json()).catch((err) => next(err));
+      Image.updateOne({imageURL: req.query.imageURL}, {$set: { status: req.body.status}}).then((image) => res.json()).catch((err) => next(err));
     }
     if (req.body.tutorUID){
       Image.updateOne({imageURL: req.query.imageURL}, {$set: { tutorUID: req.body.tutorUID}}).then((image) => res.json()).catch((err) => next(err));

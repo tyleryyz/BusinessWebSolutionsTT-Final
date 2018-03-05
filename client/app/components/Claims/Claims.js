@@ -210,6 +210,15 @@ class Claims extends Component {
         }, () => {
           this.setState({loaded: true})
         })
+        this.getImageURL(images).then((urlArray) => {
+          console.log("after get image?", urlArray)
+          this.setState({
+            downloadURL: urlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
       });
     } else {
       console.log(course)
