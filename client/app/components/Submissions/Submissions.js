@@ -2,11 +2,10 @@ import React, {Component} from 'react';
 import 'whatwg-fetch';
 import {Link} from 'react-router-dom';
 
-var firebase = require('firebase');
-
 // Load the SDK and UUID
 var AWS = require('aws-sdk');
 var uuid = require('node-uuid');
+var firebase = require('firebase');
 
 // Init variables for the S3 object
 var accessKey;
@@ -20,12 +19,11 @@ var email;
 var message;
 var subject;
 
-fetchTextFile('keys.txt', function(data) {
+
+fetchTextFile('http://localhost:8080/keys.txt', function(data) {
   updateVars(data)
 });
 
-// This function is meant to call the server side files and will read
-// from the keys.txt file
 function fetchTextFile(path, callback) {
   var httpRequest = new XMLHttpRequest();
   httpRequest.open('GET', path, false);
@@ -50,23 +48,16 @@ function updateVars(data) {
 }
 
 // Update the Access Keys
-AWS.config.update({
-    accessKeyId: accessKey,
-    secretAccessKey: secretAccess,
-    region: regionArea,
-});
+AWS.config.update({accessKeyId: accessKey.trim(), secretAccessKey: secretAccess.trim(), region: regionArea.trim()});
 
 // Create an S3 client
 var s3 = new AWS.S3();
 var ses = new AWS.SES();
 
-// Create a bucket and upload something into it
-//var bucketName = 'jjg297-' + uuid.v4();
 var bucketName = 'tailored-tutoring';
 var keyName;
 let file;
 var filename;
-
 
 function sendTheEmail()
 {
@@ -120,14 +111,16 @@ class Submissions extends Component {
       loaded: false,
       images: null,
       courses: null,
-      filterVal: 'select'
+      filterVal: 'select',
+      downloadURL: null
     };
 	
     this.getData = this.getData.bind(this);
     this.getImageData = this.getImageData.bind(this);
-    this.filterClaims = this.filterClaims.bind(this);
-	  this.submitVideo = this.submitVideo.bind(this);
+	this.filterClaims = this.filterClaims.bind(this);
+    this.submitVideo = this.submitVideo.bind(this);
     this.compare = this.compare.bind(this);
+    this.getImageURL = this.getImageURL.bind(this);
   }
 
   getData() {
@@ -145,8 +138,6 @@ class Submissions extends Component {
       console.log("will mount here", user)
       this.setState({
         user: user,
-		firstname: user.fname,
-		lastname: user.lname,
         loaded: false
       }, () => {
         this.setState({loaded: true})
@@ -159,6 +150,15 @@ class Submissions extends Component {
           images: images
         }, () => {
           this.setState({loaded: true})
+        })
+        this.getImageURL(images).then((urlArray) => {
+          console.log("after get image?", urlArray)
+          this.setState({
+            downloadURL: urlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
         })
       });
     }).then(() => {
@@ -174,8 +174,8 @@ class Submissions extends Component {
     })
   };
 
-  compare(a,b) {
-    if (a.timestamp < b.timestamp){
+  compare(a, b) {
+    if (a.timestamp < b.timestamp) {
       return -1;
     }
     if (a.timestamp > b.timestamp) {
@@ -196,7 +196,7 @@ class Submissions extends Component {
 
   getImageData() {
     console.log("here", this.state.uID)
-    return (fetch(`/api/images?clientUID=${this.state.user.uID}`, {
+    return (fetch(`/api/images?tutorUID=${this.state.user.uID}`, {
       headers: {
         "Content-Type": "Application/json"
       },
@@ -204,26 +204,44 @@ class Submissions extends Component {
     }).then(res => res.json()));
   }
 
-  getImage(imageURL) {
-      var getParams = {
+  async getImageURL(images) {
+    let urlArray = new Array();
+    let downloadURL;
+    let url;
+    console.log("images", images)
+    images.map((image, index) => {
+      var params = {
         Bucket: bucketName,
-        Key: imageURL
-      }
-        
-      s3.getObject(getParams, function(err, data) {
-        if (err){ console.log(err, err.stack); }
-        else{ console.log(data); return data}
-    });
+        Key: image.imageURL
+      };
+
+    url = s3.getSignedUrl('getObject', params)
+    console.log(url)
+
+      urlArray.push(url)
+
+
+    })
+  return urlArray
+
   }
 
-  getDateInformation(timestamp){
+  getDateInformation(timestamp) {
     let date = new Date(timestamp);
     var monthNames = [
-    "January", "February", "March",
-    "April", "May", "June", "July",
-    "August", "September", "October",
-    "November", "December"
-  ];
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ];
 
     var day = date.getDate();
     var monthIndex = date.getMonth();
@@ -236,7 +254,7 @@ class Submissions extends Component {
     e.preventDefault();
     console.log("inside filter")
     const course = e.target.value;
-    if (course === "select"){
+    if (course === "select") {
       this.getImageData().then((images) => {
         images.sort(this.compare);
 
@@ -247,48 +265,38 @@ class Submissions extends Component {
         }, () => {
           this.setState({loaded: true})
         })
+        this.getImageURL(images).then((urlArray) => {
+          console.log("after get image?", urlArray)
+          this.setState({
+            downloadURL: urlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
       });
-    } else if (course === "completed"){
-    console.log(course)
-    return (fetch(`/api/images?status=${ "completed"}&clientUID=${this.state.user.uID}`, {
-      headers: {
-        "Content-Type": "Application/json"
-      },
-      method: 'GET'
-    }).then(res => res.json()).then((images) => {
-      images.sort(this.compare);
+    } else {
+      console.log(course)
+      return (fetch(`/api/images?course=${course}&tutorUID=${this.state.user.uID}`, {
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        method: 'GET'
+      }).then(res => res.json()).then((images) => {
+        images.sort(this.compare);
 
-      console.log(images);
-      this.setState({
-        loaded: false,
-        images: images,
-        filterVal: course
-      }, () => {
-        this.setState({loaded: true})
-      })
-    }));
-  } else {
-    console.log(course)
-    return (fetch(`/api/images?course=${course}&clientUID=${this.state.user.uID}`, {
-      headers: {
-        "Content-Type": "Application/json"
-      },
-      method: 'GET'
-    }).then(res => res.json()).then((images) => {
-      images.sort(this.compare);
+        console.log(images);
+        this.setState({
+          loaded: false,
+          images: images,
+          filterVal: course
+        }, () => {
+          this.setState({loaded: true})
+        })
+      }));
+    }
+  }
 
-      console.log(images);
-      this.setState({
-        loaded: false,
-        images: images,
-        filterVal: course
-      }, () => {
-        this.setState({loaded: true})
-      })
-    }));
-  }
-  }
-  
   _handleFileChange(e) {
     e.preventDefault();
 
@@ -306,7 +314,7 @@ class Submissions extends Component {
 	  
 	e.preventDefault();
 	
-	email = this.props.user.email;
+	email = this.state.user.email;
 	firstname = this.state.user.fname;
 	lastname = this.state.user.lname;
 	
@@ -387,10 +395,9 @@ class Submissions extends Component {
   render() {
 
     if (this.state.user && this.state.loaded) {
-      if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses) {
-        var $image;
-        var $date;
-		    var $imageURL;
+      if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses && this.state.downloadURL) {
+        let $image;
+        let $date;
         return (<div className="container">
           <p>tutor view</p>
           <Link to="/Dashboard">Back to dashboard</Link>
@@ -398,21 +405,31 @@ class Submissions extends Component {
           <div className="select">
             <select onChange={this.filterClaims} value={this.state.filterVal} name="course">
               <option value="select">Select</option>
-              <option value="completed">Completed</option>
               {this.state.courses.map((course, index) => (<option key={index}>{course.name}</option>))}
             </select>
           </div>
+
           {
-            this.state.images.map((image, index) => (
-              <div key={index}>
-            <img src={"https://s3-us-west-2.amazonaws.com/tailored-tutoring/"+image.imageURL} width="256" height="256"/>
-          <p>{$date = this.getDateInformation(image.timestamp)}</p>
-				  <p>{$imageURL = image.imageURL}</p>
-				  
+            this.state.images.map((image, index) => (<div key={index}>
+              <form>
+                {console.log("renderImage", this.state.downloadURL[index])}
+                <div className="card">
+                  <a href={this.state.downloadURL[index]} download>click here to download image</a>
+
+                  <div className="card-content"></div>
+                  <div className="media-content">
+                    <p className="title is-4">{image.clientUID}</p>
+                    <p className="subtitle is-6">{image.course}</p>
+                  </div>
+                  <div className="content">
+                    {$date = this.getDateInformation(image.timestamp)}
+                  </div>
 				  <input className="fileInput" type="file" onChange={(e) => this._handleFileChange(e)}/><br />
-				  <button className="submitButton" onClick={(e) => this.submitVideo(e, image)}>submit video</button>
-          <br />
-        </div>))
+                  <button className="button is-success" onClick={(e) => this.submitVideo(e, image)}>submit video</button>
+                </div>
+              </form>
+              <br/>
+            </div>))
           }
         </div>)
       } else if (!this.state.user.permission === "Tutor") {
@@ -429,7 +446,6 @@ class Submissions extends Component {
     }
 
   }
-  
 }
 
 export default Submissions;

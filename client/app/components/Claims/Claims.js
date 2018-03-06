@@ -3,12 +3,9 @@ import 'whatwg-fetch';
 import {Link} from 'react-router-dom';
 
 var firebase = require('firebase');
-
-// Load the SDK and UUID
 var AWS = require('aws-sdk');
 var uuid = require('node-uuid');
 
-// Init variables for the S3 object
 var accessKey;
 var secretAccess;
 var regionArea;
@@ -20,12 +17,11 @@ var email;
 var message;
 var subject;
 
-fetchTextFile('keys.txt', function(data) {
+
+fetchTextFile('http://localhost:8080/keys.txt', function(data) {
   updateVars(data)
 });
 
-// This function is meant to call the server side files and will read
-// from the keys.txt file
 function fetchTextFile(path, callback) {
   var httpRequest = new XMLHttpRequest();
   httpRequest.open('GET', path, false);
@@ -50,23 +46,16 @@ function updateVars(data) {
 }
 
 // Update the Access Keys
-AWS.config.update({
-    accessKeyId: accessKey,
-    secretAccessKey: secretAccess,
-    region: regionArea,
-});
+AWS.config.update({accessKeyId: accessKey.trim(), secretAccessKey: secretAccess.trim(), region: regionArea.trim()});
 
 // Create an S3 client
 var s3 = new AWS.S3();
 var ses = new AWS.SES();
 
-// Create a bucket and upload something into it
-//var bucketName = 'jjg297-' + uuid.v4();
 var bucketName = 'tailored-tutoring';
 var keyName;
 let file;
 var filename;
-
 
 function sendTheEmail()
 {
@@ -109,6 +98,7 @@ function sendTheEmail()
     }
   );
 }
+
 
 // Will render a profile image, user name, user class list, user school,
 class Claims extends Component {
@@ -304,11 +294,24 @@ class Claims extends Component {
     }
   }
   
+  _handleFileChange(e) {
+    e.preventDefault();
+
+    let reader = new FileReader();
+    file = e.target.files[0];
+
+    reader.onloadend = () => {
+      this.setState({file: file, imagePreviewUrl: reader.result});
+    }
+
+    reader.readAsDataURL(file)
+  }
+
   submitVideo(e, image) {
 	  
 	e.preventDefault();
 	
-	email = this.props.user.email;
+	email = this.state.user.email;
 	firstname = this.state.user.fname;
 	lastname = this.state.user.lname;
 	
@@ -386,7 +389,7 @@ class Claims extends Component {
 
   }
 
-    render() {
+  render() {
 
     if (this.state.user && this.state.loaded) {
       if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses && this.state.downloadURL) {
@@ -405,7 +408,7 @@ class Claims extends Component {
 
           {
             this.state.images.map((image, index) => (<div key={index}>
-              <form onClick={this.submitVideo(image)}>
+              <form>
                 {console.log("renderIMage", this.state.downloadURL[index])}
                 <div className="card">
                   <a href={this.state.downloadURL[index]} download>click here to download image</a>
@@ -418,7 +421,8 @@ class Claims extends Component {
                   <div className="content">
                     {$date = this.getDateInformation(image.timestamp)}
                   </div>
-                  <button className="button is-success">submit video</button>
+				  <input className="fileInput" type="file" onChange={(e) => this._handleFileChange(e)}/><br />
+                  <button className="button is-success" onClick={(e) => this.submitVideo(e, image)}>submit video</button>
                 </div>
               </form>
               <br/>

@@ -18,7 +18,7 @@ var email;
 var message;
 var subject;
 
-fetchTextFile('keys.txt', function(data) {
+fetchTextFile('http://localhost:8080/keys.txt', function(data) {
   updateVars(data)
 });
 
@@ -48,11 +48,7 @@ function updateVars(data) {
 }
 
 // Update the Access Keys
-AWS.config.update({
-    accessKeyId: accessKey,
-    secretAccessKey: secretAccess,
-    region: regionArea,
-});
+AWS.config.update({accessKeyId: accessKey.trim(), secretAccessKey: secretAccess.trim(), region: regionArea.trim()});
 
 // Create an S3 client
 var s3 = new AWS.S3();
@@ -61,7 +57,7 @@ var ses = new AWS.SES();
 // Create a bucket and upload something into it
 //var bucketName = 'jjg297-' + uuid.v4();
 var bucketName = 'tailored-tutoring';
-var keyName;
+var keyName = 'hello_world.txt';
 let file;
 var filename;
 
@@ -163,7 +159,6 @@ class ImageUpload extends React.Component {
     filename = this.state.file.name;
     var d = new Date();
     var timestamp = d.getTime();
-	var timestampStr = timestamp.toString();
     var uploadName = this.props.user.uid+'-'+timestamp;
     email = this.props.user.email;
 
@@ -174,7 +169,6 @@ class ImageUpload extends React.Component {
     extension = extension.pop();    // feel free to tack .toLowerCase() here if you want
     uploadName = uploadName+'.'+extension;
     var keyName;
-    extension = extension.toLowerCase();
 
     if(extension=="png" || extension=="jpg" || extension=="jpeg")
     {
@@ -193,20 +187,20 @@ class ImageUpload extends React.Component {
     let key = keyName+uploadName;
     s3.putObject(params, function(err, data) {
       if (err)
-       {
-         console.log(err)
-       }
-       else
-       {
-         console.log("Successfully uploaded data to " + bucketName + uploadName);
-         firstname = "this.props.user.firstname";
-         lastname = "this.props.user.lastname";
-         subject = "Submission Received!";
-         message = "We have received your image submission of: "+filename+"!";
-         sendTheEmail();
-    
-       }
-     })
+      {
+        console.log(err)
+      }
+      else
+      {
+        console.log("Successfully uploaded data to " + bucketName + "Images/" + uploadName);
+        firstname = "this.props.user.firstname";
+        lastname = "this.props.user.lastname";
+        subject = "Submission Received!";
+        message = "We have received your image submission of: "+filename+"!";
+        sendTheEmail();
+
+      }
+    })
 
     let image = fetch(`/api/images`, {
       method: 'POST',
@@ -219,12 +213,12 @@ class ImageUpload extends React.Component {
 		  status: "open",
 		  tutorUID: null,
 		  course: course,
-		  videoURL: timestampStr,
-		  purchased: 0,
-		  timestamp: timestamp})
+		  timestamp: timestamp,
+		  videoURL: timestamp+"",
+		  purchased: 0})
     });
 
-    console.log(image);
+    console.log(image)
     console.log('Handling uploading, data presented: ', this.state.file);
 
   }
@@ -269,7 +263,7 @@ class ImageUpload extends React.Component {
     $pageData = (<div className="previewComponent">
       <form onSubmit={this.handleSubmit}>
         <input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/><br /><br />
-        <div className="imgPreview" width="480" height="480">
+        <div className="imgPreview image is-128x128">
           {$imagePreview}
         </div><br />
         <button className="submitButton" type="submit">Upload Image</button>

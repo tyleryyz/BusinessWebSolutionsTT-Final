@@ -44,7 +44,7 @@ AWS.config.update({accessKeyId: accessKey.trim(), secretAccessKey: secretAccess.
 var s3 = new AWS.S3();
 var ses = new AWS.SES();
 
-var bucketName = 'tailored-tutoring';
+var bucketName = 'jjg297-my-first-bucket';
 let file;
 var filename;
 
