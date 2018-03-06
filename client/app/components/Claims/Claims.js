@@ -266,7 +266,7 @@ class Claims extends Component {
               <form onClick={this.submitVideo(image)}>
                 {console.log("renderIMage", this.state.downloadURL[index])}
                 <div className="card">
-                  <a href={this.state.downloadURL[index]} download>click here to download image</a>
+                <a className="image is-128x128" href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]}/></a>
 
                   <div className="card-content"></div>
                   <div className="media-content">
