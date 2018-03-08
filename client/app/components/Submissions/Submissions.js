@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import 'whatwg-fetch';
 import {Link} from 'react-router-dom';
+import { Player, BigPlayButton } from 'video-react';
+import "../../../../node_modules/video-react/dist/video-react.css"; // import css
 
 // Load the SDK and UUID
 var AWS = require('aws-sdk');
@@ -112,7 +114,8 @@ class Submissions extends Component {
       images: null,
       courses: null,
       filterVal: 'select',
-      downloadURL: null
+      downloadURL: null,
+	  vidURL: null
     };
 	
     this.getData = this.getData.bind(this);
@@ -120,6 +123,7 @@ class Submissions extends Component {
 	this.filterClaims = this.filterClaims.bind(this);
     this.compare = this.compare.bind(this);
     this.getImageURL = this.getImageURL.bind(this);
+	this.getVideoURL = this.getVideoURL.bind(this);
   }
 
   getData() {
@@ -154,6 +158,15 @@ class Submissions extends Component {
           console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        });
+		this.getVideoURL(images).then((vidUrlArray) => {
+          console.log("after get video?", vidUrlArray)
+          this.setState({
+            vidURL: vidUrlArray,
             loaded: false
           }, () => {
             this.setState({loaded: true})
@@ -222,6 +235,28 @@ class Submissions extends Component {
 
     })
   return urlArray
+
+  }
+  
+  async getVideoURL(images) {
+    let vidUrlArray = new Array();
+    let vidURL;
+    let url;
+    console.log("images", images)
+    images.map((image, index) => {
+      var params = {
+        Bucket: bucketName,
+        Key: image.videoURL
+      };
+
+	if(image.purchased==1){
+		url = s3.getSignedUrl('getObject', params);
+		vidUrlArray.push(url)
+	}
+    console.log(url);
+
+    })
+  return vidUrlArray
 
   }
 
@@ -353,6 +388,7 @@ class Submissions extends Component {
             this.state.images.map((image, index) => (<div key={index}>
               <form>
                 {console.log("renderImage", this.state.downloadURL[index])}
+				{console.log("renderVideo", this.state.vidURL[index])}
                 <div className="card">
                   <div className="card-content">
 				  <img src={this.state.downloadURL[index]} width="75%" height="75%"/><br />
@@ -363,7 +399,9 @@ class Submissions extends Component {
                   </div>
                   <div className="content">
                     {$date = this.getDateInformation(image.timestamp)}
-					
+					<Player>
+						<source src={this.state.vidURL[index]} />
+					</Player>
                   </div>
                 </div>
               </form>
