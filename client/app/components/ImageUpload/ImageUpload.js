@@ -169,6 +169,7 @@ class ImageUpload extends React.Component {
     extension = extension.pop();    // feel free to tack .toLowerCase() here if you want
     uploadName = uploadName+'.'+extension;
     var keyName;
+	extension = extension.toLowerCase();
 
     if(extension=="png" || extension=="jpg" || extension=="jpeg")
     {

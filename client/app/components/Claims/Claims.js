@@ -243,8 +243,16 @@ class Claims extends Component {
     var day = date.getDate();
     var monthIndex = date.getMonth();
     var year = date.getFullYear();
-    let dateInformation = (day + ' ' + monthNames[monthIndex] + ' ' + year)
-    return (dateInformation)
+	var hours = date.getHours();
+	var mins = date.getMinutes();
+	var seconds = date.getSeconds();
+	var amPm = "AM";
+	if(mins < 10) { mins = "0" + mins; }
+	if(seconds < 10) { seconds = "0" + seconds; }
+	if(hours > 12) { hours = hours-12; amPm = "PM";}
+    let dateInformation = (hours + ':' + mins + ':' + seconds + amPm +
+	', ' + day + ' ' + monthNames[monthIndex] + ' ' + year);
+    return (dateInformation);
   }
 
   filterClaims(e) {
@@ -389,6 +397,9 @@ class Claims extends Component {
 
   }
 
+	// BUG: If there are more than one images with differing courses,
+	// The first image will populate the image space as opposed to the
+	// proper image that regards to that case.
   render() {
 
     if (this.state.user && this.state.loaded) {
@@ -409,11 +420,12 @@ class Claims extends Component {
           {
             this.state.images.map((image, index) => (<div key={index}>
               <form>
-                {console.log("renderIMage", this.state.downloadURL[index])}
+                {console.log("renderImage", this.state.downloadURL[index])}
                 <div className="card">
+                  <div className="card-content">
+				  <a href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]} width="75%" height="75%"/></a><br />
                   <a href={this.state.downloadURL[index]} download>click here to download image</a>
-
-                  <div className="card-content"></div>
+				  </div>
                   <div className="media-content">
                     <p className="title is-4">{image.clientUID}</p>
                     <p className="subtitle is-6">{image.course}</p>

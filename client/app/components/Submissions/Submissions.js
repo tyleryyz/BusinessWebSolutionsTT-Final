@@ -118,7 +118,6 @@ class Submissions extends Component {
     this.getData = this.getData.bind(this);
     this.getImageData = this.getImageData.bind(this);
 	this.filterClaims = this.filterClaims.bind(this);
-    this.submitVideo = this.submitVideo.bind(this);
     this.compare = this.compare.bind(this);
     this.getImageURL = this.getImageURL.bind(this);
   }
@@ -246,15 +245,23 @@ class Submissions extends Component {
     var day = date.getDate();
     var monthIndex = date.getMonth();
     var year = date.getFullYear();
-    let dateInformation = (day + ' ' + monthNames[monthIndex] + ' ' + year)
-    return (dateInformation)
+	var hours = date.getHours();
+	var mins = date.getMinutes();
+	var seconds = date.getSeconds();
+	var amPm = "AM";
+	if(mins < 10) { mins = "0" + mins; }
+	if(seconds < 10) { seconds = "0" + seconds; }
+	if(hours > 12) { hours = hours-12; amPm = "PM";}
+    let dateInformation = (hours + ':' + mins + ':' + seconds + amPm +
+	', ' + day + ' ' + monthNames[monthIndex] + ' ' + year);
+    return (dateInformation);
   }
 
   filterClaims(e) {
     e.preventDefault();
     console.log("inside filter")
     const course = e.target.value;
-    if (course === "select") {
+    if (course === "select"){
       this.getImageData().then((images) => {
         images.sort(this.compare);
 
@@ -265,36 +272,46 @@ class Submissions extends Component {
         }, () => {
           this.setState({loaded: true})
         })
-        this.getImageURL(images).then((urlArray) => {
-          console.log("after get image?", urlArray)
-          this.setState({
-            downloadURL: urlArray,
-            loaded: false
-          }, () => {
-            this.setState({loaded: true})
-          })
-        })
       });
-    } else {
-      console.log(course)
-      return (fetch(`/api/images?course=${course}&tutorUID=${this.state.user.uID}`, {
-        headers: {
-          "Content-Type": "Application/json"
-        },
-        method: 'GET'
-      }).then(res => res.json()).then((images) => {
-        images.sort(this.compare);
+    } else if (course === "completed"){
+    console.log(course)
+    return (fetch(`/api/images?status=${ "completed"}&clientUID=${this.state.user.uID}`, {
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      method: 'GET'
+    }).then(res => res.json()).then((images) => {
+      images.sort(this.compare);
 
-        console.log(images);
-        this.setState({
-          loaded: false,
-          images: images,
-          filterVal: course
-        }, () => {
-          this.setState({loaded: true})
-        })
-      }));
-    }
+      console.log(images);
+      this.setState({
+        loaded: false,
+        images: images,
+        filterVal: course
+      }, () => {
+        this.setState({loaded: true})
+      })
+    }));
+  } else {
+    console.log(course)
+    return (fetch(`/api/images?course=${course}&clientUID=${this.state.user.uID}`, {
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      method: 'GET'
+    }).then(res => res.json()).then((images) => {
+      images.sort(this.compare);
+
+      console.log(images);
+      this.setState({
+        loaded: false,
+        images: images,
+        filterVal: course
+      }, () => {
+        this.setState({loaded: true})
+      })
+    }));
+  }
   }
 
   _handleFileChange(e) {
@@ -310,88 +327,10 @@ class Submissions extends Component {
     reader.readAsDataURL(file)
   }
   
-  submitVideo(e, image) {
-	  
-	e.preventDefault();
-	
-	email = this.state.user.email;
-	firstname = this.state.user.fname;
-	lastname = this.state.user.lname;
-	
-	console.log(firstname + " " + lastname + " " + email);
-	console.log(file.name);
-	
-	filename = this.state.file.name;
-	
-	var d = new Date();
-	var timestamp = d.getTime();
-	var uploadName = this.props.user.uid+'-'+timestamp;
-
-	var extension = filename.split(".");
-	if( extension.length === 1 || ( extension[0] === "" && extension.length === 2 ) ) {
-		return "";
-	}
-	extension = extension.pop();    // feel free to tack .toLowerCase() here if you want
-	uploadName = uploadName+'.'+extension;
-	var keyName;
-  extension = extension.toLowerCase();
-
-	if (extension=="mp4" || extension=="wmv" || extension=="flv" || extension=="avi")
-	{
-		keyName = "Videos/"
-	} else {
-		console.log("Invalid file type!")
-	}
-	
-	uploadName = keyName+uploadName;
-
-	var params = {
-	  Bucket: bucketName,
-	  Key: uploadName,
-	  Body: file
-	};
-	
-	console.log(uploadName);
-	
-	const imageURL = image.imageURL;
-    fetch(`/api/images?imageURL=${imageURL}`, {
-      method: 'PUT',
-      headers: {
-        "Content-Type": "Application/json"
-      },
-      body: JSON.stringify({
-		  videoURL: uploadName,
-		  status: "completed" })
-    }).then((image) => {
-      this.getImageData().then((images) => {
-        this.setState({
-          images: images,
-          loaded: false
-        }, () => {
-          this.setState({loaded: true})
-        });
-      })
-    });
-	
-	s3.putObject(params, function(err, data) {
-	   if (err)
-	   {
-	     console.log(err)
-	   }
-	   else
-	   {
-	     console.log("Successfully uploaded data to: " + bucketName + "/" + uploadName);
-	     
-	     subject = "Submission Received!";
-	     message = "We have received your image submission of: "+filename+"!";
-	     sendTheEmail();
-	   }
-	 })
-
-	console.log('Handling uploading, data presented: ', this.state.file);
-
-  }
-
+  
+	// BUG: If there are more than one images with differing courses,
+	// The first image will populate the image space as opposed to the
+	// proper image that regards to that case.
   render() {
 
     if (this.state.user && this.state.loaded) {
@@ -405,6 +344,7 @@ class Submissions extends Component {
           <div className="select">
             <select onChange={this.filterClaims} value={this.state.filterVal} name="course">
               <option value="select">Select</option>
+			  <option value="completed">Completed</option>
               {this.state.courses.map((course, index) => (<option key={index}>{course.name}</option>))}
             </select>
           </div>
@@ -414,18 +354,17 @@ class Submissions extends Component {
               <form>
                 {console.log("renderImage", this.state.downloadURL[index])}
                 <div className="card">
-                  <a href={this.state.downloadURL[index]} download>click here to download image</a>
-
-                  <div className="card-content"></div>
+                  <div className="card-content">
+				  <img src={this.state.downloadURL[index]} width="75%" height="75%"/><br />
+				  </div>
                   <div className="media-content">
                     <p className="title is-4">{image.clientUID}</p>
                     <p className="subtitle is-6">{image.course}</p>
                   </div>
                   <div className="content">
                     {$date = this.getDateInformation(image.timestamp)}
+					
                   </div>
-				  <input className="fileInput" type="file" onChange={(e) => this._handleFileChange(e)}/><br />
-                  <button className="button is-success" onClick={(e) => this.submitVideo(e, image)}>submit video</button>
                 </div>
               </form>
               <br/>
