@@ -301,7 +301,7 @@ class Claims extends Component {
       }));
     }
   }
-  
+
   _handleFileChange(e) {
     e.preventDefault();
 
@@ -316,18 +316,18 @@ class Claims extends Component {
   }
 
   submitVideo(e, image) {
-	  
+
 	e.preventDefault();
-	
+
 	email = this.state.user.email;
 	firstname = this.state.user.fname;
 	lastname = this.state.user.lname;
-	
+
 	console.log(firstname + " " + lastname + " " + email);
 	console.log(file.name);
-	
+
 	filename = this.state.file.name;
-	
+
 	var d = new Date();
 	var timestamp = d.getTime();
 	var uploadName = this.props.user.uid+'-'+timestamp;
@@ -347,7 +347,7 @@ class Claims extends Component {
 	} else {
 		console.log("Invalid file type!")
 	}
-	
+
 	uploadName = keyName+uploadName;
 
 	var params = {
@@ -355,9 +355,9 @@ class Claims extends Component {
 	  Key: uploadName,
 	  Body: file
 	};
-	
+
 	console.log(uploadName);
-	
+
 	const imageURL = image.imageURL;
     fetch(`/api/images?imageURL=${imageURL}`, {
       method: 'PUT',
@@ -377,7 +377,7 @@ class Claims extends Component {
         });
       })
     });
-	
+
 	s3.putObject(params, function(err, data) {
 	   if (err)
 	   {
@@ -386,7 +386,7 @@ class Claims extends Component {
 	   else
 	   {
 	     console.log("Successfully uploaded data to: " + bucketName + "/" + uploadName);
-	     
+
 	     subject = "Submission Received!";
 	     message = "We have received your image submission of: "+filename+"!";
 	     sendTheEmail();

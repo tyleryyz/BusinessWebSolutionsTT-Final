@@ -326,7 +326,7 @@ class Dashboard extends Component {
               {console.log("renderImage", this.state.downloadURL[index])}
               <div className="card">
                 <div className="card-content">
-				<a href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]} width="75%" height="75%"/></a>
+                <a className="image is-128x128" href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]}/></a>
 				</div>
                 <div className="media-content">
                   <p className="title is-4">{image.clientUID}</p>
@@ -348,7 +348,7 @@ class Dashboard extends Component {
             this.state.images.map((image, index) => (<div key={index}>
 
               <div className="card">
-                <a href={this.state.downloadURL[index]} download="download">click here to download image</a>
+              <a className="image is-128x128" href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]}/></a>
 
                 <div className="card-content"></div>
                 <div className="media-content">
@@ -369,7 +369,7 @@ class Dashboard extends Component {
             this.state.images.map((image, index) => (<div key={index}>
 
               <div className="card">
-                <a href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]}/></a>
+                <a className="image is-128x128" href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]}/></a>
 
                 <div className="card-content"></div>
                 <div className="media-content">
