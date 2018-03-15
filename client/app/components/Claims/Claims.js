@@ -256,9 +256,13 @@ class Claims extends Component {
   }
 
   filterClaims(e) {
-    e.preventDefault();
-    console.log("inside filter")
-    const course = e.target.value;
+    let course;
+    if (e) {
+      e.preventDefault();
+      course = e.target.value;
+    } else {
+      course = this.state.filterVal
+    }
     if (course === "select") {
       this.getImageData().then((images) => {
         images.sort(this.compare);

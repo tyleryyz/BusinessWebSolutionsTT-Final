@@ -188,15 +188,8 @@ class Dashboard extends Component {
       },
       body: JSON.stringify({status: "claimed", tutorUID: this.state.user.uID})
     }).then((image) => {
-      this.getImageData(this.state.user.permission, this.state.user.uID).then((images) => {
-        images.sort(this.compare);
-        this.setState({
-          images: images,
-          loaded: false
-        }, () => {
-          this.setState({loaded: true})
-        });
-        this.getImageURL(images).then((urlArray) => {
+      this.filterImages().then(() => {
+        this.getImageURL(this.state.images).then((urlArray) => {
           console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
@@ -210,10 +203,16 @@ class Dashboard extends Component {
     })
   }
 
-  filterImages(e) {
-    e.preventDefault();
+  async filterImages(e) {
+    let course;
+    if (e) {
+      console.log("test")
+      e.preventDefault();
+      course = e.target.value;
+    } else {
+      course = this.state.filterVal
+    }
     console.log("inside filter")
-    const course = e.target.value;
     if (course === "select") {
       this.getImageData(this.state.user.permission, this.state.user.uID).then((images) => {
         images.sort(this.compare);
@@ -224,10 +223,19 @@ class Dashboard extends Component {
         }, () => {
           this.setState({loaded: true})
         })
+        this.getImageURL(images).then((urlArray) => {
+          console.log("after get image?", urlArray)
+          this.setState({
+            downloadURL: urlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
       });
     } else {
       console.log(course)
-      return (fetch(`/api/images?course=${course}&status=${ "open"}`, {
+      return (fetch(`/api/images?course=${course}&status=${"open"}`, {
         headers: {
           "Content-Type": "Application/json"
         },
@@ -298,9 +306,6 @@ class Dashboard extends Component {
     return 0;
   }
 
-  // BUG: If there are more than one images with differing courses,
-  // The first image will populate the image space as opposed to the
-  // proper image that regards to that case.
   render() {
     if (this.state.user) {
       console.log(this.state.user.permission)
@@ -326,8 +331,8 @@ class Dashboard extends Component {
               {console.log("renderImage", this.state.downloadURL[index])}
               <div className="card">
                 <div className="card-content">
-                <a className="image is-128x128" href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]}/></a>
-				</div>
+                  <a href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]} width="75%" height="75%"/></a>
+		            </div>
                 <div className="media-content">
                   <p className="title is-4">{image.clientUID}</p>
                   <p className="subtitle is-6">{image.course}</p>
@@ -344,11 +349,17 @@ class Dashboard extends Component {
         </div>)
       } else if (this.state.user.permission === "Student" && this.state.images && this.state.courses) {
         return (<div className="container">
+        <div className="select">
+          <select onChange={this.filterImages} value={this.state.filterVal} name="course">
+            <option value="select">Select</option>
+            {this.state.courses.map((course, index) => (<option key={index}>{course.name}</option>))}
+          </select>
+        </div>
           {
             this.state.images.map((image, index) => (<div key={index}>
 
               <div className="card">
-              <a className="image is-128x128" href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]}/></a>
+              <a href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]} width="75%" height="75%"/></a>
 
                 <div className="card-content"></div>
                 <div className="media-content">
@@ -365,11 +376,17 @@ class Dashboard extends Component {
         </div>);
       } else if (this.state.user.permission === "Admin" && this.state.images && this.state.courses) {
         return (<div className="container">
+        <div className="select">
+          <select onChange={this.filterImages} value={this.state.filterVal} name="course">
+            <option value="select">Select</option>
+            {this.state.courses.map((course, index) => (<option key={index}>{course.name}</option>))}
+          </select>
+        </div>
           {
             this.state.images.map((image, index) => (<div key={index}>
 
               <div className="card">
-                <a className="image is-128x128" href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]}/></a>
+                <a href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]} width="75%" height="75%"/></a>
 
                 <div className="card-content"></div>
                 <div className="media-content">

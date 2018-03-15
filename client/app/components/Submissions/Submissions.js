@@ -117,7 +117,7 @@ class Submissions extends Component {
       downloadURL: null,
 	  vidURL: null
     };
-	
+
     this.getData = this.getData.bind(this);
     this.getImageData = this.getImageData.bind(this);
 	this.filterClaims = this.filterClaims.bind(this);
@@ -147,6 +147,7 @@ class Submissions extends Component {
       });
     }).then(() => {
       let imageData = this.getImageData().then((images) => {
+        console.log("inside get image data submission")
         images.sort(this.compare);
         this.setState({
           loaded: false,
@@ -208,7 +209,7 @@ class Submissions extends Component {
 
   getImageData() {
     console.log("here", this.state.uID)
-    return (fetch(`/api/images?tutorUID=${this.state.user.uID}`, {
+    return (fetch(`/api/images?clientUID=${this.state.user.uID}`, {
       headers: {
         "Content-Type": "Application/json"
       },
@@ -237,7 +238,7 @@ class Submissions extends Component {
   return urlArray
 
   }
-  
+
   async getVideoURL(images) {
     let vidUrlArray = new Array();
     let vidURL;
@@ -310,7 +311,7 @@ class Submissions extends Component {
       });
     } else if (course === "completed"){
     console.log(course)
-    return (fetch(`/api/images?status=${ "completed"}&clientUID=${this.state.user.uID}`, {
+    return (fetch(`/api/images?status=${"completed"}&clientUID=${this.state.user.uID}`, {
       headers: {
         "Content-Type": "Application/json"
       },
@@ -361,19 +362,18 @@ class Submissions extends Component {
 
     reader.readAsDataURL(file)
   }
-  
-  
+
+
 	// BUG: If there are more than one images with differing courses,
 	// The first image will populate the image space as opposed to the
 	// proper image that regards to that case.
   render() {
 
     if (this.state.user && this.state.loaded) {
-      if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses && this.state.downloadURL) {
+      if (this.state.user.permission === "Student" && this.state.images && this.state.courses && this.state.downloadURL) {
         let $image;
         let $date;
         return (<div className="container">
-          <p>tutor view</p>
           <Link to="/Dashboard">Back to dashboard</Link>
           <p>Sort by course tag</p>
           <div className="select">
