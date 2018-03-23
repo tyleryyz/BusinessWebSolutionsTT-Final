@@ -9,8 +9,7 @@ const ImageSchema = new mongoose.Schema({
     unique: true
   },
   videoURL: {
-    type: String,
-    unique: true
+    type: String
   },
   status: {
     type: String

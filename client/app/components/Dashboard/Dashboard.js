@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import 'whatwg-fetch';
 import {Link} from 'react-router-dom';
+import { Player, BigPlayButton } from 'video-react';
+import "../../../../node_modules/video-react/dist/video-react.css";
 
 var firebase = require('firebase');
 var AWS = require('aws-sdk');
@@ -58,7 +60,8 @@ class Dashboard extends Component {
       images: null,
       courses: null,
       filterVal: 'select',
-      downloadURL: null
+      downloadURL: null,
+      statusVal: 'all'
     };
     this.getData = this.getData.bind(this);
     this.getImageData = this.getImageData.bind(this);
@@ -67,6 +70,8 @@ class Dashboard extends Component {
     this.getDateInformation = this.getDateInformation.bind(this);
     this.compare = this.compare.bind(this);
     this.getImageURL = this.getImageURL.bind(this);
+    this.getVideoURL = this.getVideoURL.bind(this);
+    this.filterStatus = this.filterStatus.bind(this);
 
   }
 
@@ -91,7 +96,7 @@ class Dashboard extends Component {
         this.setState({loaded: true})
       });
     }).then(() => {
-      this.getImageData(this.state.user.permission, this.state.user.uID).then((images) => {
+      this.getImageData(this.state.user.permission, this.state.user.uID, this.state.statusVal).then((images) => {
         images.sort(this.compare);
         this.setState({
           loaded: false,
@@ -108,6 +113,16 @@ class Dashboard extends Component {
             this.setState({loaded: true})
           })
         })
+        this.getVideoURL(images).then((vidUrlArray) => {
+          console.log("after get video?", vidUrlArray)
+          this.setState({
+            vidURL: vidUrlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+      })
       }).then(() => {
         this.getCourses().then((courses) => {
           console.log("courses", courses)
@@ -116,10 +131,9 @@ class Dashboard extends Component {
             loaded: false
           }, () => {
             this.setState({loaded: true})
-          })
-        })
+          });
+        });
       });
-    });
   };
 
   getCourses() {
@@ -132,16 +146,26 @@ class Dashboard extends Component {
     }).then(res => res.json()));
   }
 
-  getImageData(permission, uID) {
+  getImageData(permission, uID, status) {
     if (permission === "Student") {
+      if (status === "all"){
       return (fetch(`/api/images?clientUID=${uID}`, {
         headers: {
           "Content-Type": "Application/json"
         },
         method: 'GET'
       }).then(res => res.json()));
-    } else if (permission === "Tutor") {
-      return (fetch(`/api/images?status=${ "open"}`, {
+    }
+    else if (status === "open" || status === "completed"){
+      return (fetch(`/api/images?clientUID=${uID}&status=${status}`, {
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        method: 'GET'
+      }).then(res => res.json()));
+    }
+  } else if (permission === "Tutor") {
+      return (fetch(`/api/images?status=${"open"}`, {
         headers: {
           "Content-Type": "Application/json"
         },
@@ -178,6 +202,28 @@ class Dashboard extends Component {
 
   }
 
+  async getVideoURL(images) {
+    let vidUrlArray = new Array();
+    let vidURL;
+    let url;
+    console.log("images", images)
+    images.map((image, index) => {
+      var params = {
+        Bucket: bucketName,
+        Key: image.videoURL
+      };
+
+  if(image.purchased==1){
+    url = s3.getSignedUrl('getObject', params);
+    vidUrlArray.push(url)
+  }
+    console.log(url);
+
+    })
+  return vidUrlArray
+
+  }
+
   handleClaim(e, image) {
     e.preventDefault();
     const imageURL = image.imageURL;
@@ -189,6 +235,7 @@ class Dashboard extends Component {
       body: JSON.stringify({status: "claimed", tutorUID: this.state.user.uID})
     }).then((image) => {
       this.filterImages().then(() => {
+        this.filterStatus().then(() => {
         this.getImageURL(this.state.images).then((urlArray) => {
           console.log("after get image?", urlArray)
           this.setState({
@@ -201,6 +248,85 @@ class Dashboard extends Component {
       })
 
     })
+  })
+}
+
+  async filterStatus(e) {
+    e.preventDefault();
+    status = e.target.value;
+    console.log("status", status)
+    if (this.state.filterVal === "select"){
+      this.getImageData(this.state.user.permission, this.state.user.uID, status).then((images) => {
+        images.sort(this.compare);
+        this.setState({
+          loaded: false,
+          images: images,
+          statusVal: status
+        }, () => {
+          this.setState({loaded: true})
+        })
+        this.getImageURL(images).then((urlArray) => {
+          console.log("after get image?", urlArray)
+          this.setState({
+            downloadURL: urlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+        this.getVideoURL(images).then((vidUrlArray) => {
+          console.log("after get video?", vidUrlArray)
+          this.setState({
+            vidURL: vidUrlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+      });
+    } else {
+      let url;
+      if (status === "all") {
+        url = `/api/images?course=${this.state.filterVal}&clientUID=${this.state.user.uID}`
+      } else {
+        url = `/api/images?course=${this.state.filterVal}&status=${status}&clientUID=${this.state.user.uID}`
+      }
+      return (fetch(url, {
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        method: 'GET'
+      }).then(res => res.json()).then((images) => {
+        console.log(images);
+        images.sort(this.compare);
+
+        this.setState({
+          loaded: false,
+          images: images,
+          statusVal: status
+        }, () => {
+          this.setState({loaded: true})
+        })
+        this.getImageURL(images).then((urlArray) => {
+          console.log("after get image?", urlArray)
+          this.setState({
+            downloadURL: urlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+        this.getVideoURL(images).then((vidUrlArray) => {
+          console.log("after get video?", vidUrlArray)
+          this.setState({
+            vidURL: vidUrlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+      }));
+    }
   }
 
   async filterImages(e) {
@@ -214,7 +340,7 @@ class Dashboard extends Component {
     }
     console.log("inside filter")
     if (course === "select") {
-      this.getImageData(this.state.user.permission, this.state.user.uID).then((images) => {
+      this.getImageData(this.state.user.permission, this.state.user.uID, this.state.statusVal).then((images) => {
         images.sort(this.compare);
         this.setState({
           loaded: false,
@@ -232,10 +358,26 @@ class Dashboard extends Component {
             this.setState({loaded: true})
           })
         })
+        this.getVideoURL(images).then((vidUrlArray) => {
+          console.log("after get video?", vidUrlArray)
+          this.setState({
+            vidURL: vidUrlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
       });
     } else {
+      let url;
       console.log(course)
-      return (fetch(`/api/images?course=${course}&status=${"open"}`, {
+      console.log("status inside course filter", this.state.statusVal)
+      if (this.state.statusVal === "all") {
+        url = `/api/images?course=${course}&clientUID=${this.state.user.uID}`
+      } else {
+        url = `/api/images?course=${course}&status=${this.state.statusVal}&clientUID=${this.state.user.uID}`
+      }
+      return (fetch(url, {
         headers: {
           "Content-Type": "Application/json"
         },
@@ -255,6 +397,15 @@ class Dashboard extends Component {
           console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+        this.getVideoURL(images).then((vidUrlArray) => {
+          console.log("after get video?", vidUrlArray)
+          this.setState({
+            vidURL: vidUrlArray,
             loaded: false
           }, () => {
             this.setState({loaded: true})
@@ -355,6 +506,13 @@ class Dashboard extends Component {
             {this.state.courses.map((course, index) => (<option key={index}>{course.name}</option>))}
           </select>
         </div>
+        <div className="select">
+          <select onChange={this.filterStatus} value={this.state.statusVal} name="status">
+            <option value="all">All</option>
+            <option value="open">Pending</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
           {
             this.state.images.map((image, index) => (<div key={index}>
 
@@ -368,6 +526,9 @@ class Dashboard extends Component {
                 </div>
                 <div className="content">
                   <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
+                  <Player>
+        						<source src={this.state.vidURL[index]} />
+        					</Player>
                 </div>
               </div>
               <br/>

@@ -6,12 +6,30 @@ module.exports = (app) => {
   app.use(bodyParser.urlencoded({extended: false}));
 
   app.get('/api/images', function(req, res, next) {
-	if (req.query.course && req.query.clientUID){
+
+    if (req.query.status && req.query.clientUID && req.query.course){
+
+      if (req.query.status === "open"){
+        Image.find({$or: [{status: "open"}, {status: "claimed"}], clientUID: req.query.clientUID, course: req.query.course}).exec().then((image) => res.json(image)).catch((err) => next(err));
+      }
+      else {
+        Image.find({status: req.query.status, clientUID: req.query.clientUID, course: req.query.course}).exec().then((image) => res.json(image)).catch((err) => next(err));
+      }
+    }
+
+    else if (req.query.course && req.query.clientUID){
       Image.find({course: req.query.course, clientUID: req.query.clientUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
     else if (req.query.status && req.query.clientUID){
-      Image.find({status: req.query.status, clientUID: req.query.clientUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
+
+      if (req.query.status === "open"){
+        Image.find({$or: [{status: "open"}, {status: "claimed"}], clientUID: req.query.clientUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
+      }
+      else {
+        Image.find({status: req.query.status, clientUID: req.query.clientUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
+      }
     }
+
     else if (req.query.clientUID){
       Image.find({clientUID: req.query.clientUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
@@ -19,8 +37,15 @@ module.exports = (app) => {
       Image.find({course: req.query.course, tutorUID: req.query.tutorUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
     else if (req.query.course && req.query.status){
-      Image.find({course: req.query.course, status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
+
+      if (req.query.status === "open"){
+        Image.find({$or: [{status: "open"}, {status: "claimed"}], course: req.query.course}).exec().then((image) => res.json(image)).catch((err) => next(err));
+      }
+      else {
+        Image.find({course: req.query.course, status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
+      }
     }
+
     else if (req.query.course){
       Image.find({course: req.query.course}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
@@ -28,8 +53,15 @@ module.exports = (app) => {
       Image.find({tutorUID: req.query.tutorUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
     else if (req.query.status){
-      Image.find({status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
+
+      if (req.query.status === "open"){
+        Image.find({$or: [{status: "open"}, {status: "claimed"}]}).exec().then((image) => res.json(image)).catch((err) => next(err)); 
+      }
+      else {
+        Image.find({status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
+      }
     }
+
     else {
       Image.find().exec().then((image) => res.json(image)).catch((err) => next(err));
     }
