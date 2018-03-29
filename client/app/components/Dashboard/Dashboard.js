@@ -458,6 +458,7 @@ class Dashboard extends Component {
   }
 
   render() {
+    let $url;
     if (this.state.user) {
       console.log(this.state.user.permission)
       let $image;
@@ -526,9 +527,10 @@ class Dashboard extends Component {
                 </div>
                 <div className="content">
                   <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
+                  {this.state.vidURL[index] ? $url =(
                   <Player>
         						<source src={this.state.vidURL[index]} />
-        					</Player>
+        					</Player> ) : $url = <p></p>}
                 </div>
               </div>
               <br/>
