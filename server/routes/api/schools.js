@@ -11,14 +11,16 @@ module.exports = (app) => {
       School.findOne({name: req.query.name}).exec().then((school) => res.json(school)).catch((err) => next(err));
     }
     else {
-      
+
     }
   });
 
   app.post('/api/schools', function(req, res, next) {
     const school = new School();
+    console.log(req.body.name)
+    console.log(req.body.course)
     school.name = req.body.name;
-
+    school.courses.push({name: req.body.course});
     school.save().then(() => res.json(school)).catch((err) => next(err));
   });
 
