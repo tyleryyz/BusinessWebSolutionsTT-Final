@@ -17,16 +17,44 @@ module.exports = (app) => {
 
   app.post('/api/schools', function(req, res, next) {
     const school = new School();
-    console.log(req.body.name)
-    console.log(req.body.course)
+    course = req.body.course;
     school.name = req.body.name;
-    school.courses.push({name: req.body.course});
+    if (school.courses === undefined){
+      school.courses.addToSet(course);
+    } else {
+      school.courses = [course];
+    }
     school.save().then(() => res.json(school)).catch((err) => next(err));
   });
 
-  app.delete('/api/schools', function(req, res, next) {
+  app.put('/api/schools', function(req, res, next) {
+    let name = req.body.name;
+    let course = req.body.course;
+    School.updateOne({name: name}, {$addToSet: {courses: course}}).then((user) => res.json()).catch((err) => next(err));
 
-    School.deleteOne({name: req.query.name}).then((school) => res.json()).catch((err) => next(err));
+  });
+
+
+  app.delete('/api/schools', function(req, res, next) {
+    if (req.body.course){
+      let name = req.body.name;
+      let course = req.body.course;
+
+      School.findOne({name: name}).exec().then((school) => {
+          for (i=0; i<school.courses.length;i++){
+            if (school.courses[i].name === course){
+              school.courses.splice(i, 1);
+              school.save();
+            }
+          }
+          res.json(school)
+      }).catch((err)=>next(err));
+    }
+
+    else if (req.body.name){
+      School.deleteOne({name: req.body.name}).then((school) => res.json()).catch((err) => next(err));
+    }
+
   });
 
 

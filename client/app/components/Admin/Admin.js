@@ -31,6 +31,7 @@ class Admin extends Component {
     this.addNewSchool = this.addNewSchool.bind(this);
     this.cancelChangeSchool = this.cancelChangeSchool.bind(this);
     this.addCourse = this.addCourse.bind(this);
+    this.removeCourse = this.removeCourse.bind(this);
   }
 
   getAdminData() {
@@ -180,7 +181,25 @@ class Admin extends Component {
   }
 
   addCourse(e) {
-    
+    e.preventDefault();
+    const school = this.state.changeSchoolData.name;
+    const course = e.target.elements.course.value;
+    if (course != ""){
+      fetch(`/api/schools`, {
+        method: 'PUT',
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        body: JSON.stringify({name: school, course: course})
+      }).then((user) => {
+        this.setState({
+          changeSchoolData: null,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+        });
+      })
+    }
   }
 
   deleteUser(e) {
@@ -189,6 +208,26 @@ class Admin extends Component {
     fetch(`/api/users?email=${email}`, {method: 'DELETE'}).then((user) => {
       this.setState({
         deleteUserData: null,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      });
+    })
+  }
+
+  removeCourse(e) {
+    e.preventDefault();
+    const school = this.state.changeSchoolData.name;
+    const course = document.getElementById("changeCourse").value;
+    fetch(`/api/schools`, {
+      method: 'DELETE',
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify({name: school, course: course})
+    }).then((user) => {
+      this.setState({
+        changeSchoolData: null,
         loaded: false
       }, () => {
         this.setState({loaded: true})
@@ -242,8 +281,11 @@ class Admin extends Component {
     let $schoolData;
     let $addSchool;
     if (this.state.changeUserData) {
-      $data = (<div className="container">
-        <br/>
+      $data = (
+        <div className="container">
+        <br />
+        <div className="box">
+
         <form onSubmit={this.changePermission}>
           <p>Name: {this.state.changeUserData.fname}
             {this.state.changeUserData.lname}</p>
@@ -259,17 +301,17 @@ class Admin extends Component {
             cancel
           </button>
         </form>
+        </div>
       </div>)
     } else {
       $data = (<p></p>)
     }
 
     if (this.state.addSchoolData) {
-      $addSchool = (<div>
-        <br/>
+      $addSchool = (
         <div className="container">
+        <br/>
           <div className="box">
-            <br/>
             <form onSubmit={this.addNewSchool}>
               <p>Add one course for {this.state.addSchoolData}</p>
               <div className="box">
@@ -286,10 +328,9 @@ class Admin extends Component {
                 cancel
               </button>
             </form>
-            <br/>
           </div>
         </div>
-      </div>)
+      )
     } else {
       $addSchool = (<p></p>)
     }
@@ -297,6 +338,7 @@ class Admin extends Component {
     if (this.state.deleteUserData) {
       $deleteData = (<div className="container">
         <br/>
+        <div className="box">
         <form onSubmit={this.deleteUser}>
           <p>Name: {this.state.deleteUserData.fname}
             {this.state.deleteUserData.lname}</p>
@@ -309,38 +351,41 @@ class Admin extends Component {
             cancel
           </button>
         </form>
+        </div>
       </div>)
     } else {
       $deleteData = (<p></p>)
     }
-
     if (this.state.changeSchoolData) {
-      $schoolData = (<div className="container">
+      $schoolData = (
+        <div className="container">
         <br/>
+        <div className="box">
         <form onSubmit={this.addCourse}>
           <p>Name: {this.state.changeSchoolData.name}</p>
           <p>Courses:</p>
           <ul>
-          {this.state.changeSchoolData.courses.map((course, index) => (<li key={index}>{course.name}</li>))}
+          {this.state.changeSchoolData.courses.map((course, index) => (<li key={index}>{course}</li>))}
           </ul>
           <br />
           <div className="box">
             <div className="field">
               <p className="control">
-                <input className="input" name="course" placeholder="Course Name"/>
+                <input className="input" id="changeCourse" name="course" placeholder="Course Name"/>
               </p>
             </div>
           </div>
           <button className="button is-success">
             Add class
           </button>
-          <button onClick={this.removeClass} className="button is-danger">
+          <button onClick={(e) => this.removeCourse(e)} className="button is-danger">
             Remove Class
           </button>
           <button onClick={this.cancelChangeSchool} className="button is-success">
             cancel
           </button>
         </form>
+        </div>
         <br />
       </div>)
     } else {
