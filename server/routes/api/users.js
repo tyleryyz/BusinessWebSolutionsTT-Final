@@ -20,7 +20,7 @@ module.exports = (app) => {
     user.lname = req.body.lname;
     user.email = req.body.email;
     user.school=req.body.school;
-    user.classList=req.body.classList;
+    user.courses=req.body.courses;
     user.uID = req.body.uID;
     user.permission = req.body.permission;
     user.save().then(() => res.json(user)).catch((err) => next(err));

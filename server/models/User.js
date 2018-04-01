@@ -16,8 +16,10 @@ const UserSchema = new mongoose.Schema({
     unique: true
   },
   school: {
-    type: String
+    type: Object
   },
+  courses: [String],
+
   permission: {
     type: String
 }

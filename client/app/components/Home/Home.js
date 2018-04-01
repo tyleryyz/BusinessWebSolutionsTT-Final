@@ -48,7 +48,10 @@ class Home extends Component {
           <Link to="/EditProfile">Edit Profile</Link>
         </div>
         <p>{this.state.user.fname}</p>
-        <p>{this.state.user.school}</p>
+        <p>{this.state.user.school.name}</p>
+        <ul>
+        {this.state.user.courses.map((course, index) => (<li key={index}>{course}</li>))}
+        </ul>
       </div>)
     } else {
       return (<div>

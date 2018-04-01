@@ -11,7 +11,7 @@ module.exports = (app) => {
       School.findOne({name: req.query.name}).exec().then((school) => res.json(school)).catch((err) => next(err));
     }
     else {
-
+      School.find({}).exec().then((school) => res.json(school)).catch((err) => next(err));
     }
   });
 
