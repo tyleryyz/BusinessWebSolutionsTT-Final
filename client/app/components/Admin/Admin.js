@@ -291,6 +291,12 @@ class Admin extends Component {
             {this.state.changeUserData.lname}</p>
           <p>Email: {this.state.changeUserData.email}</p>
           <p>Permission: {this.state.changeUserData.permission}</p>
+          <p>School: {this.state.changeUserData.school.name}</p>
+          <p>Courses:</p>
+          <ul>
+          {this.state.changeUserData.courses.map((course, index) => (<li key={index}>{course}</li>))}
+          </ul>
+
           <button className="button is-warning">
             Grant tutor permission
           </button>
@@ -344,6 +350,11 @@ class Admin extends Component {
             {this.state.deleteUserData.lname}</p>
           <p>Email: {this.state.deleteUserData.email}</p>
           <p>Permission: {this.state.deleteUserData.permission}</p>
+          <p>School: {this.state.changeUserData.school.name}</p>
+          <p>Courses: </p>
+          <ul>
+          {this.state.changeUserData.courses.map((course, index) => (<li key={index}>{course}</li>))}
+          </ul>
           <button className="button is-danger">
             Confirm user deletion
           </button>

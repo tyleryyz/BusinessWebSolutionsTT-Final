@@ -114,7 +114,6 @@ class ImageUpload extends React.Component {
       courses: null
     };
     this.getData = this.getData.bind(this);
-    this.getCourses = this.getCourses.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -134,28 +133,20 @@ class ImageUpload extends React.Component {
       console.log("will mount here", user)
       this.setState({
         user: user,
+        courses: user.courses,
         loaded: false
       }, () => {
         this.setState({loaded: true})
       })
-      }).then(()=>{this.getCourses().then((courses) => {
-        console.log("courses", courses)
-        this.setState({
-          courses: courses,
-          loaded: false
-        }, () => {
-          this.setState({loaded: true})
-        })
-    })
-  })
+      })
+  }
 
-  };
 
   // When the Upload image button is clicked
   handleSubmit(e) {
     e.preventDefault();
     const course = e.target.elements.course.value;
-
+    if (!(course==="select")){
     filename = this.state.file.name;
     var d = new Date();
     var timestamp = d.getTime();
@@ -214,6 +205,7 @@ class ImageUpload extends React.Component {
 		  status: "open",
 		  tutorUID: null,
 		  course: course,
+      school: this.state.user.school.name,
 		  timestamp: timestamp,
 		  videoURL: timestamp+"",
 		  purchased: 0})
@@ -221,6 +213,7 @@ class ImageUpload extends React.Component {
 
     console.log(image)
     console.log('Handling uploading, data presented: ', this.state.file);
+  } else console.log("enter a course tag")
 
   }
 
@@ -238,15 +231,6 @@ class ImageUpload extends React.Component {
     reader.readAsDataURL(file)
   }
 
-  getCourses() {
-    console.log("inside courses")
-    return (fetch(`/api/courses`, {
-      headers: {
-        "Content-Type": "Application/json"
-      },
-      method: 'GET'
-    }).then(res => res.json()));
-  }
   // Render the screen in HTML
   render() {
     let {imagePreviewUrl} = this.state;
@@ -271,8 +255,9 @@ class ImageUpload extends React.Component {
         <p>Select course tag</p>
         <div className="select">
           <select name="course">
-          {this.state.courses.map((course, index) => (
-            <option key={index}>{course.name}</option>
+          <option value="select">Select</option>
+          {this.state.user.courses.map((course, index) => (
+            <option key={index}>{course}</option>
           ))}
           </select>
           <br />

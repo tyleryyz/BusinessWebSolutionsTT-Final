@@ -107,7 +107,6 @@ class SignUp extends Component {
 
       }
     }
-
     this.setState({
       selectedCourses: value,
       loaded: false

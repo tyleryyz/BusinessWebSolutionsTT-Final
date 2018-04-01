@@ -12,12 +12,20 @@ class EditProfile extends Component {
     super(props);
     this.state = {
       user: null,
-      loaded: false
+      loaded: false,
+      selectedSchool: 'select',
+      schools: null,
+      selectedCourses: []
     };
     this.getData = this.getData.bind(this);
     this.handleEditProfile = this.handleEditProfile.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
+    this.getSchools = this.getSchools.bind(this);
+    this.schoolSelect = this.schoolSelect.bind(this);
+    this.coursesSelect = this.coursesSelect.bind(this);
+    this.coursesDeselect = this.coursesDeselect.bind(this);
+    this.handleSchoolChange = this.handleSchoolChange.bind(this);
   }
 
   getData() {
@@ -31,6 +39,70 @@ class EditProfile extends Component {
     }).then(res => res.json()));
   }
 
+  getSchools() {
+    return (fetch(`/api/schools`, {
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      method: 'GET'
+    }).then(res => res.json()));
+  }
+
+  schoolSelect(e) {
+    let value = e.target.value;
+    var school = JSON.parse(value);
+
+    this.setState({
+      selectedSchool: school,
+      courses: school.courses,
+      loaded: false
+    }, () => {
+      this.setState({loaded: true})
+    });
+  }
+
+  coursesSelect(e) {
+    e.preventDefault();
+    let courses = e.target;
+    let value = this.state.selectedCourses;
+    for (let i = 0; i < courses.length; i++) {
+      if (courses[i].selected && !(this.state.selectedCourses.includes(courses[i].value))) {
+        value.push(courses[i].value);
+      }
+    }
+    console.log(value);
+    this.setState({
+      selectedCourses: value,
+      loaded: false
+    }, () => {
+      this.setState({loaded: true})
+    });
+  }
+
+  coursesDeselect(e) {
+    e.preventDefault();
+    console.log("here!!!")
+    let courses = e.target;
+    let value = this.state.selectedCourses;
+    for (let i = 0; i < courses.length; i++) {
+      if (courses[i].selected) {
+        if (value.length === 1) {
+          value = [];
+        } else {
+          value.splice(i, 1);
+        }
+
+      }
+    }
+
+    this.setState({
+      selectedCourses: value,
+      loaded: false
+    }, () => {
+      this.setState({loaded: true})
+    });
+  }
+
   componentWillMount() {
     let result = this.getData().then((user) => {
       console.log("will mount here", user)
@@ -39,6 +111,16 @@ class EditProfile extends Component {
         loaded: false
       }, () => {
         this.setState({loaded: true})
+      });
+    }).then(() => {
+      this.getSchools().then((schools) => {
+        console.log("schools", schools)
+        this.setState({
+          schools: schools,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+        });
       });
     })
   };
@@ -57,7 +139,7 @@ class EditProfile extends Component {
     });
   }
 
-  handleEmailChange(e){
+  handleEmailChange(e) {
     e.preventDefault();
     const currentUser = this.props.user
     const newEmail = e.target.elements.email.value;
@@ -78,7 +160,7 @@ class EditProfile extends Component {
 
   }
 
-  handlePasswordChange(e){
+  handlePasswordChange(e) {
     e.preventDefault();
     var user = this.props.user;
     var newPassword = e.target.elements.password.value;
@@ -91,64 +173,124 @@ class EditProfile extends Component {
     });
   }
 
+  handleSchoolChange(e){
+    e.preventDefault();
+    let email = this.state.user.email;
+    fetch(`/api/users?email=${email}`, {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify({school: this.state.selectedSchool, courses: this.state.selectedCourses})
+    });
+  }
+
   render() {
-    if (this.state.user && this.state.loaded){
-    return (<div className="container">
-    <div className="box">
+    let $courseData;
+    if (this.state.selectedSchool != "select") {
+      console.log(this.state.selectedSchool)
+      $courseData = (<div >
+        <p>Select multiple classes that you are in</p>
+        <br/>
+        <div className="select is-multiple">
+          <select multiple={true} onChange={this.coursesSelect} value={this.state.selectedSchool.courses}>
+            {this.state.selectedSchool.courses.map((course, index) => (<option key={index}>{course}</option>))}
+          </select>
+        </div>
+        <div className="select is-multiple">
+          <select multiple={true} onChange={this.coursesDeselect} value={this.state.selectedCourses}>
+            {this.state.selectedCourses.map((course, index) => (<option key={index}>{course}</option>))}
+          </select>
+        </div>
+      </div>)
+    } else {
+      $courseData = (<p></p>)
+    }
 
-      <form onSubmit={this.handleEditProfile}>
-          <div className="field">
-            <label className="label">First Name: {this.state.user.fname}</label>
-            <div className="control">
-              <input className="input" name="fname" type="text" placeholder="First Name"/>
-            </div>
-          </div>
-          <div className="field">
-            <label className="label">Last Name: {this.state.user.lname}</label>
-            <div className="control">
-              <input className="input" name="lname" type="text" placeholder="Last Name"/>
-            </div>
-          </div>
-          <div className="control">
-            <button className="button">Save Changes</button>
-          </div>
-      </form>
-      </div>
+    if (this.state.user && this.state.loaded && this.state.schools) {
+      return (<div className="container">
+        <div className="box">
 
-      <div className="box">
-      <form onSubmit={this.handleEmailChange}>
-        <div className="field">
-          <label className="label">Email: {this.state.user.email} (Warning: Changing this will affect your login!)</label>
-          <div className="control">
-            <input className="input" name="email" type="email" placeholder="Email"/>
-          </div>
+          <form onSubmit={this.handleEditProfile}>
+            <div className="field">
+              <label className="label">First Name: {this.state.user.fname}</label>
+              <div className="control">
+                <input className="input" name="fname" type="text" placeholder="First Name"/>
+              </div>
+            </div>
+            <div className="field">
+              <label className="label">Last Name: {this.state.user.lname}</label>
+              <div className="control">
+                <input className="input" name="lname" type="text" placeholder="Last Name"/>
+              </div>
+            </div>
+            <div className="control">
+              <button className="button">Save Changes</button>
+            </div>
+          </form>
         </div>
-        <div className="control">
-          <button className="button">Change Email</button>
+
+        <div className="box">
+          <form onSubmit={this.handleEmailChange}>
+            <div className="field">
+              <label className="label">Email: {this.state.user.email}
+                (Warning: Changing this will affect your login!)</label>
+              <div className="control">
+                <input className="input" name="email" type="email" placeholder="Email"/>
+              </div>
+            </div>
+            <div className="control">
+              <button className="button">Change Email</button>
+            </div>
+          </form>
         </div>
-      </form>
-      </div>
-      <div className="box">
-      <form onSubmit={this.handlePasswordChange}>
-        <div className="field">
-          <label className="label">Password</label>
-          <div className="control">
-            <input className="input" name="password" type="text" placeholder="Password"/>
-          </div>
+        <div className="box">
+          <form onSubmit={this.handlePasswordChange}>
+            <div className="field">
+              <label className="label">Password</label>
+              <div className="control">
+                <input className="input" name="password" type="text" placeholder="Password"/>
+              </div>
+            </div>
+            <div className="control">
+              <button className="button">Change Password</button>
+            </div>
+          </form>
         </div>
-        <div className="control">
-          <button className="button">Change Password</button>
+
+        <div className="box">
+          <form onSubmit={this.handleSchoolChange}>
+            <p>
+              Edit School: {this.state.user.school.name}
+              </p>
+              <p>Courses:</p>
+              <ul>
+              {this.state.user.courses.map((course, index) => (<li key={index}>{course}</li>))}
+              </ul>
+
+            <div className="select">
+              <select onChange={this.schoolSelect} value={this.state.selectedSchool} name="school">
+                <option value="select">Select</option>
+                {this.state.schools.map((school, index) => (<option value={JSON.stringify(school)} key={index}>{school.name}</option>))}
+              </select>
+            </div>
+            <br/>
+            {$courseData}
+            <br/>
+            <div className="control">
+              <button className="button">Change Information</button>
+            </div>
+          </form>
         </div>
-      </form>
-      </div>
         <div id="cancelButton">
           <div className="control">
             <Link to="/">Cancel</Link>
           </div>
         </div>
-    </div>);
-  } else return(<p>Please wait</p>)
-}
+      </div>);
+    } else
+      return (<p>Please wait</p>)
+  }
 }
 
 export default EditProfile;

@@ -17,6 +17,9 @@ const ImageSchema = new mongoose.Schema({
   tutorUID: {
     type: String
   },
+  school: {
+    type: String
+  },
   course: {
     type: String
   },

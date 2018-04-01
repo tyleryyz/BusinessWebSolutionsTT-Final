@@ -44,8 +44,8 @@ module.exports = (app) => {
     if (req.body.email){
       User.updateOne({email: req.query.email}, {$set: { email: req.body.email}}).then((user) => res.json()).catch((err) => next(err));
     }
-    if (req.body.school){
-      User.updateOne({email: req.query.email}, {$set: { school: req.body.school}}).then((user) => res.json()).catch((err) => next(err));
+    if (req.body.school && req.body.courses){
+      User.updateOne({email: req.query.email}, {$set: {school: req.body.school, courses: req.body.courses}}).then((user) => res.json()).catch((err) => next(err));
   }
   })
 

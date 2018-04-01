@@ -135,6 +135,7 @@ class Claims extends Component {
       console.log("will mount here", user)
       this.setState({
         user: user,
+        courses: user.courses,
         loaded: false
       }, () => {
         this.setState({loaded: true})
@@ -158,16 +159,6 @@ class Claims extends Component {
           })
         })
       });
-    }).then(() => {
-      this.getCourses().then((courses) => {
-        console.log("courses", courses)
-        this.setState({
-          courses: courses,
-          loaded: false
-        }, () => {
-          this.setState({loaded: true})
-        })
-      })
     })
   };
 
@@ -181,15 +172,6 @@ class Claims extends Component {
     return 0;
   }
 
-  getCourses() {
-    console.log("inside courses")
-    return (fetch(`/api/courses`, {
-      headers: {
-        "Content-Type": "Application/json"
-      },
-      method: 'GET'
-    }).then(res => res.json()));
-  }
 
   getImageData() {
     console.log("here", this.state.uID)
@@ -417,7 +399,7 @@ class Claims extends Component {
           <div className="select">
             <select onChange={this.filterClaims} value={this.state.filterVal} name="course">
               <option value="select">Select</option>
-              {this.state.courses.map((course, index) => (<option key={index}>{course.name}</option>))}
+              {this.state.courses.map((course, index) => (<option key={index}>{course}</option>))}
             </select>
           </div>
 

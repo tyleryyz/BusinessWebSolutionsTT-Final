@@ -61,7 +61,10 @@ class Dashboard extends Component {
       courses: null,
       filterVal: 'select',
       downloadURL: null,
-      statusVal: 'all'
+      statusVal: 'all',
+      schools: [],
+      schoolVal: 'select',
+      courseVal: 'select'
     };
     this.getData = this.getData.bind(this);
     this.getImageData = this.getImageData.bind(this);
@@ -72,7 +75,10 @@ class Dashboard extends Component {
     this.getImageURL = this.getImageURL.bind(this);
     this.getVideoURL = this.getVideoURL.bind(this);
     this.filterStatus = this.filterStatus.bind(this);
-
+    this.getSchools = this.getSchools.bind(this);
+    this.adminFilter = this.adminFilter.bind(this);
+    this.adminCourseFilter = this.adminCourseFilter.bind(this);
+    this.check = this.check.bind(this);
   }
 
   getData() {
@@ -86,11 +92,21 @@ class Dashboard extends Component {
     }).then(res => res.json()));
   }
 
+  getSchools() {
+    return (fetch(`/api/schools`, {
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      method: 'GET'
+    }).then(res => res.json()));
+  }
+
   componentWillMount() {
     let result = this.getData().then((user) => {
       console.log("will mount here", user)
       this.setState({
         user: user,
+        courses: user.courses,
         loaded: false
       }, () => {
         this.setState({loaded: true})
@@ -121,30 +137,21 @@ class Dashboard extends Component {
           }, () => {
             this.setState({loaded: true})
           })
+        }).then(()=>{
+          console.log("here")
+          this.getSchools().then((schools) => {
+            console.log("schools", schools)
+            this.setState({
+              schools: schools,
+              loaded: false
+            }, () => {
+              this.setState({loaded: true})
+            });
+          });
         })
       })
-      }).then(() => {
-        this.getCourses().then((courses) => {
-          console.log("courses", courses)
-          this.setState({
-            courses: courses,
-            loaded: false
-          }, () => {
-            this.setState({loaded: true})
-          });
-        });
-      });
+      })
   };
-
-  getCourses() {
-    console.log("inside courses")
-    return (fetch(`/api/courses`, {
-      headers: {
-        "Content-Type": "Application/json"
-      },
-      method: 'GET'
-    }).then(res => res.json()));
-  }
 
   getImageData(permission, uID, status) {
     if (permission === "Student") {
@@ -165,7 +172,7 @@ class Dashboard extends Component {
       }).then(res => res.json()));
     }
   } else if (permission === "Tutor") {
-      return (fetch(`/api/images?status=${"open"}`, {
+      return (fetch(`/api/images?school=${this.state.user.school.name}&status=${'open'}`, {
         headers: {
           "Content-Type": "Application/json"
         },
@@ -287,7 +294,13 @@ class Dashboard extends Component {
     } else {
       let url;
       if (status === "all") {
+        if (this.state.user.permission === "Tutor"){
+          url= `/api/images?course=${course}&school=${this.state.user.school.name}&status=${'open'}`
+        } else if (this.state.user.permission === "Student"){
         url = `/api/images?course=${this.state.filterVal}&clientUID=${this.state.user.uID}`
+      } else {
+        url = `/api/images?course=${this.state.filterVal}`
+        }
       } else {
         url = `/api/images?course=${this.state.filterVal}&status=${status}&clientUID=${this.state.user.uID}`
       }
@@ -332,7 +345,6 @@ class Dashboard extends Component {
   async filterImages(e) {
     let course;
     if (e) {
-      console.log("test")
       e.preventDefault();
       course = e.target.value;
     } else {
@@ -372,8 +384,10 @@ class Dashboard extends Component {
       let url;
       console.log(course)
       console.log("status inside course filter", this.state.statusVal)
-      if (this.state.statusVal === "all") {
-        url = `/api/images?course=${course}&clientUID=${this.state.user.uID}`
+      if (this.state.statusVal === "all" && this.state.user.permission === "Student") {
+        url = `/api/images?course=${course}&clientUID=${this.state.user.uID}&school=${this.state.user.school.name}`
+      } else if(this.state.user.permission === "Tutor") {
+        url = `/api/images?course=${course}&school=${this.state.user.school.name}&status=${'open'}`
       } else {
         url = `/api/images?course=${course}&status=${this.state.statusVal}&clientUID=${this.state.user.uID}`
       }
@@ -413,6 +427,151 @@ class Dashboard extends Component {
         })
       }));
     }
+  }
+
+  async adminCourseFilter(e){
+    e.preventDefault()
+    let course = e.target.value;
+    if (course === 'select'){
+      let images = (fetch(`/api/images?school=${this.state.schoolVal.name}`, {
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        method: 'GET'
+      }).then(res => res.json())).then((images) => {
+        images.sort(this.compare);
+        this.setState({
+          loaded: false,
+          images: images,
+          schoolVal: 'select'
+        }, () => {
+          this.setState({loaded: true})
+        })
+        this.getImageURL(images).then((urlArray) => {
+          console.log("after get image?", urlArray)
+          this.setState({
+            downloadURL: urlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+        this.getVideoURL(images).then((vidUrlArray) => {
+          console.log("after get video?", vidUrlArray)
+          this.setState({
+            vidURL: vidUrlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+      })
+    } else {
+      let images = (fetch(`/api/images?school=${this.state.schoolVal.name}&course=${course}`, {
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        method: 'GET'
+      }).then(res => res.json())).then((images) => {
+        images.sort(this.compare);
+        this.setState({
+          loaded: false,
+          images: images,
+          courseVal: course
+        }, () => {
+          this.setState({loaded: true})
+        })
+        this.getImageURL(images).then((urlArray) => {
+          console.log("after get image?", urlArray)
+          this.setState({
+            downloadURL: urlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+        this.getVideoURL(images).then((vidUrlArray) => {
+          console.log("after get video?", vidUrlArray)
+          this.setState({
+            vidURL: vidUrlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+      })
+    }
+  }
+
+  async adminFilter(e){
+    e.preventDefault();
+    let selectedSchool = e.target.value;
+    if (selectedSchool === 'select'){
+      this.getImageData(this.state.user.permission, this.state.user.uID, this.state.statusVal).then((images) => {
+        images.sort(this.compare);
+        this.setState({
+          loaded: false,
+          images: images,
+          schoolVal: 'select'
+        }, () => {
+          this.setState({loaded: true})
+        })
+        this.getImageURL(images).then((urlArray) => {
+          console.log("after get image?", urlArray)
+          this.setState({
+            downloadURL: urlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+        this.getVideoURL(images).then((vidUrlArray) => {
+          console.log("after get video?", vidUrlArray)
+          this.setState({
+            vidURL: vidUrlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+      })
+    }
+    else {
+    var school = JSON.parse(selectedSchool);
+    let images = (fetch(`/api/images?school=${school.name}`, {
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      method: 'GET'
+    }).then(res => res.json())).then((images) => {
+      images.sort(this.compare);
+      this.setState({
+        images: images,
+        schoolVal: school,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      })
+      this.getImageURL(images).then((urlArray) => {
+        console.log("after get image?", urlArray)
+        this.setState({
+          downloadURL: urlArray,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+        })
+      })
+      this.getVideoURL(images).then((vidUrlArray) => {
+        console.log("after get video?", vidUrlArray)
+        this.setState({
+          vidURL: vidUrlArray,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+        })
+      })
+    })
+  }
   }
 
   getDateInformation(timestamp) {
@@ -457,13 +616,19 @@ class Dashboard extends Component {
     return 0;
   }
 
+  check(){
+    console.log("check result", (this.state.schoolVal === 'select') ? this.state.schoolVal : this.state.schoolVal.name)
+    return((this.state.schoolVal === 'select') ? this.state.schoolVal : this.state.schoolVal.name)
+  }
+
   render() {
     let $url;
+    let $courseData;
     if (this.state.user) {
       console.log(this.state.user.permission)
       let $image;
       let $date;
-      if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses) {
+      if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses && this.state.downloadURL) {
 
         return (<div className="container">
           <p>tutor view</p>
@@ -473,7 +638,7 @@ class Dashboard extends Component {
           <div className="select">
             <select onChange={this.filterImages} value={this.state.filterVal} name="course">
               <option value="select">Select</option>
-              {this.state.courses.map((course, index) => (<option key={index}>{course.name}</option>))}
+              {this.state.user.courses.map((course, index) => (<option key={index}>{course}</option>))}
             </select>
           </div>
 
@@ -499,12 +664,12 @@ class Dashboard extends Component {
             </div>))
           }
         </div>)
-      } else if (this.state.user.permission === "Student" && this.state.images && this.state.courses) {
+      } else if (this.state.user.permission === "Student" && this.state.images && this.state.courses && this.state.downloadURL) {
         return (<div className="container">
         <div className="select">
           <select onChange={this.filterImages} value={this.state.filterVal} name="course">
             <option value="select">Select</option>
-            {this.state.courses.map((course, index) => (<option key={index}>{course.name}</option>))}
+            {this.state.courses.map((course, index) => (<option key={index}>{course}</option>))}
           </select>
         </div>
         <div className="select">
@@ -537,16 +702,30 @@ class Dashboard extends Component {
             </div>))
           }
         </div>);
-      } else if (this.state.user.permission === "Admin" && this.state.images && this.state.courses) {
+      } else if (this.state.user.permission === "Admin" && this.state.images && this.state.schools && this.state.downloadURL) {
+        if (this.state.schoolVal!="select"){
+          $courseData = (
+            <div className="select">
+            <select onChange={this.adminCourseFilter} value={this.state.courseVal}>
+              <option value="select">Select</option>
+                {this.state.schoolVal.courses.map((course, index) => (<option key={index}>{course}</option>))}
+            </select>
+            </div>
+          )
+        } else $courseData = (<p></p>)
         return (<div className="container">
         <div className="select">
-          <select onChange={this.filterImages} value={this.state.filterVal} name="course">
+        {console.log("school val:",this.state.schoolVal)}
+          <select onChange={this.adminFilter} value={this.schoolVal}>
             <option value="select">Select</option>
-            {this.state.courses.map((course, index) => (<option key={index}>{course.name}</option>))}
-          </select>
+              {this.state.schools.map((school, index) => (<option value={JSON.stringify(school)} key={index}>{school.name}</option>))}
+            </select>
         </div>
+        {$courseData}
+        <br />
           {
-            this.state.images.map((image, index) => (<div key={index}>
+            this.state.images.map((image, index) => (
+              <div key={index}>
 
               <div className="card">
                 <a href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]} width="75%" height="75%"/></a>
@@ -562,6 +741,7 @@ class Dashboard extends Component {
                   <p>Status: {image.status}</p>
 
                   {image.tutorUID && <p>Tutor UID: {image.tutorUID}</p>}
+                  <p>school: {image.school}</p>
                 </div>
               </div>
               <br/>
