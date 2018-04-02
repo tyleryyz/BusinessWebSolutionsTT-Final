@@ -47,6 +47,7 @@ class Home extends Component {
         {this.state.user.classList.map((subject, index) => (
           <p key={index}>{subject}</p>
         ))}
+        <Payment />
       </div>);
     } else {
       return (<div>
