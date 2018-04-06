@@ -117,6 +117,28 @@ var PaymentForm = React.createClass({
         <input type='text' data-stripe='cvc' placeholder='cvc' /><br />
         <input disabled={this.state.submitDisabled} type='submit' value='Purchase' />
       </form>);
+
+
+	  // <div className="box">
+		// <form onSubmit={this.onSubmit}>
+		// <span>{ this.state.paymentError }</span><br />
+		//   <div className="field">
+		// 	<label className="label">First Name: {this.state.user.fname}</label>
+		// 	<div className="control">
+		// 	  <input className="input" name="fname" type="text" placeholder="First Name"/>
+		// 	</div>
+		//   </div>
+		//   <div className="field">
+		// 	<label className="label">Last Name: {this.state.user.lname}</label>
+		// 	<div className="control">
+		// 	  <input className="input" name="lname" type="text" placeholder="Last Name"/>
+		// 	</div>
+		//   </div>
+		//   <div className="control">
+		// 	<button className="button">Save Changes</button>
+		//   </div>
+		// </form>
+	  // </div>
     }
   }
 });
