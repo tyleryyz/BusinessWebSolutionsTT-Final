@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import 'whatwg-fetch';
-import Payment from "../Payment/Payment";
+import PaymentForm from "../PaymentForm/PaymentForm";
 
 var firebase = require('firebase');
 
@@ -47,7 +47,7 @@ class Home extends Component {
         {this.state.user.classList.map((subject, index) => (
           <p key={index}>{subject}</p>
         ))}
-        <Payment />
+        <PaymentForm />
       </div>);
     } else {
       return (<div>
