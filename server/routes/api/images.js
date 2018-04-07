@@ -17,6 +17,10 @@ module.exports = (app) => {
       }
     }
 
+    else if (req.query.school && req.query.course && req.query.status){
+      Image.find({course: req.query.course, school: req.query.school, status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
+    }
+
     else if (req.query.school && req.query.course){
       Image.find({course: req.query.course, school: req.query.school}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
