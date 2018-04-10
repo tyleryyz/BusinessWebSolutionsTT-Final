@@ -86,14 +86,17 @@ var PaymentForm = React.createClass({
     var self = this;
     event.preventDefault();
     this.setState({ submitDisabled: true, paymentError: null });
+
     // send form here
+
     Stripe.createToken(event.target, function(status, response) {
       if (response.error) {
         self.setState({ paymentError: response.error.message, submitDisabled: false });
       }
       else {
         self.setState({ paymentComplete: true, submitDisabled: false, token: response.id });
-        // make request to your server here!
+		console.log("response: ", response);
+		// make request to your server here!
       }
     });
   },
@@ -109,36 +112,48 @@ var PaymentForm = React.createClass({
       return <div>Payment Complete!</div>;
     }
     else {
-      return (<form onSubmit={this.onSubmit} >
-        <span>{ this.state.paymentError }</span><br />
-        <input type='text' data-stripe='number' placeholder='credit card number' /><br />
-        <input type='text' data-stripe='exp-month' placeholder='expiration month' /><br />
-        <input type='text' data-stripe='exp-year' placeholder='expiration year' /><br />
-        <input type='text' data-stripe='cvc' placeholder='cvc' /><br />
-        <input disabled={this.state.submitDisabled} type='submit' value='Purchase' />
-      </form>);
+      return (
+	// <form onSubmit={this.onSubmit} >
+    //     <span>{ this.state.paymentError }</span><br />
+    //     <input type='text' data-stripe='number' placeholder='credit card number' /><br />
+    //     <input type='text' data-stripe='exp-month' placeholder='expiration month' /><br />
+    //     <input type='text' data-stripe='exp-year' placeholder='expiration year' /><br />
+    //     <input type='text' data-stripe='cvc' placeholder='cvc' /><br />
+    //     <input disabled={this.state.submitDisabled} type='submit' value='Purchase' />
+    //   </form>);
 
+	  <div className="box">
+		<form onSubmit={this.onSubmit}>
+		<span>{ this.state.paymentError }</span><br />
+		  <div className="field">
+			<div className="control">
+			  <input className="input" data-stripe="number" type="text" placeholder="Card Number"/>
+			</div>
+		  </div>
 
-	  // <div className="box">
-		// <form onSubmit={this.onSubmit}>
-		// <span>{ this.state.paymentError }</span><br />
-		//   <div className="field">
-		// 	<label className="label">First Name: {this.state.user.fname}</label>
-		// 	<div className="control">
-		// 	  <input className="input" name="fname" type="text" placeholder="First Name"/>
-		// 	</div>
-		//   </div>
-		//   <div className="field">
-		// 	<label className="label">Last Name: {this.state.user.lname}</label>
-		// 	<div className="control">
-		// 	  <input className="input" name="lname" type="text" placeholder="Last Name"/>
-		// 	</div>
-		//   </div>
-		//   <div className="control">
-		// 	<button className="button">Save Changes</button>
-		//   </div>
-		// </form>
-	  // </div>
+		  <div className="field">
+			<div className="control">
+			  <input className="input" data-stripe="exp-month" type="text" placeholder="Expiration Month"/>
+			</div>
+		  </div>
+
+		  <div className="field">
+			<div className="control">
+			  <input className="input" data-stripe="exp-year" type="text" placeholder="Expiration Year"/>
+			</div>
+		  </div>
+
+		  <div className="field">
+			<div className="control">
+			  <input className="input" data-stripe="cvc" type="text" placeholder="CVC"/>
+			</div>
+		  </div>
+
+		  <div className="control">
+			<button className="button">Purchase</button>
+		  </div>
+		</form>
+	  </div>);
     }
   }
 });
