@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import 'whatwg-fetch';
-import {Link} from 'react-router-dom';
+import {Link, Route, Switch, Router} from 'react-router-dom';
 const testimage = require("../../../public/assets/img/poster.png")
 
 var firebase = require('firebase');
@@ -14,6 +14,7 @@ class Home extends Component {
       loaded: false
     };
     this.getData = this.getData.bind(this);
+	this.handleFilter = this.handleFilter.bind(this);
 
   }
 
@@ -39,6 +40,14 @@ class Home extends Component {
       });
     })
   };
+
+//not working
+  handleFilter(subject) {
+	  console.log("Made it to func: ", subject);
+	  <Switch>
+	      <Route path="/Dashboard" render={() => <Dashboard user={this.state.user} filter={subject} />}/>
+	  </Switch>
+  }
 
   render() {
 
@@ -95,8 +104,10 @@ class Home extends Component {
                   {/* My For-Loop essentially */}
                     {this.state.user.courses.map((subject, index) => (
                         <div key={index} className="column">
-                          <a href="" style={{fontSize: "24px"}} >{subject}</a>
-                          <button className="button">
+
+                          <button className="button" style={{fontSize: "20px"}} onClick={this.handleFilter(subject)}>{subject}</button>
+
+						  <button className="button">
                             <Link to="">Submit Assignment</Link>
                           </button>
                           <button className="button">
