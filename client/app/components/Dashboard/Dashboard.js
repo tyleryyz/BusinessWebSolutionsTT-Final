@@ -103,7 +103,8 @@ class Dashboard extends Component {
 
   componentWillMount() {
     let result = this.getData().then((user) => {
-      console.log("will mount here", user)
+      console.log("will mount here", user);
+	  console.log("HRERERERER: ", this.props);
       this.setState({
         user: user,
         courses: user.courses,

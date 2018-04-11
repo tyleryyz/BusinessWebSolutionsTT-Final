@@ -38,7 +38,7 @@ class App extends Component {
         <Route path="/tt-admin" render={() => <Admin user={this.props.user}/>}/>
         <Route exact path="/" render={() => <Home user={this.props.user}/>}/>
         <Route path="/Claims" render={() => <Claims user={this.props.user}/>}/>
-        <Route path="/Dashboard" render={() => <Dashboard user={this.props.user}/>}/>
+        <Route path="/Dashboard/:subject" render={() => <Dashboard user={this.props.user} />}/>
 		    <Route path="/Submissions" render={() => <Submissions user={this.props.user}/>}/>
         <Route path="/Emailing" render={() => <Emailing user={this.props.user}/>}/>
         <Route path="/imageupload" render={() => <ImageUpload user={this.props.user}/>}/>
