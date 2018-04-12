@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import 'whatwg-fetch';
 import {Link} from 'react-router-dom';
 import { Player, BigPlayButton } from 'video-react';
+import PaymentForm from '../PaymentForm/PaymentForm';
 import "../../../../node_modules/video-react/dist/video-react.css";
 
 var firebase = require('firebase');
@@ -112,8 +113,11 @@ class Dashboard extends Component {
         this.setState({loaded: true})
       });
     }).then(() => {
+		console.log("IMAGES START");
+		console.log("Permission is: ", this.state.user.permission);
       this.getImageData(this.state.user.permission, this.state.user.uID, this.state.statusVal).then((images) => {
-        images.sort(this.compare);
+		  console.log("Images: ", images);
+		images.sort(this.compare);
         this.setState({
           loaded: false,
           images: images
@@ -642,6 +646,7 @@ class Dashboard extends Component {
             </select>
           </div>
 
+
           {
             this.state.images.map((image, index) => (<div key={index}>
 
@@ -698,6 +703,9 @@ class Dashboard extends Component {
         					</Player> ) : $url = <p></p>}
                 </div>
               </div>
+
+			  <PaymentForm image={image} />
+
               <br/>
             </div>))
           }
