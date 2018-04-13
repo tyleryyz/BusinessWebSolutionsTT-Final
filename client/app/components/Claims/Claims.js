@@ -175,7 +175,7 @@ class Claims extends Component {
 
   getImageData() {
     console.log("here", this.state.uID)
-    return (fetch(`/api/images?tutorUID=${this.state.user.uID}`, {
+    return (fetch(`/api/images?tutorUID=${this.state.user.uID}&status=${'claimed'}`, {
       headers: {
         "Content-Type": "Application/json"
       },
@@ -355,12 +355,22 @@ class Claims extends Component {
 		  status: "completed" })
     }).then((image) => {
       this.getImageData().then((images) => {
+
         this.setState({
           images: images,
           loaded: false
         }, () => {
           this.setState({loaded: true})
         });
+        this.getImageURL(images).then((urlArray) => {
+          console.log("after get image?", urlArray)
+          this.setState({
+            downloadURL: urlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
       })
     });
 

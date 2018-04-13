@@ -24,10 +24,19 @@ const ImageSchema = new mongoose.Schema({
     type: String
   },
   purchased: {
-	type: Number
+	   type: Number
   },
   timestamp: {
     type: Number
+  },
+  reportComment: {
+    type: String
+  },
+  reportReason: {
+    type: String
+  },
+  comment: {
+    type: String
   }
 });
 

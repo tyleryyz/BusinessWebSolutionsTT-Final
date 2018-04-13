@@ -64,8 +64,8 @@ module.exports = (app) => {
     else if (req.query.course){
       Image.find({course: req.query.course}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
-    else if (req.query.tutorUID){
-      Image.find({tutorUID: req.query.tutorUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
+    else if (req.query.tutorUID && req.query.status){
+      Image.find({tutorUID: req.query.tutorUID, status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
     else if (req.query.status){
 
@@ -93,13 +93,19 @@ module.exports = (app) => {
     image.videoURL = req.body.videoURL;
     image.purchased = req.body.purchased;
     image.school = req.body.school;
+    image.comment = req.body.comment;
+    image.reportComment = "";
+    image.reportReason = "";
 
     image.save().then(() => res.json(image)).catch((err) => next(err));
   });
 
   app.delete('/api/images', function(req, res, next) {
-
+    if (req.query.imageURL){
+      Image.deleteOne({imageURL: req.query.imageURL}).then((image) => res.json()).catch((err) => next(err));
+    } else{
     Image.deleteOne({email: req.query.email}).then((image) => res.json()).catch((err) => next(err));
+    }
   });
 
   app.put('/api/images', function(req, res, next) {
@@ -115,6 +121,14 @@ module.exports = (app) => {
 	if (req.body.purchased){
 		Image.updateOne({imageURL: req.query.imageURL}, {$set: { purchased: req.body.purchased}}).then((image) => res.json()).catch((err) => next(err));
     }
+
+  if(req.body.reportComment && req.body.status && req.body.reportReason){
+    Image.updateOne({imageURL: req.query.imageURL}, {$set: { reportComment: req.body.reportComment, status: req.body.status, reportReason: req.body.reportReason }}).then((image) => res.json()).catch((err) => next(err));
+  }
+  if (req.body.status && req.body.reportReason){
+    Image.updateOne({imageURL: req.query.imageURL}, {$set: { status: req.body.status, reportReason: req.body.reportReason }}).then((image) => res.json()).catch((err) => next(err));
+
+  }
   })
 
 };

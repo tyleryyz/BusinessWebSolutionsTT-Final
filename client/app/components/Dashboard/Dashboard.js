@@ -63,8 +63,12 @@ class Dashboard extends Component {
       downloadURL: null,
       statusVal: 'all',
       schools: [],
+      vidURL: null,
       schoolVal: 'select',
-      courseVal: 'select'
+      courseVal: 'select',
+      reportID: null,
+      reportVal: 'select',
+      reportComment: ''
     };
     this.getData = this.getData.bind(this);
     this.getImageData = this.getImageData.bind(this);
@@ -79,6 +83,13 @@ class Dashboard extends Component {
     this.adminFilter = this.adminFilter.bind(this);
     this.adminCourseFilter = this.adminCourseFilter.bind(this);
     this.check = this.check.bind(this);
+    this.renderReportForm = this.renderReportForm.bind(this);
+    this.reportChange = this.reportChange.bind(this);
+    this.handleReport = this.handleReport.bind(this);
+    this.reportImage = this.reportImage.bind(this);
+    this.cancelReport = this.cancelReport.bind(this);
+    this.enterComment = this.enterComment.bind(this);
+    this.checkReport = this.checkReport.bind(this);
   }
 
   getData() {
@@ -574,6 +585,169 @@ class Dashboard extends Component {
   }
   }
 
+  handleReport(e, image){
+    e.preventDefault();
+    this.setState({
+      reportID: image.imageURL,
+      reportVal: 'select',
+      loaded: false
+    }, () => {
+      this.setState({loaded: true})
+    })
+  }
+
+  reportChange(e){
+    e.preventDefault();
+    this.setState({
+      reportVal: e.target.value,
+      loaded: false
+    }, () => {
+      this.setState({loaded: true})
+    })
+  }
+
+  renderReportForm(image){
+    if (this.state.reportID === image.imageURL){
+      let $otherForm;
+      if (this.state.reportVal === 'Other'){
+        $otherForm = (
+
+          <div className="field">
+            <label className="label">Specify</label>
+            <div className="control">
+              <input className="input" onChange={this.enterComment} value={this.state.reportComment} name="report" type="text" placeholder="Specify Report"/>
+            </div>
+          </div>
+        )
+      } else {
+        $otherForm = (<p></p>)
+      }
+      return (
+        <form onSubmit={(e) => this.reportImage(e, image)}>
+        <div className="select">
+          <select onChange={this.reportChange} value={this.state.reportVal} name="report">
+            <option value="select">Select</option>
+            <option value="Inappropriate">Inappropriate Image/Comment</option>
+            <option value="Misplaced">Wrong course tag for image content</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        {$otherForm}
+        <div className="control">
+          <button className="button">Submit Report</button>
+        </div>
+        <div id="cancelButton">
+          <div className="control">
+            <button onClick={this.cancelReport} className="button">Cancel Report</button>
+          </div>
+        </div>
+        </form>
+      )
+    } else {
+      return(<p></p>)
+    }
+  }
+
+  enterComment(e){
+    e.preventDefault();
+    this.setState({
+      reportComment: e.target.value
+    })
+  }
+
+  cancelReport(){
+    this.setState({
+      reportVal: 'select',
+      reportID: null,
+      loaded: false
+    }, () => {
+      this.setState({loaded: true})
+    })
+  }
+
+  checkReport(image){
+    let $verboseReason;
+    let $comment;
+    if (image.status === "reported"){
+      if (image.reportReason === "Other"){
+        $verboseReason = "Other"
+        $comment = image.reportComment;
+      }
+      else if (image.reportReason === "Inappropriate"){
+        $verboseReason = "Inappropriate image/comment"
+      }
+      else if (image.reportReason === "Misplaced"){
+        $verboseReason = "Wrong course tag for image content"
+      }
+      return (
+        <div>
+        <p>Report reason: {$verboseReason}</p>
+        {$comment? <p>Comment from tutor: {$comment}</p>:<p></p>}
+        </div>
+      )
+    } else {
+      return(<p></p>)
+    }
+  }
+
+  reportImage(e, image){
+    console.log("reported!")
+    e.preventDefault();
+    console.log(this.state.reportComment)
+    if (this.state.reportComment != ""){
+      const comment = this.state.reportComment;
+      const imageURL = image.imageURL;
+      fetch(`/api/images?imageURL=${imageURL}`, {
+        method: 'PUT',
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        body: JSON.stringify({status: "reported", reportComment: comment, reportReason: this.state.reportVal})
+      }).then((image) => {
+        this.filterImages().then(() => {
+          this.filterStatus().then(() => {
+          this.getImageURL(this.state.images).then((urlArray) => {
+            this.setState({
+              downloadURL: urlArray,
+              reportID: null,
+              reportVal: 'select',
+              reportComment: '',
+              loaded: false
+            }, () => {
+              this.setState({loaded: true})
+            })
+          })
+        })
+      })
+    })
+  } else {
+    const imageURL = image.imageURL;
+    fetch(`/api/images?imageURL=${imageURL}`, {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify({status: "reported", reportReason: this.state.reportVal})
+    }).then((image) => {
+      this.filterImages().then(() => {
+        this.filterStatus().then(() => {
+        this.getImageURL(this.state.images).then((urlArray) => {
+          this.setState({
+            downloadURL: urlArray,
+            reportID: null,
+            reportVal: 'select',
+            reportComment: '',
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+      })
+    })
+  })
+  }
+  }
+
   getDateInformation(timestamp) {
     let date = new Date(timestamp);
     var monthNames = [
@@ -629,7 +803,6 @@ class Dashboard extends Component {
       let $image;
       let $date;
       if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses && this.state.downloadURL) {
-
         return (<div className="container">
           <p>tutor view</p>
           <Link to="/Claims">View claimed clients</Link>
@@ -655,16 +828,19 @@ class Dashboard extends Component {
                   <p className="subtitle is-6">{image.course}</p>
                 </div>
                 <div className="content">
+                <p>Comments: {image.comment} </p>
                   <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
                 </div>
                 <button onClick={(e) => this.handleClaim(e, image)} className="button is-success">Claim image</button>
+                <button onClick={(e) => this.handleReport(e, image)} className="button is-warning">Report Image</button>
+                { this.renderReportForm(image) }
               </div>
 
               <br/>
             </div>))
           }
         </div>)
-      } else if (this.state.user.permission === "Student" && this.state.images && this.state.courses && this.state.downloadURL) {
+      } else if (this.state.user.permission === "Student" && this.state.images && this.state.courses && this.state.downloadURL && this.state.vidURL) {
         return (<div className="container">
         <div className="select">
           <select onChange={this.filterImages} value={this.state.filterVal} name="course">
@@ -690,12 +866,15 @@ class Dashboard extends Component {
                   <p className="title is-4">{image.clientUID}</p>
                   <p className="subtitle is-6">{image.course}</p>
                 </div>
+                <p>Comments: {image.comment} </p>
                 <div className="content">
                   <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
-                  {this.state.vidURL[index] ? $url =(
+
+                  {image.videoURL ? $url =(
                   <Player>
         						<source src={this.state.vidURL[index]} />
         					</Player> ) : $url = <p></p>}
+                  {$url}
                 </div>
               </div>
               <br/>
@@ -742,6 +921,9 @@ class Dashboard extends Component {
 
                   {image.tutorUID && <p>Tutor UID: {image.tutorUID}</p>}
                   <p>school: {image.school}</p>
+                  {image.comment?<p>comment: {image.comment}</p> : <p></p>}
+                  {this.checkReport(image)}
+                  <br />
                 </div>
               </div>
               <br/>

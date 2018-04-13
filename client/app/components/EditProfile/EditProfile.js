@@ -26,6 +26,8 @@ class EditProfile extends Component {
     this.coursesSelect = this.coursesSelect.bind(this);
     this.coursesDeselect = this.coursesDeselect.bind(this);
     this.handleSchoolChange = this.handleSchoolChange.bind(this);
+    this.addOneClass = this.addOneClass.bind(this);
+
   }
 
   getData() {
@@ -50,11 +52,25 @@ class EditProfile extends Component {
 
   schoolSelect(e) {
     let value = e.target.value;
-    var school = JSON.parse(value);
+    if (value != "select"){
+      var school = JSON.parse(value);
+    } else {
+      var school = value;
+    }
 
     this.setState({
       selectedSchool: school,
       courses: school.courses,
+      selectedCourses: [],
+      loaded: false
+    }, () => {
+      this.setState({loaded: true})
+    });
+  }
+
+  addOneClass(){
+    this.setState({
+      selectedCourses: this.state.selectedSchool.courses,
       loaded: false
     }, () => {
       this.setState({loaded: true})
@@ -187,25 +203,42 @@ class EditProfile extends Component {
 
   render() {
     let $courseData;
-    if (this.state.selectedSchool != "select") {
-      console.log(this.state.selectedSchool)
-      $courseData = (<div >
-        <p>Select multiple classes that you are in</p>
-        <br/>
-        <div className="select is-multiple">
-          <select multiple={true} onChange={this.coursesSelect} value={this.state.selectedSchool.courses}>
-            {this.state.selectedSchool.courses.map((course, index) => (<option key={index}>{course}</option>))}
-          </select>
-        </div>
-        <div className="select is-multiple">
-          <select multiple={true} onChange={this.coursesDeselect} value={this.state.selectedCourses}>
-            {this.state.selectedCourses.map((course, index) => (<option key={index}>{course}</option>))}
-          </select>
-        </div>
-      </div>)
-    } else {
-      $courseData = (<p></p>)
-    }
+      if (this.state.selectedSchool != "select" && this.state.courses) {
+        if (this.state.courses.length === 1) {
+            $courseData = (
+              <div>
+            <p>Only one class available for that University</p>
+            <br />
+            <p>{this.state.courses}   <a onClick={this.addOneClass} className="button">Add Class</a></p>
+            <p>Your course list</p>
+            <div className="select is-multiple">
+              <select multiple size="3" onChange={this.coursesDeselect} value={this.state.selectedCourses}>
+                {this.state.selectedCourses.map((course, index) => (<option value={course} key={index}>{course}</option>))}
+              </select>
+            </div>
+
+            </div>
+          )
+        } else if(this.state.courses.length>1) {
+         $courseData = (
+           <div>
+           <p>Select multiple classes that you are in</p>
+           <br/>
+           <p>Available courses</p>
+           <div className="select is-multiple">
+             <select multiple size="3" id="courses" onChange={this.coursesSelect} value={this.state.selectedSchool.courses}>
+               {this.state.selectedSchool.courses.map((course, index) => (<option value={course} key={index}>{course}</option>))}
+             </select>
+           </div>
+           <p>Your course list</p>
+           <div className="select is-multiple">
+             <select multiple size="3" onChange={this.coursesDeselect} value={this.state.selectedCourses}>
+               {this.state.selectedCourses.map((course, index) => (<option value={course} key={index}>{course}</option>))}
+             </select>
+           </div>
+         </div>)
+       } else {$courseData = (<p></p>)}
+     }
 
     if (this.state.user && this.state.loaded && this.state.schools) {
       return (<div className="container">
@@ -269,7 +302,7 @@ class EditProfile extends Component {
               </ul>
 
             <div className="select">
-              <select onChange={this.schoolSelect} value={this.state.selectedSchool} name="school">
+              <select onChange={this.schoolSelect} value={JSON.stringify(this.state.selectedSchool)} name="school">
                 <option value="select">Select</option>
                 {this.state.schools.map((school, index) => (<option value={JSON.stringify(school)} key={index}>{school.name}</option>))}
               </select>
