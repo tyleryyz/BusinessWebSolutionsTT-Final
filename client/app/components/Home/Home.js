@@ -106,7 +106,7 @@ class Home extends Component {
                     {this.state.user.courses.map((subject, index) => (
                         <div key={index} className="column">
 
-						  <Link to={'/Dashboard/${subject}'}>{subject}</Link>
+						  <Link to='/Dashboard'>{subject}</Link>
 
 						  <button className="button">
                             <Link to="">Submit Assignment</Link>
