@@ -14,8 +14,7 @@ class Home extends Component {
       loaded: false
     };
     this.getData = this.getData.bind(this);
-	//this.handleFilter = this.handleFilter.bind(this);
-
+	this.handleFilter = this.handleFilter.bind(this);
   }
 
   getData() {
@@ -41,14 +40,10 @@ class Home extends Component {
     })
   };
 
-// //not working
-//   handleFilter(e, subject) {
-// 	  e.preventDefault();
-// 	  console.log("Made it to func: ", subject);
-// 	  <Switch>
-// 	      <Route path="/Dashboard" render={() => <Dashboard user={this.state.user} filter={subject} />}/>
-// 	  </Switch>
-//   }
+  handleFilter(subject, e) {
+	  e.preventDefault();
+	  this.props.filter(subject);
+  }
 
   render() {
 
@@ -106,7 +101,9 @@ class Home extends Component {
                     {this.state.user.courses.map((subject, index) => (
                         <div key={index} className="column">
 
-						  <Link to='/Dashboard'>{subject}</Link>
+						  <button className="button" onClick={(e) => this.handleFilter(subject, e)}>
+						  	<Link to='/Dashboard'>{subject}</Link>
+						  </button>
 
 						  <button className="button">
                             <Link to="">Submit Assignment</Link>
