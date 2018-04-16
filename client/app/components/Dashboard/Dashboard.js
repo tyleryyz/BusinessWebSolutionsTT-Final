@@ -68,7 +68,10 @@ class Dashboard extends Component {
       courseVal: 'select',
       reportID: null,
       reportVal: 'select',
-      reportComment: ''
+      reportComment: '',
+      available: false,
+      reported: false,
+      deleteID: null
     };
     this.getData = this.getData.bind(this);
     this.getImageData = this.getImageData.bind(this);
@@ -90,11 +93,18 @@ class Dashboard extends Component {
     this.cancelReport = this.cancelReport.bind(this);
     this.enterComment = this.enterComment.bind(this);
     this.checkReport = this.checkReport.bind(this);
+    this.viewAvailable = this.viewAvailable.bind(this);
+    this.changeAvailable = this.changeAvailable.bind(this);
+    this.viewAll = this.viewAll.bind(this);
+    this.viewReports = this.viewReports.bind(this);
+    this.changeReported = this.changeReported.bind(this);
+    this.renderDeleteConfirmation = this.renderDeleteConfirmation.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+    this.confirmDelete = this.confirmDelete.bind(this);
   }
 
   getData() {
     let uID = this.props.user.uid;
-    console.log(uID)
     return (fetch(`/api/users?uID=${uID}`, {
       headers: {
         "Content-Type": "Application/json"
@@ -114,7 +124,6 @@ class Dashboard extends Component {
 
   componentWillMount() {
     let result = this.getData().then((user) => {
-      console.log("will mount here", user)
       this.setState({
         user: user,
         courses: user.courses,
@@ -132,7 +141,6 @@ class Dashboard extends Component {
           this.setState({loaded: true})
         })
         this.getImageURL(images).then((urlArray) => {
-          console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
             loaded: false
@@ -141,7 +149,6 @@ class Dashboard extends Component {
           })
         })
         this.getVideoURL(images).then((vidUrlArray) => {
-          console.log("after get video?", vidUrlArray)
           this.setState({
             vidURL: vidUrlArray,
             loaded: false
@@ -149,9 +156,7 @@ class Dashboard extends Component {
             this.setState({loaded: true})
           })
         }).then(()=>{
-          console.log("here")
           this.getSchools().then((schools) => {
-            console.log("schools", schools)
             this.setState({
               schools: schools,
               loaded: false
@@ -166,7 +171,14 @@ class Dashboard extends Component {
 
   getImageData(permission, uID, status) {
     if (permission === "Student") {
-      if (status === "all"){
+      if (this.state.available) {
+        return (fetch(`/api/images?clientUID=${uID}&status=${"completed"}`, {
+          headers: {
+            "Content-Type": "Application/json"
+          },
+          method: 'GET'
+        }).then(res => res.json()));
+      } else if (status === "all"){
       return (fetch(`/api/images?clientUID=${uID}`, {
         headers: {
           "Content-Type": "Application/json"
@@ -190,6 +202,14 @@ class Dashboard extends Component {
         method: 'GET'
       }).then(res => res.json()));
     } else if (permission === "Admin") {
+      if (this.state.reported){
+        return (fetch(`/api/images?status=${"reported"}`, {
+          headers: {
+            "Content-Type": "Application/json"
+          },
+          method: 'GET'
+        }).then(res => res.json()));
+      } else {
       return (fetch(`/api/images`, {
         headers: {
           "Content-Type": "Application/json"
@@ -198,12 +218,13 @@ class Dashboard extends Component {
       }).then(res => res.json()));
     }
   }
+}
+
 
   async getImageURL(images) {
     let urlArray = new Array();
     let downloadURL;
     let url;
-    console.log("images", images)
     images.map((image, index) => {
       var params = {
         Bucket: bucketName,
@@ -211,7 +232,6 @@ class Dashboard extends Component {
       };
 
       url = s3.getSignedUrl('getObject', params)
-      console.log(url)
 
       urlArray.push(url)
 
@@ -224,7 +244,6 @@ class Dashboard extends Component {
     let vidUrlArray = new Array();
     let vidURL;
     let url;
-    console.log("images", images)
     images.map((image, index) => {
       var params = {
         Bucket: bucketName,
@@ -235,15 +254,13 @@ class Dashboard extends Component {
     url = s3.getSignedUrl('getObject', params);
     vidUrlArray.push(url)
   }
-    console.log(url);
 
     })
   return vidUrlArray
 
   }
 
-  handleClaim(e, image) {
-    e.preventDefault();
+  handleClaim(image) {
     const imageURL = image.imageURL;
     fetch(`/api/images?imageURL=${imageURL}`, {
       method: 'PUT',
@@ -255,7 +272,6 @@ class Dashboard extends Component {
       this.filterImages().then(() => {
         this.filterStatus().then(() => {
         this.getImageURL(this.state.images).then((urlArray) => {
-          console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
             loaded: false
@@ -270,9 +286,13 @@ class Dashboard extends Component {
 }
 
   async filterStatus(e) {
-    e.preventDefault();
-    status = e.target.value;
-    console.log("status", status)
+    let status;
+    if (e){
+      e.preventDefault();
+      status = e.target.value;
+    } else {
+      status=this.state.statusVal;
+    }
     if (this.state.filterVal === "select"){
       this.getImageData(this.state.user.permission, this.state.user.uID, status).then((images) => {
         images.sort(this.compare);
@@ -284,7 +304,6 @@ class Dashboard extends Component {
           this.setState({loaded: true})
         })
         this.getImageURL(images).then((urlArray) => {
-          console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
             loaded: false
@@ -293,7 +312,6 @@ class Dashboard extends Component {
           })
         })
         this.getVideoURL(images).then((vidUrlArray) => {
-          console.log("after get video?", vidUrlArray)
           this.setState({
             vidURL: vidUrlArray,
             loaded: false
@@ -321,7 +339,6 @@ class Dashboard extends Component {
         },
         method: 'GET'
       }).then(res => res.json()).then((images) => {
-        console.log(images);
         images.sort(this.compare);
 
         this.setState({
@@ -332,7 +349,6 @@ class Dashboard extends Component {
           this.setState({loaded: true})
         })
         this.getImageURL(images).then((urlArray) => {
-          console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
             loaded: false
@@ -341,7 +357,6 @@ class Dashboard extends Component {
           })
         })
         this.getVideoURL(images).then((vidUrlArray) => {
-          console.log("after get video?", vidUrlArray)
           this.setState({
             vidURL: vidUrlArray,
             loaded: false
@@ -361,7 +376,6 @@ class Dashboard extends Component {
     } else {
       course = this.state.filterVal
     }
-    console.log("inside filter")
     if (course === "select") {
       this.getImageData(this.state.user.permission, this.state.user.uID, this.state.statusVal).then((images) => {
         images.sort(this.compare);
@@ -373,7 +387,6 @@ class Dashboard extends Component {
           this.setState({loaded: true})
         })
         this.getImageURL(images).then((urlArray) => {
-          console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
             loaded: false
@@ -382,7 +395,6 @@ class Dashboard extends Component {
           })
         })
         this.getVideoURL(images).then((vidUrlArray) => {
-          console.log("after get video?", vidUrlArray)
           this.setState({
             vidURL: vidUrlArray,
             loaded: false
@@ -393,8 +405,6 @@ class Dashboard extends Component {
       });
     } else {
       let url;
-      console.log(course)
-      console.log("status inside course filter", this.state.statusVal)
       if (this.state.statusVal === "all" && this.state.user.permission === "Student") {
         url = `/api/images?course=${course}&clientUID=${this.state.user.uID}&school=${this.state.user.school.name}`
       } else if(this.state.user.permission === "Tutor") {
@@ -408,7 +418,6 @@ class Dashboard extends Component {
         },
         method: 'GET'
       }).then(res => res.json()).then((images) => {
-        console.log(images);
         images.sort(this.compare);
 
         this.setState({
@@ -419,7 +428,6 @@ class Dashboard extends Component {
           this.setState({loaded: true})
         })
         this.getImageURL(images).then((urlArray) => {
-          console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
             loaded: false
@@ -428,7 +436,6 @@ class Dashboard extends Component {
           })
         })
         this.getVideoURL(images).then((vidUrlArray) => {
-          console.log("after get video?", vidUrlArray)
           this.setState({
             vidURL: vidUrlArray,
             loaded: false
@@ -441,8 +448,13 @@ class Dashboard extends Component {
   }
 
   async adminCourseFilter(e){
-    e.preventDefault()
-    let course = e.target.value;
+    let course
+    if (e){
+      e.preventDefault()
+      course = e.target.value;
+    } else {
+      course = this.state.courseVal;
+    }
     if (course === 'select'){
       let images = (fetch(`/api/images?school=${this.state.schoolVal.name}`, {
         headers: {
@@ -459,7 +471,6 @@ class Dashboard extends Component {
           this.setState({loaded: true})
         })
         this.getImageURL(images).then((urlArray) => {
-          console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
             loaded: false
@@ -468,7 +479,6 @@ class Dashboard extends Component {
           })
         })
         this.getVideoURL(images).then((vidUrlArray) => {
-          console.log("after get video?", vidUrlArray)
           this.setState({
             vidURL: vidUrlArray,
             loaded: false
@@ -493,7 +503,6 @@ class Dashboard extends Component {
           this.setState({loaded: true})
         })
         this.getImageURL(images).then((urlArray) => {
-          console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
             loaded: false
@@ -502,7 +511,6 @@ class Dashboard extends Component {
           })
         })
         this.getVideoURL(images).then((vidUrlArray) => {
-          console.log("after get video?", vidUrlArray)
           this.setState({
             vidURL: vidUrlArray,
             loaded: false
@@ -515,8 +523,14 @@ class Dashboard extends Component {
   }
 
   async adminFilter(e){
-    e.preventDefault();
-    let selectedSchool = e.target.value;
+    let selectedSchool
+    if (e){
+      e.preventDefault();
+      selectedSchool = e.target.value;
+    } else {
+      selectedSchool = this.state.schoolVal;
+    }
+
     if (selectedSchool === 'select'){
       this.getImageData(this.state.user.permission, this.state.user.uID, this.state.statusVal).then((images) => {
         images.sort(this.compare);
@@ -528,7 +542,6 @@ class Dashboard extends Component {
           this.setState({loaded: true})
         })
         this.getImageURL(images).then((urlArray) => {
-          console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
             loaded: false
@@ -537,7 +550,6 @@ class Dashboard extends Component {
           })
         })
         this.getVideoURL(images).then((vidUrlArray) => {
-          console.log("after get video?", vidUrlArray)
           this.setState({
             vidURL: vidUrlArray,
             loaded: false
@@ -564,7 +576,6 @@ class Dashboard extends Component {
         this.setState({loaded: true})
       })
       this.getImageURL(images).then((urlArray) => {
-        console.log("after get image?", urlArray)
         this.setState({
           downloadURL: urlArray,
           loaded: false
@@ -573,7 +584,6 @@ class Dashboard extends Component {
         })
       })
       this.getVideoURL(images).then((vidUrlArray) => {
-        console.log("after get video?", vidUrlArray)
         this.setState({
           vidURL: vidUrlArray,
           loaded: false
@@ -585,8 +595,7 @@ class Dashboard extends Component {
   }
   }
 
-  handleReport(e, image){
-    e.preventDefault();
+  handleReport(image){
     this.setState({
       reportID: image.imageURL,
       reportVal: 'select',
@@ -594,6 +603,70 @@ class Dashboard extends Component {
     }, () => {
       this.setState({loaded: true})
     })
+  }
+
+  handleDelete(image){
+    this.setState({
+      deleteID: image.imageURL,
+      loaded: false
+    }, () => {
+      this.setState({loaded: true})
+    })
+  }
+
+  renderDeleteConfirmation(image){
+    if (this.state.deleteID === image.imageURL){
+      return(
+        <div className="control">
+          <button onClick = {()=> {this.confirmDelete(image)}} className="button">Confirm Delete</button>
+        </div>
+      )
+    }
+    else return(<p></p>)
+  }
+
+  confirmDelete(image){
+      var params = {
+        Bucket: bucketName,
+        Key: image.imageURL
+      };
+      s3.deleteObject(params, function(err, data){
+        if (err)
+        {
+          console.log("error:",err)
+        }
+        else
+        {
+          console.log("Successfully deleted image!");
+          // 
+          // subject = "Submission Deleted";
+          // message = "We have deleted your image submission of";
+          //sendTheEmail()
+
+        }
+      })
+      fetch(`/api/images?imageURL=${image.imageURL}`, {
+        method: 'DELETE',
+        headers: {
+          "Content-Type": "Application/json"
+        }
+      }).then((image) => {
+        this.filterImages().then(() => {
+          this.filterStatus().then(() => {
+          this.getImageURL(this.state.images).then((urlArray) => {
+            this.setState({
+              downloadURL: urlArray,
+              deleteID: null,
+              loaded: false
+            }, () => {
+              this.setState({loaded: true})
+            })
+          })
+        })
+
+      })
+    })
+
   }
 
   reportChange(e){
@@ -683,6 +756,9 @@ class Dashboard extends Component {
         <div>
         <p>Report reason: {$verboseReason}</p>
         {$comment? <p>Comment from tutor: {$comment}</p>:<p></p>}
+        <div className="control">
+          <button onClick={()=>{this.restoreImage(image)}} className="button">Restore image</button>
+        </div>
         </div>
       )
     } else {
@@ -690,10 +766,30 @@ class Dashboard extends Component {
     }
   }
 
+  restoreImage(image){
+    fetch(`/api/images?imageURL=${image.imageURL}`, {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify({status: "open", reportComment: "", reportReason: "", tutorUID: null})
+    }).then((image) => {
+      this.filterImages().then(() => {
+        this.filterStatus().then(() => {
+        this.getImageURL(this.state.images).then((urlArray) => {
+          this.setState({
+            downloadURL: urlArray,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+      })
+    })
+  })
+}
   reportImage(e, image){
-    console.log("reported!")
     e.preventDefault();
-    console.log(this.state.reportComment)
     if (this.state.reportComment != ""){
       const comment = this.state.reportComment;
       const imageURL = image.imageURL;
@@ -791,20 +887,132 @@ class Dashboard extends Component {
   }
 
   check(){
-    console.log("check result", (this.state.schoolVal === 'select') ? this.state.schoolVal : this.state.schoolVal.name)
     return((this.state.schoolVal === 'select') ? this.state.schoolVal : this.state.schoolVal.name)
   }
+
+  async changeAvailable(value){
+    this.setState({
+      available: value,
+      loaded: false
+    }, () => {
+      this.setState({loaded: true})
+    })
+  }
+
+  async changeReported(value){
+    this.setState({
+      reported: value,
+      loaded: false
+    }, () => {
+      this.setState({loaded: true})
+    })
+  }
+
+  async viewAvailable(){
+    this.changeAvailable(true).then(() =>{
+    this.getImageData(this.state.user.permission, this.state.user.uID, this.state.statusVal).then((images) => {
+      images.sort(this.compare);
+      this.setState({
+        loaded: false,
+        images: images
+      }, () => {
+        this.setState({loaded: true})
+      })
+      this.getImageURL(images).then((urlArray) => {
+        this.setState({
+          downloadURL: urlArray,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+        })
+      })
+      this.getVideoURL(images).then((vidUrlArray) => {
+        this.setState({
+          vidURL: vidUrlArray,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+        })
+      })
+    })
+  })
+}
+
+async viewReports() {
+  this.changeReported(true).then(() =>{
+  this.getImageData(this.state.user.permission, this.state.user.uID, this.state.statusVal).then((images) => {
+    images.sort(this.compare);
+    this.setState({
+      loaded: false,
+      images: images
+    }, () => {
+      this.setState({loaded: true})
+    })
+    this.getImageURL(images).then((urlArray) => {
+      this.setState({
+        downloadURL: urlArray,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      })
+    })
+    this.getVideoURL(images).then((vidUrlArray) => {
+      this.setState({
+        vidURL: vidUrlArray,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      })
+    })
+  })
+})
+}
+
+async viewAll(type){
+  let changefunc;
+  if(type==="available"){
+    changefunc = this.changeAvailable(false);
+  } else if (type==="reported"){
+    changefunc = this.changeReported(false);
+  }
+  changefunc.then(() =>{
+  this.getImageData(this.state.user.permission, this.state.user.uID, this.state.statusVal).then((images) => {
+    images.sort(this.compare);
+    this.setState({
+      loaded: false,
+      images: images
+    }, () => {
+      this.setState({loaded: true})
+    })
+    this.getImageURL(images).then((urlArray) => {
+      this.setState({
+        downloadURL: urlArray,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      })
+    })
+    this.getVideoURL(images).then((vidUrlArray) => {
+      this.setState({
+        vidURL: vidUrlArray,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      })
+    })
+  })
+})
+}
+
 
   render() {
     let $url;
     let $courseData;
     if (this.state.user) {
-      console.log(this.state.user.permission)
       let $image;
       let $date;
       if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses && this.state.downloadURL) {
         return (<div className="container">
-          <p>tutor view</p>
           <Link to="/Claims">View claimed clients</Link>
           <br/>
           <br/>
@@ -817,8 +1025,6 @@ class Dashboard extends Component {
 
           {
             this.state.images.map((image, index) => (<div key={index}>
-
-              {console.log("renderImage", this.state.downloadURL[index])}
               <div className="card">
                 <div className="card-content">
                   <a href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]} width="75%" height="75%"/></a>
@@ -831,8 +1037,8 @@ class Dashboard extends Component {
                 <p>Comments: {image.comment} </p>
                   <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
                 </div>
-                <button onClick={(e) => this.handleClaim(e, image)} className="button is-success">Claim image</button>
-                <button onClick={(e) => this.handleReport(e, image)} className="button is-warning">Report Image</button>
+                <button onClick={() => this.handleClaim(image)} className="button is-success">Claim image</button>
+                <button onClick={() => this.handleReport(image)} className="button is-warning">Report Image</button>
                 { this.renderReportForm(image) }
               </div>
 
@@ -842,6 +1048,11 @@ class Dashboard extends Component {
         </div>)
       } else if (this.state.user.permission === "Student" && this.state.images && this.state.courses && this.state.downloadURL && this.state.vidURL) {
         return (<div className="container">
+        {!this.state.available ?
+          (<div>
+            <div className="control">
+            <a onClick={this.viewAvailable}>View all available video</a>
+          </div>
         <div className="select">
           <select onChange={this.filterImages} value={this.state.filterVal} name="course">
             <option value="select">Select</option>
@@ -855,6 +1066,13 @@ class Dashboard extends Component {
             <option value="completed">Completed</option>
           </select>
         </div>
+      </div>)
+      : (
+        <div className="control">
+          <a onClick={()=>{this.viewAll("available")}}>View all</a>
+        </div>
+      )
+    }
           {
             this.state.images.map((image, index) => (<div key={index}>
 
@@ -893,20 +1111,32 @@ class Dashboard extends Component {
           )
         } else $courseData = (<p></p>)
         return (<div className="container">
-        <div className="select">
-        {console.log("school val:",this.state.schoolVal)}
-          <select onChange={this.adminFilter} value={this.schoolVal}>
-            <option value="select">Select</option>
+        {!this.state.reported ?
+        (<div>
+          <div className="control">
+          <a onClick={this.viewReports}>View reports</a>
+          </div>
+          <div className="select">
+            <select onChange={this.adminFilter} value={this.schoolVal}>
+              <option value="select">Select</option>
               {this.state.schools.map((school, index) => (<option value={JSON.stringify(school)} key={index}>{school.name}</option>))}
             </select>
-        </div>
-        {$courseData}
-        <br />
+          </div>
+          {$courseData}
+          <br />
+        </div>) :
+
+        (<div className="control">
+        <a onClick={()=>{this.viewAll("reported")}}>View all</a>
+        </div>)
+      }
           {
             this.state.images.map((image, index) => (
               <div key={index}>
 
               <div className="card">
+              <button onClick={() => this.handleDelete(image)} className="button is-danger">Delete Image</button>
+              { this.renderDeleteConfirmation(image) }
                 <a href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]} width="75%" height="75%"/></a>
 
                 <div className="card-content"></div>

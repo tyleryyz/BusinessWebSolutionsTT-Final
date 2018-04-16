@@ -8,6 +8,13 @@ var provider = new firebase.auth.FacebookAuthProvider();
 class LogIn extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      fbError: null,
+      emailError: false,
+      passwordError: false,
+      facebookError: null,
+      loaded: true
+    }
     this.handleLogIn = this.handleLogIn.bind(this);
     this.handleFacebookLogin = this.handleFacebookLogin.bind(this);
   }
@@ -16,12 +23,35 @@ class LogIn extends Component {
     e.preventDefault();
     const email = e.target.elements.email.value;
     const password = e.target.elements.password.value;
-    firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
-      console.log("it broked");
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      console.log(errorCode)
-      console.log(errorMessage)
+    let errorCode;
+    let errorMessage;
+    if (!email){
+      this.setState({
+        emailError: true,
+        loaded: false
+      }, () => {
+        loaded: true
+      });
+    }
+    if (!password){
+      this.setState({
+        passwordError: true,
+        loaded: false
+      }, () => {
+        loaded: true
+      });
+    }
+
+    firebase.auth().signInWithEmailAndPassword(email, password).catch((error) => {
+      // Handle Errors here.
+      errorCode = error.code;
+      errorMessage = error.message;
+      this.setState({
+        fbError: errorMessage,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      });
     });
     let user = firebase.auth().currentUser
     this.props.update(user);
@@ -30,6 +60,8 @@ class LogIn extends Component {
 
   handleFacebookLogin(e) {
     firebase.auth().signInWithPopup(provider).then(function(result) {
+      let errorCode;
+      let errorMessage;
       // This gives you a Facebook Access Token. You can use it to access the Facebook API.
       var token = result.credential.accessToken;
       // The signed-in user info.
@@ -37,15 +69,12 @@ class LogIn extends Component {
       const email = user.email;
       const uID = user.uid;
       const nameArray = user.displayName.split(" ");
-      console.log(nameArray)
       const fname = nameArray[0];
       const lname = nameArray[1];
       const permission = "Student"
       const school = null;
       const classList = null;
 
-      console.log(result.additionalUserInfo.isNewUser);
-      console.log(fname, lname, uID, email)
       if (result.additionalUserInfo.isNewUser){
         fetch('/api/users', {
           method: 'POST',
@@ -55,10 +84,9 @@ class LogIn extends Component {
           body: JSON.stringify({fname: fname, lname: lname, email: email, uID: uID, school: school, permission: "Student"})
         });
       }
-      console.log("uid: ", user.uid)
       this.props.update(user);
 
-    }).catch(function(error) {
+    }).catch((error) => {
 
       // Handle Errors here.
       var errorCode = error.code;
@@ -67,49 +95,41 @@ class LogIn extends Component {
       var email = error.email;
       // The firebase.auth.AuthCredential type that was used.
       var credential = error.credential;
-      // ...
-      console.log("borked")
-      console.log("errorCode: ", errorCode)
-      console.log("errorMessage: ", errorMessage)
-      console.log("emailError: ", email)
-      console.log("credential: ", credential)
+
+
+      this.setState({
+        facebookError: errorMessage,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      });
+
+
     });
 
   }
-  //this.props.update(e, true, "tyler");
-
-  // 	let apiResponse;
-  //   const email = e.target.elements.email.value;
-  // 	const password = e.target.elements.password.value;
-  // 	fetch(`/api/users?email=${email}&password=${password}`, {
-  // 												headers: {"Content-Type": "Application/json"},
-  // 												method: 'GET'
-  // 											})
-  // 											.then(res => res.json())
-  // 							       	.then(json => {
-  // 												localStorage.setItem('user', JSON.stringify(json));
-  // 							         this.setState({
-  // 							           user: json
-  // 							         });
-  // 											 this.props.history.push('/');
-  // 							       });
-  //
-
   render() {
+    if (this.state.loaded){
     return (<div className="container">
     <p>log in with Facebook</p>
     <button onClick={this.handleFacebookLogin}>|F| Login with Facebook</button>
+    {this.state.fbError?<p style={{color: 'red'}}>{this.state.fbError}</p>:<p></p>}
+    <br />
     <p>Or email and password</p>
     <br />
       <form onSubmit={this.handleLogIn}>
         <div className="container">
+        {this.state.fbError?<p style={{color: 'red'}}>{this.state.fbError}</p>:<p></p>}
+
           <div className="box">
             <div className="field">
+            {this.state.emailError?<p style={{color: 'red'}}>Please enter an email</p>:<p></p>}
               <p className="control">
                 <input className="input" name="email" type="email" placeholder="Email"/>
               </p>
             </div>
             <div className="field">
+            {this.state.passwordError?<p style={{color: 'red'}}>Please enter a password</p>:<p></p>}
               <p className="control">
                 <input className="input" name="password" type="password" placeholder="Password"/>
               </p>
@@ -131,7 +151,7 @@ class LogIn extends Component {
         </div>
       </form>
     </div>);
-
+} else {return (<p>Please Wait</p>)}
   }
 }
 

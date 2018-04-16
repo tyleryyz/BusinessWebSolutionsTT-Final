@@ -110,7 +110,10 @@ class Claims extends Component {
       images: null,
       courses: null,
       filterVal: 'select',
-      downloadURL: null
+      downloadURL: null,
+      reportID: null,
+      reportVal: 'select',
+      reportComment: ''
     };
     this.getData = this.getData.bind(this);
     this.getImageData = this.getImageData.bind(this);
@@ -118,6 +121,12 @@ class Claims extends Component {
     this.filterClaims = this.filterClaims.bind(this);
     this.compare = this.compare.bind(this);
     this.getImageURL = this.getImageURL.bind(this);
+    this.renderReportForm = this.renderReportForm.bind(this);
+    this.reportChange = this.reportChange.bind(this);
+    this.handleReport = this.handleReport.bind(this);
+    this.reportImage = this.reportImage.bind(this);
+    this.cancelReport = this.cancelReport.bind(this);
+    this.enterComment = this.enterComment.bind(this);
   }
 
   getData() {
@@ -132,7 +141,6 @@ class Claims extends Component {
 
   componentWillMount() {
     let result = this.getData().then((user) => {
-      console.log("will mount here", user)
       this.setState({
         user: user,
         courses: user.courses,
@@ -150,7 +158,6 @@ class Claims extends Component {
           this.setState({loaded: true})
         })
         this.getImageURL(images).then((urlArray) => {
-          console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
             loaded: false
@@ -174,7 +181,6 @@ class Claims extends Component {
 
 
   getImageData() {
-    console.log("here", this.state.uID)
     return (fetch(`/api/images?tutorUID=${this.state.user.uID}&status=${'claimed'}`, {
       headers: {
         "Content-Type": "Application/json"
@@ -187,7 +193,6 @@ class Claims extends Component {
     let urlArray = new Array();
     let downloadURL;
     let url;
-    console.log("images", images)
     images.map((image, index) => {
       var params = {
         Bucket: bucketName,
@@ -195,7 +200,6 @@ class Claims extends Component {
       };
 
     url = s3.getSignedUrl('getObject', params)
-    console.log(url)
 
       urlArray.push(url)
 
@@ -237,7 +241,7 @@ class Claims extends Component {
     return (dateInformation);
   }
 
-  filterClaims(e) {
+  async filterClaims(e) {
     let course;
     if (e) {
       e.preventDefault();
@@ -257,7 +261,6 @@ class Claims extends Component {
           this.setState({loaded: true})
         })
         this.getImageURL(images).then((urlArray) => {
-          console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
             loaded: false
@@ -267,7 +270,6 @@ class Claims extends Component {
         })
       });
     } else {
-      console.log(course)
       return (fetch(`/api/images?course=${course}&tutorUID=${this.state.user.uID}`, {
         headers: {
           "Content-Type": "Application/json"
@@ -276,7 +278,6 @@ class Claims extends Component {
       }).then(res => res.json()).then((images) => {
         images.sort(this.compare);
 
-        console.log(images);
         this.setState({
           loaded: false,
           images: images,
@@ -309,8 +310,6 @@ class Claims extends Component {
 	firstname = this.state.user.fname;
 	lastname = this.state.user.lname;
 
-	console.log(firstname + " " + lastname + " " + email);
-	console.log(file.name);
 
 	filename = this.state.file.name;
 
@@ -342,7 +341,6 @@ class Claims extends Component {
 	  Body: file
 	};
 
-	console.log(uploadName);
 
 	const imageURL = image.imageURL;
     fetch(`/api/images?imageURL=${imageURL}`, {
@@ -363,7 +361,6 @@ class Claims extends Component {
           this.setState({loaded: true})
         });
         this.getImageURL(images).then((urlArray) => {
-          console.log("after get image?", urlArray)
           this.setState({
             downloadURL: urlArray,
             loaded: false
@@ -391,7 +388,138 @@ class Claims extends Component {
 
 	console.log('Handling uploading, data presented: ', this.state.file);
 
+}
+
+handleReport(image){
+  this.setState({
+    reportID: image.imageURL,
+    reportVal: 'select',
+    loaded: false
+  }, () => {
+    this.setState({loaded: true})
+  })
+}
+
+reportChange(e){
+  e.preventDefault();
+  this.setState({
+    reportVal: e.target.value,
+    loaded: false
+  }, () => {
+    this.setState({loaded: true})
+  })
+}
+
+renderReportForm(image){
+  if (this.state.reportID === image.imageURL){
+    let $otherForm;
+    if (this.state.reportVal === 'Other'){
+      $otherForm = (
+
+        <div className="field">
+          <label className="label">Specify</label>
+          <div className="control">
+            <input className="input" onChange={this.enterComment} value={this.state.reportComment} name="report" type="text" placeholder="Specify Report"/>
+          </div>
+        </div>
+      )
+    } else {
+      $otherForm = (<p></p>)
+    }
+    return (
+      <form onSubmit={(e) => this.reportImage(e, image)}>
+      <div className="select">
+        <select onChange={this.reportChange} value={this.state.reportVal} name="report">
+          <option value="select">Select</option>
+          <option value="Inappropriate">Inappropriate Image/Comment</option>
+          <option value="Misplaced">Wrong course tag for image content</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      {$otherForm}
+      <div className="control">
+        <button className="button">Submit Report</button>
+      </div>
+      <div id="cancelButton">
+        <div className="control">
+          <button onClick={this.cancelReport} className="button">Cancel Report</button>
+        </div>
+      </div>
+      </form>
+    )
+  } else {
+    return(<p></p>)
   }
+}
+
+enterComment(e){
+  e.preventDefault();
+  this.setState({
+    reportComment: e.target.value
+  })
+}
+
+cancelReport(){
+  this.setState({
+    reportVal: 'select',
+    reportID: null,
+    loaded: false
+  }, () => {
+    this.setState({loaded: true})
+  })
+}
+
+reportImage(e, image){
+  e.preventDefault();
+  if (this.state.reportComment != ""){
+    const comment = this.state.reportComment;
+    const imageURL = image.imageURL;
+    fetch(`/api/images?imageURL=${imageURL}`, {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify({status: "reported", reportComment: comment, reportReason: this.state.reportVal})
+    }).then((image) => {
+      this.filterClaims().then(() => {
+        this.getImageURL(this.state.images).then((urlArray) => {
+          this.setState({
+            downloadURL: urlArray,
+            reportID: null,
+            reportVal: 'select',
+            reportComment: '',
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+      })
+    })
+} else {
+  const imageURL = image.imageURL;
+  fetch(`/api/images?imageURL=${imageURL}`, {
+    method: 'PUT',
+    headers: {
+      "Content-Type": "Application/json"
+    },
+    body: JSON.stringify({status: "reported", reportReason: this.state.reportVal})
+  }).then((image) => {
+    this.filterClaims().then(() => {
+      this.getImageURL(this.state.images).then((urlArray) => {
+        this.setState({
+          downloadURL: urlArray,
+          reportID: null,
+          reportVal: 'select',
+          reportComment: '',
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+        })
+      })
+    })
+  })
+}
+}
 
 	// BUG: If there are more than one images with differing courses,
 	// The first image will populate the image space as opposed to the
@@ -415,9 +543,9 @@ class Claims extends Component {
 
           {
             this.state.images.map((image, index) => (<div key={index}>
-              <form>
-                {console.log("renderImage", this.state.downloadURL[index])}
                 <div className="card">
+                <form>
+
                   <div className="card-content">
 				  <a href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]} width="75%" height="75%"/></a><br />
                   <a href={this.state.downloadURL[index]} download>click here to download image</a>
@@ -431,8 +559,11 @@ class Claims extends Component {
                   </div>
 				  <input className="fileInput" type="file" onChange={(e) => this._handleFileChange(e)}/><br />
                   <button className="button is-success" onClick={(e) => this.submitVideo(e, image)}>submit video</button>
-                </div>
               </form>
+              <button onClick={() => this.handleReport(image)} className="button is-warning">Report Image</button>
+              { this.renderReportForm(image) }
+              </div>
+
               <br/>
             </div>))
           }
