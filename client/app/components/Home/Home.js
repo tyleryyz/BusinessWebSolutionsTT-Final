@@ -75,9 +75,8 @@ class Home extends Component {
                     <p key={index}>{subject}</p>
                     ))}
 
-                    <button className="button">
-                      <Link to="/EditProfile">Edit Profile</Link>
-                    </button>
+
+                    <Link className="button" to="/EditProfile">Edit Profile</Link>
 
                   </div>
                 </div> {/* close columns */}

@@ -17,6 +17,10 @@ module.exports = (app) => {
       }
     }
 
+    else if (req.query.course && req.query.clientUID && req.query.school){
+      Image.find({course: req.query.course, clientUID: req.query.clientUID, school: req.query.school}).exec().then((image) => res.json(image)).catch((err) => next(err));
+    }
+
     else if (req.query.school && req.query.course && req.query.status){
       Image.find({course: req.query.course, school: req.query.school, status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
@@ -121,6 +125,9 @@ module.exports = (app) => {
 	if (req.body.purchased){
 		Image.updateOne({imageURL: req.query.imageURL}, {$set: { purchased: req.body.purchased}}).then((image) => res.json()).catch((err) => next(err));
     }
+  if(req.body.reportComment && req.body.status && req.body.reportReason && req.body.tutorUID){
+    Image.updateOne({imageURL: req.query.imageURL}, {$set: { reportComment: req.body.reportComment, status: req.body.status, reportReason: req.body.reportReason, tutorUID: req.body.tutorUID }}).then((image) => res.json()).catch((err) => next(err));
+  }
 
   if(req.body.reportComment && req.body.status && req.body.reportReason){
     Image.updateOne({imageURL: req.query.imageURL}, {$set: { reportComment: req.body.reportComment, status: req.body.status, reportReason: req.body.reportReason }}).then((image) => res.json()).catch((err) => next(err));
