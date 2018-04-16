@@ -113,7 +113,7 @@ class LogIn extends Component {
     return (<div className="container">
     <p>log in with Facebook</p>
     <button onClick={this.handleFacebookLogin}>|F| Login with Facebook</button>
-    {this.state.fbError?<p style={{color: 'red'}}>{this.state.fbError}</p>:<p></p>}
+    {this.state.facebookError?<p style={{color: 'red'}}>{this.state.facebookError}</p>:<p></p>}
     <br />
     <p>Or email and password</p>
     <br />

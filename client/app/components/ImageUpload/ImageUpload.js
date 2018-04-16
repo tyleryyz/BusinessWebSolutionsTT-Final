@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import 'whatwg-fetch';
 
+import {NotificationContainer, NotificationManager} from 'react-notifications';
+import '../../styles/bulma.css';
+
 // Load the SDK and UUID
 var AWS = require('aws-sdk');
 var uuid = require('node-uuid');
@@ -170,10 +173,10 @@ class ImageUpload extends React.Component {
     var keyName;
 	extension = extension.toLowerCase();
 
-    if(extension=="png" || extension=="jpg" || extension=="jpeg")
+    if(extension==="png" || extension==="jpg" || extension==="jpeg")
     {
         keyName = "Images/";
-    } else if (extension=="mp4" || extension=="wmv" || extension=="flv" || extension=="avi")
+    } else if (extension==="mp4" || extension==="wmv" || extension==="flv" || extension==="avi")
     {
         keyName = "Videos/"
     }
@@ -222,6 +225,7 @@ class ImageUpload extends React.Component {
 
     console.log(image)
     console.log('Handling uploading, data presented: ', this.state.file);
+    NotificationManager.success('Your image was successfully uploaded!', 'Success!');
   } else console.log("enter a course tag")
 
   }

@@ -2,7 +2,9 @@ import React, {Component} from 'react';
 import 'whatwg-fetch';
 import {Link} from 'react-router-dom';
 import { Player, BigPlayButton } from 'video-react';
+import {NotificationContainer, NotificationManager} from 'react-notifications';
 import "../../../../node_modules/video-react/dist/video-react.css";
+
 
 var firebase = require('firebase');
 var AWS = require('aws-sdk');
@@ -71,7 +73,9 @@ class Dashboard extends Component {
       reportComment: '',
       available: false,
       reported: false,
-      deleteID: null
+      deleteID: null,
+      reportError: false,
+      commentError: false
     };
     this.getData = this.getData.bind(this);
     this.getImageData = this.getImageData.bind(this);
@@ -280,8 +284,9 @@ class Dashboard extends Component {
           })
         })
       })
-
     })
+  }).then(()=>{
+    NotificationManager.success('Visit the claims page to submit a video', 'Image claimed');
   })
 }
 
@@ -630,7 +635,7 @@ class Dashboard extends Component {
         Bucket: bucketName,
         Key: image.imageURL
       };
-      s3.deleteObject(params, function(err, data){
+      s3.deleteObject(params, ((err, data) =>{
         if (err)
         {
           console.log("error:",err)
@@ -638,35 +643,35 @@ class Dashboard extends Component {
         else
         {
           console.log("Successfully deleted image!");
-          // 
+          //
           // subject = "Submission Deleted";
           // message = "We have deleted your image submission of";
           //sendTheEmail()
-
-        }
-      })
-      fetch(`/api/images?imageURL=${image.imageURL}`, {
-        method: 'DELETE',
-        headers: {
-          "Content-Type": "Application/json"
-        }
-      }).then((image) => {
-        this.filterImages().then(() => {
-          this.filterStatus().then(() => {
-          this.getImageURL(this.state.images).then((urlArray) => {
-            this.setState({
-              downloadURL: urlArray,
-              deleteID: null,
-              loaded: false
-            }, () => {
-              this.setState({loaded: true})
+          fetch(`/api/images?imageURL=${image.imageURL}`, {
+            method: 'DELETE',
+            headers: {
+              "Content-Type": "Application/json"
+            }
+          }).then((image) => {
+            this.filterImages().then(() => {
+              this.filterStatus().then(() => {
+              this.getImageURL(this.state.images).then((urlArray) => {
+                this.setState({
+                  downloadURL: urlArray,
+                  deleteID: null,
+                  loaded: false
+                }, () => {
+                  this.setState({loaded: true})
+                })
+              })
             })
+
           })
+        }).then(()=>{
+          NotificationManager.success('Image has been deleted and student notified', 'Image deleted');
         })
-
-      })
-    })
-
+        }
+      }))
   }
 
   reportChange(e){
@@ -684,9 +689,9 @@ class Dashboard extends Component {
       let $otherForm;
       if (this.state.reportVal === 'Other'){
         $otherForm = (
-
           <div className="field">
             <label className="label">Specify</label>
+            {this.state.commentError?<p style={{color: 'red'}}>Please specify</p>:<p></p>}
             <div className="control">
               <input className="input" onChange={this.enterComment} value={this.state.reportComment} name="report" type="text" placeholder="Specify Report"/>
             </div>
@@ -697,6 +702,7 @@ class Dashboard extends Component {
       }
       return (
         <form onSubmit={(e) => this.reportImage(e, image)}>
+        {this.state.reportError?<p style={{color: 'red'}}>Please pick a reason</p>:<p></p>}
         <div className="select">
           <select onChange={this.reportChange} value={this.state.reportVal} name="report">
             <option value="select">Select</option>
@@ -786,11 +792,32 @@ class Dashboard extends Component {
         })
       })
     })
+  }).then(()=>{
+    NotificationManager.success('Image restored, tutors can now claim it again', 'Image restored');
   })
 }
   reportImage(e, image){
     e.preventDefault();
-    if (this.state.reportComment != ""){
+
+    if(this.state.reportComment === ""){
+      this.setState({
+        commentError: true,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      })
+    }
+
+    if(this.state.reportVal==='select'){
+      this.setState({
+        reportError: true,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      })
+    }
+
+    if (this.state.reportComment != "" && this.state.reportVal!='select'){
       const comment = this.state.reportComment;
       const imageURL = image.imageURL;
       fetch(`/api/images?imageURL=${imageURL}`, {
@@ -808,6 +835,8 @@ class Dashboard extends Component {
               reportID: null,
               reportVal: 'select',
               reportComment: '',
+              reportError: false,
+              commentError: false,
               loaded: false
             }, () => {
               this.setState({loaded: true})
@@ -815,8 +844,10 @@ class Dashboard extends Component {
           })
         })
       })
+    }).then(()=>{
+      NotificationManager.success('Report was sent to site admin.', 'Report success');
     })
-  } else {
+  } else if (this.state.reportVal !='select') {
     const imageURL = image.imageURL;
     fetch(`/api/images?imageURL=${imageURL}`, {
       method: 'PUT',
@@ -833,6 +864,8 @@ class Dashboard extends Component {
             reportID: null,
             reportVal: 'select',
             reportComment: '',
+            reportError: false,
+            commentError: false,
             loaded: false
           }, () => {
             this.setState({loaded: true})
@@ -840,6 +873,8 @@ class Dashboard extends Component {
         })
       })
     })
+  }).then(()=>{
+    NotificationManager.success('Report was sent to site admin.', 'Report success');
   })
   }
   }
@@ -1111,6 +1146,7 @@ async viewAll(type){
           )
         } else $courseData = (<p></p>)
         return (<div className="container">
+
         {!this.state.reported ?
         (<div>
           <div className="control">

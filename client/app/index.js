@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import {render} from 'react-dom';
 import {BrowserRouter as Router, Route, Link, Switch, Redirect} from 'react-router-dom'
+import {NotificationContainer, NotificationManager} from 'react-notifications';
+
 
 import App from './components/App/App';
 import NotFound from './components/App/NotFound';
@@ -12,12 +14,12 @@ import SignUp from './components/SignUp/SignUp';
 import ImageUpload from './components/ImageUpload/ImageUpload';
 import VideoPlayer from './components/VideoPlayer/VideoPlayer';
 
+import 'react-notifications/lib/notifications.css';
 import './styles/styles.scss';
 
 var firebase = require('firebase');
 
-// var fbconfig = 
-
+// var fbconfig =
 
 firebase.initializeApp(fbconfig);
 
@@ -48,25 +50,6 @@ class Index extends Component {
       this.setState({loaded: true})
     })
   }
-  // componentDidMount() {
-  // 	let currentUser;
-  //
-  // 	currentUser = localStorage.getItem('user')
-  //
-  // 	if (currentUser) {
-  //     this.setState({
-  //       user: currentUser
-  //     }, () => {
-  //       this.setState({loaded: true})
-  //     })
-  //   } else {
-  //     this.setState({
-  //       user: null
-  //     }, () => {
-  //       this.setState({loaded: true})
-  //     })
-  //   }
-  // }
 
   componentWillMount() {
 
@@ -86,31 +69,28 @@ class Index extends Component {
       }
     })
   }
-  // if (user) {
-  // 	this.setState({
-  // 		user: user
-  // 	}, () => {
-  // 		this.setState({loaded: true})
-  // 	})
-  // } else {
-  //   this.setState({
-  //     user: null
-  //   }, () => {
-  //     this.setState({loaded: true})
-  //   })
-  // }
 
   render() {
 
     if (this.state.user && this.state.loaded) {
-      return (<Router>
+      return (
+        <div>
+        <NotificationContainer/>
+
+        <Router>
         <div>
           <NavBar auth={this.state.user} logout={this.logout}/>
           <App user={this.state.user}/>
         </div>
-      </Router>)
+      </Router>
+    </div>)
     } else if (!this.state.user && this.state.loaded) {
-      return (<Router>
+      return (<div>
+        <NotificationContainer/>
+
+        <Router>
+
+
         <div>
 
           <NavBar auth={this.state.user}/>
@@ -122,7 +102,8 @@ class Index extends Component {
 
           </Switch>
         </div>
-      </Router>)
+      </Router>
+    </div>)
     } else {
       return (<div>
         <h1>Please wait</h1>

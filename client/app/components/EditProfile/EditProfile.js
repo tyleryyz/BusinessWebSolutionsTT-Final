@@ -6,7 +6,6 @@ var firebase = require('firebase');
 var firebaseui = require('firebaseui');
 
 import '../../styles/bulma.css';
-import 'react-notifications/lib/notifications.css';
 
 
 class EditProfile extends Component {
@@ -399,7 +398,6 @@ class EditProfile extends Component {
             </div>
           </form>
         </div>
-        <NotificationContainer/>
         <div className="box">
           <form onSubmit={this.handleEmailChange}>
             <div className="field">
