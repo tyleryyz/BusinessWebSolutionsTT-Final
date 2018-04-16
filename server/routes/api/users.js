@@ -11,6 +11,8 @@ module.exports = (app) => {
     }
     else if (req.query.email){
       User.findOne({email: req.query.email}).exec().then((user) => res.json(user)).catch((err) => next(err));
+    } else {
+      User.find({}).exec().then((user) => res.json(user)).catch((err) => next(err));
     }
   });
 
