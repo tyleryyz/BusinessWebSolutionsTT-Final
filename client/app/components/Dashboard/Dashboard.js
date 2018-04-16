@@ -14,6 +14,14 @@ var accessKey;
 var secretAccess;
 var regionArea;
 
+// Init variables
+var firstname;
+var lastname;
+var email;
+var message;
+var subject;
+
+
 fetchTextFile('http://localhost:8080/keys.txt', function(data) {
   updateVars(data)
 });
@@ -51,6 +59,42 @@ var ses = new AWS.SES();
 var bucketName = 'tailored-tutoring';
 let file;
 var filename;
+
+function sendTheEmail() {
+
+  const ses = new AWS.SES();
+
+  const params = {
+    Destination: {
+      ToAddresses: [email]
+    },
+    Message: {
+      Body: {
+        Html: {
+          Charset: 'UTF-8',
+          Data: '<strong>First Name:</strong> ' + firstname + '<br><strong>Last Name:</strong> ' + lastname + '<br><strong>Email to:</strong> ' + email + '<br>Subject: ' + subject + '<br>Message: ' + message
+        },
+        Text: {
+          Charset: 'UTF-8',
+          Data: 'First Name: ' + firstname + '\nLast Name: ' + lastname + '\nEmail to: ' + email + '\nSubject: ' + subject + '\nMessage: ' + message
+        }
+      },
+      Subject: {
+        Charset: 'UTF-8',
+        Data: subject
+      }
+    },
+    ReturnPath: 'jjg297@nau.edu',
+    Source: 'jjg297@nau.edu'
+  };
+
+  ses.sendEmail(params, (err, data) => {
+    if (err)
+      console.log(err, err.stack)
+    else
+      console.log(data)
+  });
+}
 
 // Will render a profile image, user name, user class list, user school,
 class Dashboard extends Component {
@@ -105,6 +149,16 @@ class Dashboard extends Component {
     this.renderDeleteConfirmation = this.renderDeleteConfirmation.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.confirmDelete = this.confirmDelete.bind(this);
+    this.getStudentData = this.getStudentData.bind(this);
+  }
+
+  getStudentData(studentUID){
+    return (fetch(`/api/users?uID=${studentUID}`, {
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      method: 'GET'
+    }).then(res => res.json()));
   }
 
   getData() {
@@ -642,11 +696,17 @@ class Dashboard extends Component {
         }
         else
         {
-          console.log("Successfully deleted image!");
-          //
-          // subject = "Submission Deleted";
-          // message = "We have deleted your image submission of";
-          //sendTheEmail()
+          this.getStudentData(image.clientUID).then((user)=>{
+
+            firstname = user.fname;
+            lastname = user.lname;
+            email = user.email;
+            subject = "Submission Deleted";
+            message = "We have deleted your image submission because it was reported or deemed inappropriate. Please resubmit a problem if you still require help!";
+            sendTheEmail()
+
+          })
+
           fetch(`/api/images?imageURL=${image.imageURL}`, {
             method: 'DELETE',
             headers: {
