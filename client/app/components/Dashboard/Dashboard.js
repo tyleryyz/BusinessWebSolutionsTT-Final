@@ -149,22 +149,28 @@ class Dashboard extends Component {
               this.setState({loaded: true})
             });
           });
-        })
+	  }).then(()=>{
+		  if(this.props.filter != 'select'){
+			  console.log("Made it INOT HERE");
+			  this.filterImages().then(() => {
+		        this.filterStatus().then(() => {
+		        this.getImageURL(this.state.images).then((urlArray) => {
+		          console.log("after get image?", urlArray)
+		          this.setState({
+		            downloadURL: urlArray,
+		            loaded: false
+		          }, () => {
+		            this.setState({loaded: true})
+		          })
+		        })
+		      })
+
+		    })
+		  }
+	  })
       })
   	});
-	this.filterImages().then(() => {
-      this.filterStatus().then(() => {
-      this.getImageURL(this.state.images).then((urlArray) => {
-        console.log("after get image?", urlArray)
-        this.setState({
-          downloadURL: urlArray,
-          loaded: false
-        }, () => {
-          this.setState({loaded: true})
-        })
-      })
-    })
-  })
+
   };
 
   getImageData(permission, uID, status) {
