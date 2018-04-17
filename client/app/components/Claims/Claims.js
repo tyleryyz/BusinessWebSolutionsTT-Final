@@ -322,10 +322,9 @@ class Claims extends Component {
 	if( extension.length === 1 || ( extension[0] === "" && extension.length === 2 ) ) {
 		return "";
 	}
-	extension = extension.pop();    // feel free to tack .toLowerCase() here if you want
+	extension = extension.pop().toLowerCase();    // feel free to tack .toLowerCase() here if you want
 	uploadName = uploadName+'.'+extension;
 	var keyName;
-  extension = extension.toLowerCase();
 
 	if (extension=="mp4" || extension=="wmv" || extension=="flv" || extension=="avi")
 	{
