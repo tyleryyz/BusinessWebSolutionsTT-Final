@@ -103,10 +103,11 @@ class Dashboard extends Component {
 
   componentWillMount() {
     let result = this.getData().then((user) => {
-      console.log("will mount here", user)
+      console.log("will mount here", user);
       this.setState({
         user: user,
         courses: user.courses,
+		filterVal: this.props.filter,
         loaded: false
       }, () => {
         this.setState({loaded: true})
@@ -148,9 +149,28 @@ class Dashboard extends Component {
               this.setState({loaded: true})
             });
           });
-        })
+	  }).then(()=>{
+		  if(this.props.filter != 'select'){
+			  console.log("Made it INOT HERE");
+			  this.filterImages().then(() => {
+		        this.filterStatus().then(() => {
+		        this.getImageURL(this.state.images).then((urlArray) => {
+		          console.log("after get image?", urlArray)
+		          this.setState({
+		            downloadURL: urlArray,
+		            loaded: false
+		          }, () => {
+		            this.setState({loaded: true})
+		          })
+		        })
+		      })
+
+		    })
+		  }
+	  })
       })
-      })
+  	});
+
   };
 
   getImageData(permission, uID, status) {
@@ -385,7 +405,7 @@ class Dashboard extends Component {
       console.log(course)
       console.log("status inside course filter", this.state.statusVal)
       if (this.state.statusVal === "all" && this.state.user.permission === "Student") {
-        url = `/api/images?course=${course}&clientUID=${this.state.user.uID}&school=${this.state.user.school.name}`
+		url = `/api/images?course=${course}&clientUID=${this.state.user.uID}&school=${this.state.user.school.name}`
       } else if(this.state.user.permission === "Tutor") {
         url = `/api/images?course=${course}&school=${this.state.user.school.name}&status=${'open'}`
       } else {

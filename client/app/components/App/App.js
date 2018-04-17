@@ -27,8 +27,21 @@ class App extends Component {
   constructor(props) {
 
     super(props);
+	this.state = {
+		filter: 'select'
+	}
     console.log(this.props);
     this.children = this.props.children;
+	this.setFilter = this.setFilter.bind(this);
+  }
+
+  setFilter(subject) {
+    this.setState({
+      filter: subject,
+      loaded: false
+    }, () => {
+      this.setState({loaded: true});
+  	});
   }
 
   render() {
@@ -36,10 +49,10 @@ class App extends Component {
     return (<div>
       <Switch>
         <Route path="/tt-admin" render={() => <Admin user={this.props.user}/>}/>
-        <Route exact path="/" render={() => <Home user={this.props.user}/>}/>
+        <Route exact path="/" render={() => <Home user={this.props.user} filter={this.setFilter} />}/>
         <Route path="/Claims" render={() => <Claims user={this.props.user}/>}/>
-        <Route path="/Dashboard" render={() => <Dashboard user={this.props.user}/>}/>
-		    <Route path="/Submissions" render={() => <Submissions user={this.props.user}/>}/>
+        <Route path="/Dashboard" render={() => <Dashboard user={this.props.user} filter={this.state.filter}/>}/>
+		<Route path="/Submissions" render={() => <Submissions user={this.props.user}/>}/>
         <Route path="/Emailing" render={() => <Emailing user={this.props.user}/>}/>
         <Route path="/imageupload" render={() => <ImageUpload user={this.props.user}/>}/>
         <Route path="/paypal" render={() => <PayPal user={this.props.user}/>}/>

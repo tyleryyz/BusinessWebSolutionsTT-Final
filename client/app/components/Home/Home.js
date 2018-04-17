@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import 'whatwg-fetch';
-import {Link} from 'react-router-dom';
+import {Link, Route, Switch, Router} from 'react-router-dom';
 const testimage = require("../../../public/assets/img/poster.png")
 const profImage = require("../../../public/assets/img/profile.png")
 
@@ -15,7 +15,7 @@ class Home extends Component {
       loaded: false
     };
     this.getData = this.getData.bind(this);
-
+	this.handleFilter = this.handleFilter.bind(this);
   }
 
   getData() {
@@ -40,6 +40,11 @@ class Home extends Component {
       });
     })
   };
+
+  handleFilter(subject, e) {
+	  e.preventDefault();
+	  this.props.filter(subject);
+  }
 
   render() {
 
@@ -100,8 +105,12 @@ class Home extends Component {
                   {/* My For-Loop essentially */}
                     {this.state.user.courses.map((subject, index) => (
                         <div key={index} className="column is-3">
-						  <button className="button is-text-dark"><h2 className="subtitle">{subject}</h2></button>
-                          <p><button className="button">
+
+						  <button className="button is-text-dark" onClick={(e) => this.handleFilter(subject, e)}>
+						  	<Link to='/Dashboard'>{subject}</Link>
+						  </button>
+
+						  <p><button className="button">
                             <Link to="">Submit Assignment</Link>
                           </button></p>
                           <p><button className="button">
