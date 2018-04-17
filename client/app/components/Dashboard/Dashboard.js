@@ -151,7 +151,20 @@ class Dashboard extends Component {
           });
         })
       })
+  	});
+	this.filterImages().then(() => {
+      this.filterStatus().then(() => {
+      this.getImageURL(this.state.images).then((urlArray) => {
+        console.log("after get image?", urlArray)
+        this.setState({
+          downloadURL: urlArray,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+        })
       })
+    })
+  })
   };
 
   getImageData(permission, uID, status) {
