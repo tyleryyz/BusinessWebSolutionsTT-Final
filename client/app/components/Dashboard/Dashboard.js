@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import Image from 'react-image-resizer';
 import 'whatwg-fetch';
 import {Link} from 'react-router-dom';
 import { Player, BigPlayButton } from 'video-react';
@@ -629,7 +630,7 @@ class Dashboard extends Component {
       let $image;
       let $date;
       if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses && this.state.downloadURL) {
-
+        //*** Tutor View ****
         return (<div className="container">
           <p>tutor view</p>
           <Link to="/Claims">View claimed clients</Link>
@@ -643,28 +644,35 @@ class Dashboard extends Component {
           </div>
 
           {
+            // ******** Main Section to Style **********
             this.state.images.map((image, index) => (<div key={index}>
-
-              {console.log("renderImage", this.state.downloadURL[index])}
               <div className="card">
-                <div className="card-content">
-                  <a href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]} width="75%" height="75%"/></a>
-		            </div>
-                <div className="media-content">
-                  <p className="title is-4">{image.clientUID}</p>
-                  <p className="subtitle is-6">{image.course}</p>
-                </div>
-                <div className="content">
-                  <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
-                </div>
-                <button onClick={(e) => this.handleClaim(e, image)} className="button is-success">Claim image</button>
-              </div>
-
-              <br/>
+                <div className="columns">
+                  {console.log("renderImage", this.state.downloadURL[index])}
+                  <div className="column is-half">
+                    <div className="card-content">
+                      <a href={this.state.downloadURL[index]} download="download"><img
+                        src={this.state.downloadURL[index]} height={250} width={250}/></a>
+    		            </div>
+                    <button onClick={(e) => this.handleClaim(e, image)} className="button is-success">Claim image</button>
+                  </div> {/* close column */}
+                  <div className="column is-half">
+                    <div className="media-content">
+                      <p className="title is-4">{image.clientUID}</p>
+                      <p className="subtitle is-6">{image.course}</p>
+                    </div>
+                    <div className="content">
+                      <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
+                    </div>
+                  </div> {/* close column */}
+                </div> {/* close card */}
+                  <br/>
+                </div> {/* close columns */}
             </div>))
           }
         </div>)
       } else if (this.state.user.permission === "Student" && this.state.images && this.state.courses && this.state.downloadURL) {
+        //*** Student View ****
         return (<div className="container">
         <div className="select">
           <select onChange={this.filterImages} value={this.state.filterVal} name="course">
@@ -680,29 +688,42 @@ class Dashboard extends Component {
           </select>
         </div>
           {
-            this.state.images.map((image, index) => (<div key={index}>
+            // ******** Main Section to Style **********
+              this.state.images.map((image, index) => (<div key={index}>
 
-              <div className="card">
-              <a href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]} width="75%" height="75%"/></a>
+                  <div className="card">
+                    <div className="columns">
+                      <div className="column is-one-third">
+                        <a href={this.state.downloadURL[index]} download="download"><img
+                        src={this.state.downloadURL[index]}
+                        height={250} width={250}  /> </a>
+                        <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
+                      </div>{/* close column */}
 
-                <div className="card-content"></div>
-                <div className="media-content">
-                  <p className="title is-4">{image.clientUID}</p>
-                  <p className="subtitle is-6">{image.course}</p>
-                </div>
-                <div className="content">
-                  <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
-                  {this.state.vidURL[index] ? $url =(
-                  <Player>
-        						<source src={this.state.vidURL[index]} />
-        					</Player> ) : $url = <p></p>}
-                </div>
-              </div>
-              <br/>
+                      <div className="card-content"></div>
+
+                      <div className="column">
+                        <div className="media-content">
+                          <p className="title is-5">Bob</p>
+                          <p className="subtitle is-6">{image.course}</p>
+                        </div>
+                      </div> {/* close column*/}
+
+                      <div className="column">
+                        <div className="content">
+                          <Player>
+                						<source src={this.state.vidURL[index]} />
+                					</Player>
+                        </div>
+                      </div> {/* close column*/}
+                    </div>
+                    <br/>
+                  </div>
             </div>))
           }
         </div>);
       } else if (this.state.user.permission === "Admin" && this.state.images && this.state.schools && this.state.downloadURL) {
+        //*** Admin View ****
         if (this.state.schoolVal!="select"){
           $courseData = (
             <div className="select">
@@ -724,26 +745,37 @@ class Dashboard extends Component {
         {$courseData}
         <br />
           {
-            this.state.images.map((image, index) => (
-              <div key={index}>
+            // ******** Main Section to Style **********
+            this.state.images.map((image, index) => ( <div key={index}>
 
-              <div className="card">
-                <a href={this.state.downloadURL[index]} download="download"><img src={this.state.downloadURL[index]} width="75%" height="75%"/></a>
+            <div className="card">
+              <div className="columns">
+                <div className="column is-one-half">
+                  <a href={this.state.downloadURL[index]} download="download"><img
+                  src={this.state.downloadURL[index]}
+                  height={250} width={250} /></a>
+                  <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
+                </div> {/* close column */}
 
                 <div className="card-content"></div>
-                <div className="media-content">
-                  <p className="title is-4">{image.clientUID}</p>
-                  <p className="subtitle is-6">{image.course}</p>
-                  <br />
-                </div>
-                <div className="content">
-                  <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
-                  <p>Status: {image.status}</p>
 
-                  {image.tutorUID && <p>Tutor UID: {image.tutorUID}</p>}
-                  <p>school: {image.school}</p>
-                </div>
-              </div>
+                <div className="column">
+                  <div className="media-content">
+                    <p className="title is-4">{image.clientUID}</p>
+                    <p className="subtitle is-6">{image.course}</p>
+                    <br />
+                  </div>
+                </div> {/* close column */}
+                <div className="column">
+                  <div className="content">
+                    <p>Status: {image.status}</p>
+                    {image.tutorUID && <p>Tutor UID: {image.tutorUID}</p>}
+                    <p>school: {image.school}</p>
+                  </div>
+                </div> {/* close column */}
+
+              </div> {/* close columns*/}
+            </div> {/* close card*/}
               <br/>
             </div>))
           }

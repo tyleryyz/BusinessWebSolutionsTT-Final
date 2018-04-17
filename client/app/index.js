@@ -16,7 +16,7 @@ import './styles/styles.scss';
 
 var firebase = require('firebase');
 
-// var fbconfig = 
+
 
 
 firebase.initializeApp(fbconfig);
