@@ -1,12 +1,15 @@
 import React, {Component} from 'react';
 import 'whatwg-fetch';
+import ReactDOM from 'react-dom';
 import {Link} from 'react-router-dom';
 import { Player, BigPlayButton } from 'video-react';
 import "../../../../node_modules/video-react/dist/video-react.css";
+import PayPal from '../PayPal/PayPal';
 
 var firebase = require('firebase');
 var AWS = require('aws-sdk');
 var uuid = require('node-uuid');
+var paypal = require('paypal-checkout');
 
 var accessKey;
 var secretAccess;
@@ -50,9 +53,36 @@ var bucketName = 'tailored-tutoring';
 let file;
 var filename;
 
+var client = {
+			// DELETE THESE BEFORE PUSHING IF MAKING ANY CHANGES TO THIS FILE
+            sandbox: 'AUF9q58jUbZ79R8AFyy4EFE4W07SGJqLo7Xqsngr4Birx1Fz8WfgjLWpwr3C-CeelMaL7LbCDMHxxg6v',
+            production: 'AWre8N0N2d_uCfSCFf4mSuYENw2uitbgzU2T9mZG7DCyIdzPDRB_pMlI0TK4-QribrKDvrXc0lTIjpkr'
+        };
+		
+var env = 'sandbox';
+
+var payment = (data, actions) => {
+	return actions.payment.create({
+		payment: {
+			transactions: [
+				{
+					amount: { total: 0.01, currency: 'USD' }
+				}
+			]
+		}
+	})
+};
+
+var onAuthorize = (data, actions) => {
+	// return [Some kind of function that gives authorization to a video]
+	return actions.payment.execute().then(console.log("Payment success!"));
+};
+
+var PayPalButton = paypal.Button.driver('react', { React, ReactDOM });
+
 // Will render a profile image, user name, user class list, user school,
 class Dashboard extends Component {
-  constructor(props) {
+	constructor(props) {
     super(props);
     this.state = {
       user: null,
@@ -241,14 +271,73 @@ class Dashboard extends Component {
       };
 
   if(image.purchased==1){
-    url = s3.getSignedUrl('getObject', params);
-    vidUrlArray.push(url)
-  }
+		url = s3.getSignedUrl('getObject', params);
+	} else {
+		url = "https://www.youtube.com/embed/Wl2Q_MceIUc";
+	}
+	vidUrlArray.push(url)
     console.log(url);
 
     })
   return vidUrlArray
 
+  }
+  
+  setPurchased(e, image) {
+	e.preventDefault();
+	const imageURL = image.imageURL;
+	const isPurchased = image.purchased;
+	console.log(isPurchased);
+	if(isPurchased==0){
+		fetch(`/api/images?imageURL=${imageURL}`, {
+			  method: 'PUT',
+			  headers: {
+				"Content-Type": "Application/json"
+			  },
+			  body: JSON.stringify({purchased: 1})
+			}).then((image) => {
+			  this.filterImages().then(() => {
+				this.filterStatus().then(() => {
+				this.getImageURL(this.state.images).then((urlArray) => {
+				  console.log("after get image?", urlArray)
+				  this.setState({
+					downloadURL: urlArray,
+					loaded: false
+				  }, () => {
+					this.setState({loaded: true})
+				  })
+				})
+			  })
+
+			})
+		  })
+		console.log("Video Purchased!");
+	} else {
+		fetch(`/api/images?imageURL=${imageURL}`, {
+			  method: 'PUT',
+			  headers: {
+				"Content-Type": "Application/json"
+			  },
+			  body: JSON.stringify({purchased: 0})
+			}).then((image) => {
+			  this.filterImages().then(() => {
+				this.filterStatus().then(() => {
+				this.getImageURL(this.state.images).then((urlArray) => {
+				  console.log("after get image?", urlArray)
+				  this.setState({
+					downloadURL: "",
+					loaded: false
+				  }, () => {
+					this.setState({loaded: true})
+				  })
+				})
+			  })
+
+			})
+		  })
+		console.log("Video Un-purchased!");
+	}
+	
   }
 
   handleClaim(e, image) {
@@ -712,10 +801,12 @@ class Dashboard extends Component {
                 </div>
                 <div className="content">
                   <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
-                  {this.state.vidURL[index] ? $url =(
+				  <button onClick={(e) => this.setPurchased(e, image)} className="button is-success">Purchase Video!</button>
+				  {this.state.vidURL[index] ? $url =(
                   <Player>
         						<source src={this.state.vidURL[index]} />
-        					</Player> ) : $url = <p></p>}
+        					</Player>) : $url = <p></p>}
+							{/*This is disabled for now*/}<PayPal/>
                 </div>
               </div>
               <br/>
