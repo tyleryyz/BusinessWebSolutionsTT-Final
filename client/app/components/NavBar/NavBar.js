@@ -16,8 +16,6 @@ class NavBar extends Component {
   handleSignOut() {
 
     firebase.auth().signOut().then(function() {
-      console.log('Signed Out');
-      //this.props.logout();
     }, function(error) {
       console.error('Sign Out Error', error);
     });

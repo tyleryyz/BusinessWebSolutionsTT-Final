@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import 'whatwg-fetch';
 import {Link, Route, Switch, Router} from 'react-router-dom';
 
-
+import ImageUpload from '../ImageUpload/ImageUpload';
 const testimage = require("../../../public/assets/img/poster.png")
 const profImage = require("../../../public/assets/img/profile.png")
 
@@ -125,10 +125,10 @@ class Home extends Component {
 	this.handleFilter = this.handleFilter.bind(this);
 	this.handleClick = this.handleClick.bind(this);
   }
-  
+
   handleClick() {
     this.setState({
-      clicked: true
+      clicked: !(this.state.clicked)
     });
   }
 
@@ -200,9 +200,8 @@ class Home extends Component {
 				</div>
 				<div className="column">
 
-                    <button className="button">
-                      <Link to="/EditProfile">Edit Profile</Link>
-                    </button>
+        <Link className="button" to="/EditProfile">Edit Profile</Link>
+
 
                   </div>
                 </div> {/* close columns */}
@@ -252,177 +251,7 @@ class Home extends Component {
   }
 }
 
-class ImageUpload extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      file: '',
-      imagePreviewUrl: '',
-      user: this.props.user,
-      loaded: this.props.loaded,
-      courses: null
-    };
-    this.getData = this.getData.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
 
-  getData() {
-	  console.log(this.state);
-	  console.log(this.props)
-    let uID = this.state.user.uid;
-    console.log(uID)
-    return (fetch(`/api/users?uID=${uID}`, {
-      headers: {
-        "Content-Type": "Application/json"
-      },
-      method: 'GET'
-    }).then(res => res.json()));
-  }
-
-  componentWillMount() {
-    let result = this.getData().then((user) => {
-      console.log("will mount here", user)
-      this.setState({
-        user: user,
-        courses: user.courses,
-        loaded: false
-      }, () => {
-        this.setState({loaded: true})
-      })
-      })
-  }
-
-
-  // When the Upload image button is clicked
-  handleSubmit(e) {
-    e.preventDefault();
-    const course = e.target.elements.course.value;
-    if (!(course==="select")){
-    filename = this.state.file.name;
-    var d = new Date();
-    var timestamp = d.getTime();
-    var uploadName = this.props.user.uid+'-'+timestamp;
-    email = this.props.user.email;
-
-    var extension = filename.split(".");
-    if( extension.length === 1 || ( extension[0] === "" && extension.length === 2 ) ) {
-        return "";
-    }
-    extension = extension.pop();    // feel free to tack .toLowerCase() here if you want
-    uploadName = uploadName+'.'+extension;
-    var keyName;
-	extension = extension.toLowerCase();
-
-    if(extension=="png" || extension=="jpg" || extension=="jpeg")
-    {
-        keyName = "Images/";
-    } else if (extension=="mp4" || extension=="wmv" || extension=="flv" || extension=="avi")
-    {
-        keyName = "Videos/"
-    }
-
-    var params = {
-      Bucket: bucketName,
-      Key: keyName+uploadName,
-      Body: file
-    };
-
-    let key = keyName+uploadName;
-    s3.putObject(params, function(err, data) {
-      if (err)
-      {
-        console.log(err)
-      }
-      else
-      {
-        console.log("Successfully uploaded data to " + bucketName + "Images/" + uploadName);
-        firstname = "this.props.user.firstname";
-        lastname = "this.props.user.lastname";
-        subject = "Submission Received!";
-        message = "We have received your image submission of: "+filename+"!";
-        sendTheEmail();
-
-      }
-    })
-
-    let image = fetch(`/api/images`, {
-      method: 'POST',
-      headers: {
-        "Content-Type": "Application/json"
-      },
-      body: JSON.stringify({
-		  clientUID: this.state.user.uID,
-		  imageURL: key,
-		  status: "open",
-		  tutorUID: null,
-		  course: course,
-      school: this.state.user.school.name,
-		  timestamp: timestamp,
-		  videoURL: timestamp+"",
-		  purchased: 0})
-    });
-
-    console.log(image)
-    console.log('Handling uploading, data presented: ', this.state.file);
-  } else console.log("enter a course tag")
-
-  }
-
-  // This changes the 'Please select an Image for Preview'
-  _handleImageChange(e) {
-    e.preventDefault();
-
-    let reader = new FileReader();
-    file = e.target.files[0];
-
-    reader.onloadend = () => {
-      this.setState({file: file, imagePreviewUrl: reader.result});
-    }
-
-    reader.readAsDataURL(file)
-  }
-
-  // Render the screen in HTML
-  render() {
-    let {imagePreviewUrl} = this.state;
-    let $imagePreview = null;
-
-    if (imagePreviewUrl) {
-      $imagePreview = (<img src={imagePreviewUrl}/>)
-    } else {
-      $imagePreview = (<div className="previewText">Please upload your question image!
-      (Acceptable formats: jpg., .jpeg, .png)</div>);
-    }
-
-    let $pageData;
-    if (this.state.courses){
-    $pageData = (<div className="previewComponent">
-      <form onSubmit={this.handleSubmit}>
-        <input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/><br /><br />
-        <div className="imgPreview image is-128x128">
-          {$imagePreview}
-        </div><br />
-        <button className="submitButton" type="submit">Upload Image</button>
-        <p>Select course tag</p>
-        <div className="select">
-          <select name="course">
-          <option value="select">Select</option>
-          {this.state.user.courses.map((course, index) => (
-            <option key={index}>{course}</option>
-          ))}
-          </select>
-          <br />
-        </div>
-      </form>
-    </div>)
-  } else {$pageData = (<p>Please Wait</p>)}
-    if (this.state.user && this.state.user && this.state.courses){
-    return (<div>
-      {$pageData}
-    </div>)
-  } else {return (<p>Please Wait</p>)}
-}
-}
 // <div id="editProfileButton">
 // <div className="control">
 //   <Link to="/EditProfile">Edit Profile</Link>

@@ -41,7 +41,6 @@ module.exports = (app) => {
       let course = req.body.course;
 
       School.findOne({name: name}).exec().then((school) => {
-        console.log(school.courses)
           for (i=0; i<school.courses.length;i++){
             if (school.courses[i] === course){
               school.courses.splice(i, 1);

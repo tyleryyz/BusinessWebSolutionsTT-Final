@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import 'whatwg-fetch';
 
+import {NotificationContainer, NotificationManager} from 'react-notifications';
+import '../../styles/bulma.css';
+
 // Load the SDK and UUID
 var AWS = require('aws-sdk');
 var uuid = require('node-uuid');
@@ -111,7 +114,8 @@ class ImageUpload extends React.Component {
       imagePreviewUrl: '',
       user: null,
       loaded: false,
-      courses: null
+      courses: null,
+      comment: ""
     };
     this.getData = this.getData.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -144,8 +148,15 @@ class ImageUpload extends React.Component {
 
   // When the Upload image button is clicked
   handleSubmit(e) {
+    let comments;
     e.preventDefault();
     const course = e.target.elements.course.value;
+    if (!e.target.elements.comments.value){
+      comments = "";
+    } else {
+      comments = e.target.elements.comments.value;
+    }
+    console.log(comments)
     if (!(course==="select")){
     filename = this.state.file.name;
     var d = new Date();
@@ -162,10 +173,10 @@ class ImageUpload extends React.Component {
     var keyName;
 	extension = extension.toLowerCase();
 
-    if(extension=="png" || extension=="jpg" || extension=="jpeg")
+    if(extension==="png" || extension==="jpg" || extension==="jpeg")
     {
         keyName = "Images/";
-    } else if (extension=="mp4" || extension=="wmv" || extension=="flv" || extension=="avi")
+    } else if (extension==="mp4" || extension==="wmv" || extension==="flv" || extension==="avi")
     {
         keyName = "Videos/"
     }
@@ -205,14 +216,16 @@ class ImageUpload extends React.Component {
 		  status: "open",
 		  tutorUID: null,
 		  course: course,
+      comment: comments,
       school: this.state.user.school.name,
 		  timestamp: timestamp,
-		  videoURL: timestamp+"",
+		  videoURL: null,
 		  purchased: 0})
     });
 
     console.log(image)
     console.log('Handling uploading, data presented: ', this.state.file);
+    NotificationManager.success('Your image was successfully uploaded!', 'Success!');
   } else console.log("enter a course tag")
 
   }
@@ -245,7 +258,9 @@ class ImageUpload extends React.Component {
 
     let $pageData;
     if (this.state.courses){
-    $pageData = (<div className="previewComponent">
+    $pageData = (
+      <div className="container">
+      <div className="previewComponent">
       <form onSubmit={this.handleSubmit}>
         <input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/><br /><br />
         <div className="imgPreview image is-128x128">
@@ -262,8 +277,15 @@ class ImageUpload extends React.Component {
           </select>
           <br />
         </div>
+        <div className="field">
+          <label className="label">Comments (optional)</label>
+          <div className="control">
+            <input className="input" name="comments" type="text" placeholder="Comments"/>
+          </div>
+        </div>
       </form>
-    </div>)
+    </div>
+  </div>)
   } else {$pageData = (<p>Please Wait</p>)}
     if (this.state.user && this.state.user && this.state.courses){
     return (<div>
