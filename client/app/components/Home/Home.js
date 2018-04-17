@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import 'whatwg-fetch';
 import {Link} from 'react-router-dom';
 const testimage = require("../../../public/assets/img/poster.png")
+const profImage = require("../../../public/assets/img/profile.png")
 
 var firebase = require('firebase');
 
@@ -48,32 +49,36 @@ class Home extends Component {
         <div>
         <section className="headerSection">
           <div style={{ textAlign: "center"}} className="block">
-            <img src={testimage} />
+            {/*<img src={testimage} />*/}
             <h1 className="title">Tailored Tutoring Co.</h1>
-            <h2 className="subtitle">roblokken@tailoredtutoringco.com</h2>
+            {/*<h2 className="subtitle">roblokken@tailoredtutoringco.com</h2>*/}
           </div>
         </section>
 
         <div className="block">
-          <section className="hero is-primary">
+          <section className="hero is-light">
             <div className="hero-body">
 
                 <div className="columns">
-                  <div className="column is-1">
-                    <a href="">
-                      <h2 className="subtitle">Image Here</h2>
-                    </a>
+                  <div className="column is-3">
+					<figure className="image is-128x128">
+  						<img src={profImage} />
+					</figure>
+					<h2 style= {{fontSize: "22px" }} className="subtitle">
+                    {this.state.user.fname}{" "}{this.state.user.lname}</h2>
                   </div>
 
 
-                  <div className="column is-2">
+                  <div className="column is-8">
+				  <br></br>
 
-                    <h2 style= {{fontSize: "22px" }} className="subtitle">
-                    {this.state.user.fname}{" "}{this.state.user.lname}</h2>
                     <p className="heading">{this.state.user.school.name}</p>
                     {this.state.user.courses.map((subject, index) => (
                     <p key={index}>{subject}</p>
                     ))}
+
+				</div>
+				<div className="column">
 
                     <button className="button">
                       <Link to="/EditProfile">Edit Profile</Link>
@@ -94,14 +99,14 @@ class Home extends Component {
                   <div className="columns">
                   {/* My For-Loop essentially */}
                     {this.state.user.courses.map((subject, index) => (
-                        <div key={index} className="column">
-                          <a href="" style={{fontSize: "24px"}} >{subject}</a>
-                          <button className="button">
+                        <div key={index} className="column is-3">
+						  <button className="button is-text-dark"><h2 className="subtitle">{subject}</h2></button>
+                          <p><button className="button">
                             <Link to="">Submit Assignment</Link>
-                          </button>
-                          <button className="button">
+                          </button></p>
+                          <p><button className="button">
                             <Link to="">View Past Submissions</Link>
-                          </button>
+                          </button></p>
                         </div>
                     ))}
                   </div>

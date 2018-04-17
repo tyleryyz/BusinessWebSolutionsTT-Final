@@ -3,6 +3,7 @@ import {Link} from 'react-router-dom';
 import {withRouter} from 'react-router';
 var firebase = require('firebase');
 var firebaseui = require('firebaseui');
+const ttcLogo = require("../../../public/assets/img/ttcLogo.png")
 
 import '../../styles/bulma.css';
 
@@ -26,34 +27,32 @@ class NavBar extends Component {
   render() {
     if (this.props.auth) {
       // User is signed in.
-      return (<div className="navbar-item">
-
+      return (
         <nav className="navbar" aria-label="main navigation">
           <div className="navbar-brand">
-            <Link className="navbar-item" to="/">
-              Tech Demo Home
-            </Link>
-            <Link className="navbar-item" to="/dashboard">
-              Dashboard
-            </Link>
-            <Link className="navbar-item" to="/emailing">
-              Email Example
-            </Link>
-            <Link className="navbar-item" to="/imageupload">
-              Image Upload
-            </Link>
-	    <Link className="navbar-item" to="/paypal">
-              Paypal Example
-            </Link>
-            <a className="navbar-item button" onClick={this.handleSignOut}>Sign Out</a>
+
+		  	<img style={{height: 60}} src={ttcLogo} />
+
             <button className="button navbar-burger">
               <span></span>
               <span></span>
               <span></span>
             </button>
           </div>
-        </nav>
-      </div>)
+		  <div className="navbar-menu">
+		  	<div className="navbar-start">
+				<Link className="navbar-item" to="/">
+	              Home
+	            </Link>
+	            <Link className="navbar-item" to="/dashboard">
+	              Assignments
+	            </Link>
+			</div>
+			<div className="navbar-end">
+				<button style={{margin: 15}} className="button" onClick={this.handleSignOut}>Sign Out</button>
+			</div>
+		  </div>
+        </nav>)
     } else {
       return (<div className="navbar-item">
         <Link className="navbar-item" to="/signup">
