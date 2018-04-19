@@ -179,9 +179,9 @@ class Home extends Component {
           <section className="hero is-light">
             <div className="hero-body">
 
-                <div className="columns">
-                  <div className="column is-3">
-					<figure className="image is-128x128">
+                <div className="columns is-centered">
+                  <div className="column is-3 has-text-centered">
+					<figure style={{ margin: "auto" }} className="image is-128x128">
   						<img src={profImage} />
 					</figure>
 					<h2 style= {{fontSize: "22px" }} className="subtitle">
@@ -213,28 +213,36 @@ class Home extends Component {
         <div className="block">
           <section className="subjectSection">
               <div className="container">
-                <h1 className="title">My Subjects</h1>
-                <h2 className="subtitle">
-                  <div className="columns">
+                <h1 className="subtitle has-text-centered">My Subjects</h1>
+                  <div className="columns is-centered">
                   {/* My For-Loop essentially */}
                     {this.state.user.courses.map((subject, index) => (
-                        <div key={index} className="column is-3">
+                        <div key={index} className="column has-text-centered is-3">
 
-						  <button className="button is-text-dark" onClick={(e) => this.handleFilter(subject, e)}>
+
+						<div className="card"><div className="card-content is-centered">
+
+						  <p><a className="subtitle is-text-dark" onClick={(e) => this.handleFilter(subject, e)}>
 						  	<Link to='/Dashboard'>{subject}</Link>
-						  </button>
+						  </a></p>
+
+						  <br/>
 
 						  <p><button className="button" onClick={this.handleClick}>
                             <Link to="">Submit Assignment</Link>
                           </button></p>
+
+						  <br/>
+
                           <p><button className="button">
                             <Link to="">View Past Submissions</Link>
                           </button></p>
+
+						  </div></div>
                         </div>
                     ))}
-					{this.state.clicked ? <ImageUpload user={this.props.user}/> : null}
                   </div>
-                </h2>
+				  {this.state.clicked ? <ImageUpload user={this.props.user}/> : null}
               </div> {/* close container, adds a margin */}
           </section>
         </div>

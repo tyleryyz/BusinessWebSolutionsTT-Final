@@ -1295,26 +1295,29 @@ async viewAll(type){
               this.state.images.map((image, index) => (<div key={index}>
 
                   <div className="card">
-                    <div className="columns">
-                      <div className="column is-one-third">
+                    <div className="columns is-vcentered is-centered">
+                      <div className="column is-one-third has-text-centered">
                         <a href={this.state.downloadURL[index]} download="download"><img
                         src={this.state.downloadURL[index]}
                         height={250} width={250}  /> </a>
                         <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
-						<button onClick={(e) => this.setPurchased(e, image)} className="button is-success">Purchase Video!</button>
                       </div>{/* close column */}
 
                       <div className="card-content"></div>
 
-                      <div className="column">
+                      <div className="column is-centered">
                         <div className="media-content">
                           <p className="title is-5">{image.clientUID}</p>
                           <p className="subtitle is-6">{image.course}</p>
                           <p>{image.comment}</p>
+						  <br />
+						  <button onClick={(e) => this.setPurchased(e, image)} className="button">Pay with Credit Card</button>
+						  <br /><br />
+  						  <PayPal />
                         </div>
                       </div> {/* close column*/}
 
-                      <div className="column">
+                      <div className="column has-text-centered">
                         <div className="content">
                     {this.state.vidURL[index] ? $url =(
 		                  <Player>
