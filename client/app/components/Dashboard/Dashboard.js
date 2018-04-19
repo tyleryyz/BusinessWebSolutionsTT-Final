@@ -1301,7 +1301,7 @@ async viewAll(type){
                         src={this.state.downloadURL[index]}
                         height={250} width={250}  /> </a>
                         <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
-						<button onClick={(e) => this.setPurchased(e, image)} className="button is-success">Purchase Video!</button>
+
                       </div>{/* close column */}
 
                       <div className="card-content"></div>
@@ -1319,7 +1319,8 @@ async viewAll(type){
                     {this.state.vidURL[index] ? $url =(
 		                  <Player>
 		        						<source src={this.state.vidURL[index]} />
-		        					</Player>) : $url = <p></p>}
+		        					</Player>) : $url = <p>Video Currently Production</p>}
+                      <button onClick={(e) => this.setPurchased(e, image)} className="button is-success">Purchase Video!</button>
                         </div>
                       </div> {/* close column*/}
                     </div>

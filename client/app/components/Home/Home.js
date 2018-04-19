@@ -3,8 +3,10 @@ import 'whatwg-fetch';
 import {Link, Route, Switch, Router} from 'react-router-dom';
 
 import ImageUpload from '../ImageUpload/ImageUpload';
+import '../../styles/styles.css';
 const testimage = require("../../../public/assets/img/poster.png")
 const profImage = require("../../../public/assets/img/profile.png")
+const ttcLogo = require("../../../public/assets/img/ttcLogo.png")
 
 // Load the SDK and UUID
 var AWS = require('aws-sdk');
@@ -167,7 +169,7 @@ class Home extends Component {
 
       return (
         <div>
-        <section className="headerSection">
+        <section className="headerSection" >
           <div style={{ textAlign: "center"}} className="block">
             {/*<img src={testimage} />*/}
             <h1 className="title">Tailored Tutoring Co.</h1>
@@ -176,15 +178,16 @@ class Home extends Component {
         </section>
 
         <div className="block">
-          <section className="hero is-light">
+          {/*section gets Whole Background: */}
+          <section className="hero">
             <div className="hero-body">
 
                 <div className="columns">
                   <div className="column is-3">
-					<figure className="image is-128x128">
-  						<img src={profImage} />
-					</figure>
-					<h2 style= {{fontSize: "22px" }} className="subtitle">
+					             <figure className="image is-128x128">
+  						               <img src={profImage} />
+					             </figure>
+					<h2 style= {{fontSize: "22px", color: "white"}} className="subtitle">
                     {this.state.user.fname}{" "}{this.state.user.lname}</h2>
                   </div>
 
@@ -228,7 +231,7 @@ class Home extends Component {
                             <Link to="">Submit Assignment</Link>
                           </button></p>
                           <p><button className="button">
-                            <Link to="">View Past Submissions</Link>
+                            <Link to='/Dashboard'>View Past Submissions</Link>
                           </button></p>
                         </div>
                     ))}
