@@ -1,29 +1,3 @@
 #cancelButton{
 	align-content: right;
 }
-
-#profile-data{
-	background-image: url('../../public/assets/img/alphabets.jpg');
-	background-size: cover;
-	background-position: center center;
-	color: white;
-	position: relative;
-	top: 0;
-	bottom: 0;
-	height: 100%;
-	width: 100%;
-	z-index: -10;
-}
-
-#profile-body{
-	background-color: rgba(0,0,0,0.5);
-	top: 0;
-	bottom: 0;
-	height: 100%;
-	width: 100%;
-	z-index: -5;
-}
-
-#title-hero{
-	background-color: Lightgrey;
-}

@@ -1301,7 +1301,6 @@ async viewAll(type){
                         src={this.state.downloadURL[index]}
                         height={250} width={250}  /> </a>
                         <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
-
                       </div>{/* close column */}
 
                       <div className="card-content"></div>
@@ -1323,7 +1322,7 @@ async viewAll(type){
                     {this.state.vidURL[index] ? $url =(
 		                  <Player>
 		        						<source src={this.state.vidURL[index]} />
-		        					</Player>) : $url = <p>Video Currently Production</p>}
+		        					</Player>) : $url = <p></p>}
                         </div>
                       </div> {/* close column*/}
                     </div>
