@@ -66,8 +66,7 @@ var filename;
 
 var client = {
 			// DELETE THESE BEFORE PUSHING IF MAKING ANY CHANGES TO THIS FILE
-            sandbox: 'AUF9q58jUbZ79R8AFyy4EFE4W07SGJqLo7Xqsngr4Birx1Fz8WfgjLWpwr3C-CeelMaL7LbCDMHxxg6v',
-            production: 'AWre8N0N2d_uCfSCFf4mSuYENw2uitbgzU2T9mZG7DCyIdzPDRB_pMlI0TK4-QribrKDvrXc0lTIjpkr'
+          
         };
 
 var env = 'sandbox';
@@ -216,7 +215,7 @@ class Dashboard extends Component {
       this.setState({
         user: user,
         courses: user.courses,
-		filterVal: this.props.filter,
+        filterVal: this.props.filterVal,
         loaded: false
       }, () => {
         this.setState({loaded: true})
@@ -254,8 +253,10 @@ class Dashboard extends Component {
               this.setState({loaded: true})
             });
           });
-	  }).then(()=>{
-		  if(this.props.filter != 'select'){
+	       })
+      })
+  	}).then(()=>{
+		  if(this.props.filterVal != 'select'){
 			  console.log("Made it INOT HERE");
 			  this.filterImages().then(() => {
 		        this.filterStatus().then(() => {
@@ -273,8 +274,6 @@ class Dashboard extends Component {
 		    })
 		  }
 	  })
-      })
-  	});
 
   };
 
@@ -1211,6 +1210,15 @@ async viewAll(type){
 })
 }
 
+checkForVid(index){
+  if (this.state.vidURL!=null && this.state.vidURL[index]){
+    return (
+      <Player>
+        <source src={this.state.vidURL[index]} />
+      </Player>
+    )} else { return (<p>Video in production</p>)}
+}
+
 
   render() {
     let $url;
@@ -1319,10 +1327,7 @@ async viewAll(type){
 
                       <div className="column has-text-centered">
                         <div className="content">
-                    {this.state.vidURL[index] ? $url =(
-		                  <Player>
-		        						<source src={this.state.vidURL[index]} />
-		        					</Player>) : $url = <p></p>}
+                    {this.checkForVid(index)}
                         </div>
                       </div> {/* close column*/}
                     </div>
