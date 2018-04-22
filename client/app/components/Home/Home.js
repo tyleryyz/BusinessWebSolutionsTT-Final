@@ -11,7 +11,6 @@ var AWS = require('aws-sdk');
 var uuid = require('node-uuid');
 var firebase = require('firebase');
 
-
 // Init variables for the S3 object
 var accessKey;
 var secretAccess;
@@ -67,8 +66,7 @@ var keyName = 'hello_world.txt';
 let file;
 var filename;
 
-function sendTheEmail()
-{
+function sendTheEmail() {
 
   const ses = new AWS.SES();
 
@@ -80,17 +78,11 @@ function sendTheEmail()
       Body: {
         Html: {
           Charset: 'UTF-8',
-          Data:
-            '<strong>First Name:</strong> ' + firstname +
-            '<br><strong>Last Name:</strong> ' + lastname +
-            '<br><strong>Email to:</strong> ' + email +
-            '<br>Subject: '+ subject +
-            '<br>Message: ' + message
+          Data: '<strong>First Name:</strong> ' + firstname + '<br><strong>Last Name:</strong> ' + lastname + '<br><strong>Email to:</strong> ' + email + '<br>Subject: ' + subject + '<br>Message: ' + message
         },
         Text: {
           Charset: 'UTF-8',
-          Data: 'First Name: ' + firstname + '\nLast Name: ' + lastname +
-            '\nEmail to: ' + email + '\nSubject: ' + subject + '\nMessage: ' + message
+          Data: 'First Name: ' + firstname + '\nLast Name: ' + lastname + '\nEmail to: ' + email + '\nSubject: ' + subject + '\nMessage: ' + message
         }
       },
       Subject: {
@@ -103,10 +95,11 @@ function sendTheEmail()
   };
 
   ses.sendEmail(params, (err, data) => {
-      if (err) console.log(err, err.stack)
-      else console.log(data)
-    }
-  );
+    if (err)
+      console.log(err, err.stack)
+    else
+      console.log(data)
+  });
 }
 
 // Will render a profile image, user name, user class list, user school,
@@ -119,17 +112,28 @@ class Home extends Component {
       user: null,
       loaded: false,
       courses: null,
-	  clicked: false
+      clicked: false,
+      submitImageSubject: null
     };
     this.getData = this.getData.bind(this);
-	this.handleFilter = this.handleFilter.bind(this);
-	this.handleClick = this.handleClick.bind(this);
+    this.handleFilter = this.handleFilter.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+    this.handleClose = this.handleClose.bind(this);
   }
 
-  handleClick() {
-    this.setState({
-      clicked: !(this.state.clicked)
-    });
+  handleClick(e, subject) {
+    e.preventDefault();
+
+    if (this.state.clicked){
+      this.setState({
+        submitImageSubject: subject
+      });
+    } else {
+      this.setState({
+        clicked: !(this.state.clicked),
+        submitImageSubject: subject
+      });
+    }
   }
 
   getData() {
@@ -148,7 +152,7 @@ class Home extends Component {
       console.log("will mount here", user)
       this.setState({
         user: user,
-		courses: user.courses,
+        courses: user.courses,
         loaded: false
       }, () => {
         this.setState({loaded: true})
@@ -156,22 +160,31 @@ class Home extends Component {
     })
   };
 
-  handleFilter(subject, e) {
-	  e.preventDefault();
-	  this.props.filter(subject);
+  handleFilter(e, subject) {
+    e.preventDefault();
+    this.props.filterCallBack(subject);
+  }
+
+  handleClose(e, subject) {
+    e.preventDefault();
+    this.setState({
+      clicked: false,
+      submitImageSubject: null
+    });
   }
 
   render() {
 
     if (this.state.user && this.state.loaded) {
 
-      return (
-        <div>
+      return (<div>
         <section className="headerSection">
-          <div style={{ textAlign: "center"}} className="block">
-            {/*<img src={testimage} />*/}
+          <div style={{
+              textAlign: "center"
+            }} className="block">
+            {/* <img src={testimage} /> */}
             <h1 className="title">Tailored Tutoring Co.</h1>
-            {/*<h2 className="subtitle">roblokken@tailoredtutoringco.com</h2>*/}
+            {/* <h2 className="subtitle">roblokken@tailoredtutoringco.com</h2> */}
           </div>
         </section>
 
@@ -179,32 +192,33 @@ class Home extends Component {
           <section className="hero is-light">
             <div className="hero-body">
 
-                <div className="columns is-centered">
-                  <div className="column is-3 has-text-centered">
-					<figure style={{ margin: "auto" }} className="image is-128x128">
-  						<img src={profImage} />
-					</figure>
-					<h2 style= {{fontSize: "22px" }} className="subtitle">
+              <div className="columns is-centered">
+                <div className="column is-3 has-text-centered">
+                  <figure style={{
+                      margin: "auto"
+                    }} className="image is-128x128">
+                    <img src={profImage}/>
+                  </figure>
+                  <h2 style={{
+                      fontSize: "22px"
+                    }} className="subtitle">
                     {this.state.user.fname}{" "}{this.state.user.lname}</h2>
-                  </div>
+                </div>
 
+                <div className="column is-8">
+                  <br></br>
 
-                  <div className="column is-8">
-				  <br></br>
+                  <p className="heading">{this.state.user.school.name}</p>
+                  {this.state.user.courses.map((subject, index) => (<p key={index}>{subject}</p>))}
 
-                    <p className="heading">{this.state.user.school.name}</p>
-                    {this.state.user.courses.map((subject, index) => (
-                    <p key={index}>{subject}</p>
-                    ))}
+                </div>
+                <div className="column">
 
-				</div>
-				<div className="column">
+                  <Link className="button" to="/EditProfile">Edit Profile</Link>
 
-        <Link className="button" to="/EditProfile">Edit Profile</Link>
-
-
-                  </div>
-                </div> {/* close columns */}
+                </div>
+              </div>
+              {/* close columns */}
 
             </div>
           </section>
@@ -212,45 +226,61 @@ class Home extends Component {
 
         <div className="block">
           <section className="subjectSection">
-              <div className="container">
-                <h1 className="subtitle has-text-centered">My Subjects</h1>
-                  <div className="columns is-centered">
-                  {/* My For-Loop essentially */}
-                    {this.state.user.courses.map((subject, index) => (
-                        <div key={index} className="column has-text-centered is-3">
+            <div className="container">
+              <h1 className="subtitle has-text-centered">My Subjects</h1>
+              <div className="columns is-centered">
+                {/* My For-Loop essentially */}
+                {
+                  this.state.user.courses.map((subject, index) => (<div key={index} className="column has-text-centered is-3">
+
+                    <div className="card">
+                      <div className="card-content is-centered">
 
 
-						<div className="card"><div className="card-content is-centered">
 
-						  <p><a className="subtitle is-text-dark" onClick={(e) => this.handleFilter(subject, e)}>
-						  	<Link to='/Dashboard'>{subject}</Link>
-						  </a></p>
+                          <div className="control subtitle is-text-dark" onClick={(e) => this.handleFilter(e, subject)}>
+                            <Link to='/Dashboard'>{subject}</Link>
+                          </div>
 
-						  <br/>
 
-						  <p><button className="button" onClick={this.handleClick}>
+
+                        <br/>
+
+                        <p>
+                          <button className="button" onClick={(e) => this.handleClick(e, subject)}>
                             <Link to="">Submit Assignment</Link>
-                          </button></p>
+                          </button>
 
-						  <br/>
+                        </p>
 
-                          <p><button className="button">
+                        <br/>
+
+                        <p>
+                          <button className="button">
                             <Link to="">View Past Submissions</Link>
-                          </button></p>
+                          </button>
+                        </p>
 
-						  </div></div>
-                        </div>
-                    ))}
-                  </div>
-				  {this.state.clicked ? <ImageUpload user={this.props.user}/> : null}
-              </div> {/* close container, adds a margin */}
+                        {
+                          (this.state.clicked && this.state.submitImageSubject === subject)
+                            ? <div><ImageUpload user={this.props.user}/><a onClick={this.handleClose} className="button">Close</a></div>
+                            : <p></p>
+                        }
+
+                      </div>
+
+                    </div>
+
+
+                  </div>))
+                }
+              </div>
+            </div>
+            {/* close container, adds a margin */}
           </section>
         </div>
-      </div> //close container
-
-
-      )
-    } else {
+      </div>
+    )} else {
       return (<div>
         <h1>Please wait</h1>
       </div>)
@@ -258,7 +288,6 @@ class Home extends Component {
 
   }
 }
-
 
 // <div id="editProfileButton">
 // <div className="control">
