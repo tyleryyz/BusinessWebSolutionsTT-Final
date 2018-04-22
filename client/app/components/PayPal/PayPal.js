@@ -38,7 +38,6 @@ class PayPal extends React.Component{
         let PayPalButton = paypal.Button.driver('react', { React, ReactDOM });
 
         return (<div className='shoppingCart'>
-            <p>Buy <strong>Full Body Lobster Onesie - $0.01</strong> now!</p>
             <PayPalButton
                 client={client}
                 payment={payment}

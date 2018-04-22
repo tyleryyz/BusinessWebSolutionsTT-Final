@@ -252,22 +252,24 @@ class ImageUpload extends React.Component {
     if (imagePreviewUrl) {
       $imagePreview = (<img src={imagePreviewUrl}/>)
     } else {
-      $imagePreview = (<div className="previewText">Please upload your question image!
-      (Acceptable formats: jpg., .jpeg, .png)</div>);
+      $imagePreview = (
+        <div className="previewText" style={{ width: '170%'}}>
+          <p>Please upload your Homework Image File!</p>
+          <p><i>(Acceptable formats are: .jpg, .jpeg, .png)</i></p>
+      </div>);
     }
 
     let $pageData;
     if (this.state.courses){
     $pageData = (
-      <div className="container">
+      <div className="block">
       <div className="previewComponent">
       <form onSubmit={this.handleSubmit}>
         <input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/><br /><br />
         <div className="imgPreview image is-128x128">
           {$imagePreview}
-        </div><br />
-        <button className="submitButton" type="submit">Upload Image</button>
-        <p>Select course tag</p>
+        </div>
+        <p>Select course tag below:</p>
         <div className="select">
           <select name="course">
           <option value="select">Select</option>
@@ -280,9 +282,10 @@ class ImageUpload extends React.Component {
         <div className="field">
           <label className="label">Comments (optional)</label>
           <div className="control">
-            <input className="input" name="comments" type="text" placeholder="Comments"/>
+            <input className="input" name="comments" type="text" placeholder="Comments" style={{ width: '80%'}}/>
           </div>
-        </div>
+        </div><br />
+		<button className="button" style={{ backgroundColor: "#22d0b2"}} type="submit">Upload Image</button>
       </form>
     </div>
   </div>)

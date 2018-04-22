@@ -1321,7 +1321,7 @@ async viewAll(type){
                     {this.state.vidURL[index] ? $url =(
 		                  <Player>
 		        						<source src={this.state.vidURL[index]} />
-		        					</Player>) : $url = <p></p>}
+		        					</Player>) : $url = <p>Video Currently in Production!</p>}
                         </div>
                       </div> {/* close column*/}
                     </div>
