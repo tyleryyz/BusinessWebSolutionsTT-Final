@@ -7,6 +7,7 @@ import { Player, BigPlayButton } from 'video-react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import "../../../../node_modules/video-react/dist/video-react.css";
 import PayPal from '../PayPal/PayPal';
+// import PaymentForm from '../PaymentForm/PaymentForm';
 
 
 var firebase = require('firebase');
@@ -66,7 +67,7 @@ var filename;
 
 var client = {
 			// DELETE THESE BEFORE PUSHING IF MAKING ANY CHANGES TO THIS FILE
-      
+
         };
 
 var env = 'sandbox';
@@ -361,7 +362,7 @@ class Dashboard extends Component {
   if(image.purchased==1){
 		url = s3.getSignedUrl('getObject', params);
 	} else {
-		url = "https://www.youtube.com/embed/Wl2Q_MceIUc";
+		url = null;
 	}
 	vidUrlArray.push(url)
     console.log(url);
@@ -1214,6 +1215,7 @@ async viewAll(type){
   render() {
     let $url;
     let $courseData;
+    let $pushImage;
     if (this.state.user) {
       let $image;
       let $date;
@@ -1312,7 +1314,7 @@ async viewAll(type){
 						  <br />
 						  <button onClick={(e) => this.setPurchased(e, image)} className="button">Pay with Credit Card</button>
 						  <br /><br />
-  						  <PayPal />
+  						  <PayPal image={image.imageURL}/>
                         </div>
                       </div> {/* close column*/}
 
