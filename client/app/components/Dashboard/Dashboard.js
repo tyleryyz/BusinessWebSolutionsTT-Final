@@ -66,7 +66,7 @@ var filename;
 
 var client = {
 			// DELETE THESE BEFORE PUSHING IF MAKING ANY CHANGES TO THIS FILE
-          
+
         };
 
 var env = 'sandbox';
