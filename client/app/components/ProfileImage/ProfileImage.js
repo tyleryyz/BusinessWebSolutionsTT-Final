@@ -112,6 +112,7 @@ class ProfileImage extends React.Component {
     this.state = {
       file: '',
       imagePreviewUrl: '',
+	  profileImage: null,
       user: null,
       loaded: false,
       courses: null
@@ -131,6 +132,33 @@ class ProfileImage extends React.Component {
     }).then(res => res.json()));
   }
 
+  async getProfileImage(){
+	  let uID = this.props.user.uid;
+	  let url;
+      console.log(uID)
+      let image = fetch(`/api/profileimages?clientUID=${uID}`, {
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        method: 'GET'
+	}).then(res => res.json()).then(() => {
+		var params = {
+			Bucket: bucketName,
+			Key: image.imageURL
+		};
+		url = s3.getSignedUrl('getObject', params)
+	})
+		console.log("IMAGE: ", image);
+		console.log("URL: ", url);
+	  this.setState({
+        imagePreviewUrl: url,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+	});
+	return url;
+  }
+
   componentWillMount() {
     let result = this.getData().then((user) => {
       console.log("will mount here", user)
@@ -140,7 +168,18 @@ class ProfileImage extends React.Component {
       }, () => {
         this.setState({loaded: true})
       })
-      })
+  }).then(() => {
+	  let image = this.getProfileImage();
+	  if(image.imageURL)
+	  {
+		  this.setState({
+			  profileImage: image,
+			  loaded: false
+		  }, () => {
+			  this.setState({loaded: true})
+		  });
+	  }
+	})
   }
 
 
@@ -149,9 +188,7 @@ class ProfileImage extends React.Component {
     e.preventDefault();
 
     filename = this.state.file.name;
-    var d = new Date();
-    var timestamp = d.getTime();
-    var uploadName = this.props.user.uid+'-'+timestamp;
+    var uploadName = this.props.user.uid;
 
     var extension = filename.split(".");
     if( extension.length === 1 || ( extension[0] === "" && extension.length === 2 ) ) {
@@ -185,15 +222,14 @@ class ProfileImage extends React.Component {
       }
     })
 
-    let image = fetch(`/api/images`, { //new place to store these?
+    let image = fetch(`/api/profileimages`, { //new place to store these?
       method: 'POST',
       headers: {
         "Content-Type": "Application/json"
       },
       body: JSON.stringify({
 		  clientUID: this.state.user.uID,
-		  imageURL: key,
-		  timestamp: timestamp})
+		  imageURL: key})
     });
 
     console.log(image)
@@ -221,32 +257,32 @@ class ProfileImage extends React.Component {
     let $imagePreview = null;
 
     if (imagePreviewUrl) {
-      $imagePreview = (<img src={imagePreviewUrl}/>)
+      $imagePreview = (<div className="imgPreview image is-128x128"><img src={imagePreviewUrl}/></div>)
     } else {
       $imagePreview = (<div className="previewText">Please upload your profile image!
       (Acceptable formats: .jpg, .jpeg, .png)</div>);
     }
+	console.log("Image preview: ", imagePreviewUrl);
 
     let $pageData;
-    if (this.state.courses){
+    if (this.state.user){
     $pageData = (
       <div className="container">
       <div className="previewComponent">
       <form onSubmit={this.handleSubmit}>
-        <input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/>
-		<br />
-		<br />
-        <div className="imgPreview image is-128x128">
+        <div>
           {$imagePreview}
         </div>
-		<br />
-        <button className="submitButton" type="submit">Upload Image</button>
+		<br/>
+		<input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/>
+		<br /><br />
+        <button className="button submitButton" type="submit">Upload Image</button>
 
       </form>
     </div>
   </div>)
   } else {$pageData = (<p>Please Wait</p>)}
-    if (this.state.user && this.state.user && this.state.courses){
+    if (this.state.user){
     return (<div>
       {$pageData}
     </div>)

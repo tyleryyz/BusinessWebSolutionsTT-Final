@@ -2,6 +2,9 @@ import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import '../../styles/bulma.css';
+
+const fbBtn = require("../../../public/assets/img/facebook2.png")
+
 var firebase = require('firebase');
 var provider = new firebase.auth.FacebookAuthProvider();
 
@@ -111,45 +114,51 @@ class LogIn extends Component {
   render() {
     if (this.state.loaded){
     return (<div className="container">
-    <p>log in with Facebook</p>
-    <button onClick={this.handleFacebookLogin}>|F| Login with Facebook</button>
-    {this.state.facebookError?<p style={{color: 'red'}}>{this.state.facebookError}</p>:<p></p>}
-    <br />
-    <p>Or email and password</p>
-    <br />
-      <form onSubmit={this.handleLogIn}>
-        <div className="container">
-        {this.state.fbError?<p style={{color: 'red'}}>{this.state.fbError}</p>:<p></p>}
+			<div className="columns">
+				<div className="column"><span /></div>
+				<div className="column has-text-centered">
+					<img src={fbBtn} onClick={this.handleFacebookLogin} width={250}/>
+				    {this.state.facebookError?<p style={{color: 'red'}}>{this.state.facebookError}</p>:<p></p>}
+				    <br />
+				    <p>Or email and password</p>
+				    <br />
+						  <form onSubmit={this.handleLogIn}>
+					        <div className="container">
+					        {this.state.fbError?<p style={{color: 'red'}}>{this.state.fbError}</p>:<p></p>}
 
-          <div className="box">
-            <div className="field">
-            {this.state.emailError?<p style={{color: 'red'}}>Please enter an email</p>:<p></p>}
-              <p className="control">
-                <input className="input" name="email" type="email" placeholder="Email"/>
-              </p>
-            </div>
-            <div className="field">
-            {this.state.passwordError?<p style={{color: 'red'}}>Please enter a password</p>:<p></p>}
-              <p className="control">
-                <input className="input" name="password" type="password" placeholder="Password"/>
-              </p>
-            </div>
-            <div className="field">
-              <p className="control">
-                <button className="button is-success">
-                  Login
-                </button>
-              </p>
-            </div>
-          </div>
-          {
-            <Link to="/SignUp">
-                Sign Up!
-              </Link>
-          }
+					          <div className="box">
+					            <div className="field">
+					            {this.state.emailError?<p style={{color: 'red'}}>Please enter an email</p>:<p></p>}
+					              <p className="control">
+					                <input className="input" name="email" type="email" placeholder="Email"/>
+					              </p>
+					            </div>
+					            <div className="field">
+					            {this.state.passwordError?<p style={{color: 'red'}}>Please enter a password</p>:<p></p>}
+					              <p className="control">
+					                <input className="input" name="password" type="password" placeholder="Password"/>
+					              </p>
+					            </div>
+					            <div className="field">
+					              <p className="control">
+					                <button className="button is-success">
+					                  Login
+					                </button>
+					              </p>
+					            </div>
+					          </div>
+					          {
+					            <Link to="/SignUp">
+					                Sign Up!
+					              </Link>
+					          }
 
-        </div>
-      </form>
+					        </div>
+					      </form>
+				    </div>
+					<div className="column is-2"><span /></div>
+	  			</div>
+
     </div>);
 } else {return (<p>Please Wait</p>)}
   }

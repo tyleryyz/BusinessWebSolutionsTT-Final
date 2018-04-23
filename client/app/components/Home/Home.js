@@ -3,8 +3,11 @@ import 'whatwg-fetch';
 import {Link, Route, Switch, Router} from 'react-router-dom';
 
 import ImageUpload from '../ImageUpload/ImageUpload';
+import '../../styles/styles.css';
+
 const testimage = require("../../../public/assets/img/poster.png")
 const profImage = require("../../../public/assets/img/profile.png")
+const ttcLogo = require("../../../public/assets/img/ttcLogo.png")
 
 // Load the SDK and UUID
 var AWS = require('aws-sdk');
@@ -124,6 +127,7 @@ class Home extends Component {
     this.getData = this.getData.bind(this);
 	this.handleFilter = this.handleFilter.bind(this);
 	this.handleClick = this.handleClick.bind(this);
+	this.getProfileImage = this.getProfileImage.bind(this);
   }
 
   handleClick() {
@@ -143,6 +147,39 @@ class Home extends Component {
     }).then(res => res.json()));
   }
 
+  async getProfileImage(){
+	  let uID = this.props.user.uid;
+      console.log("Client UID on fetch", uID)
+      let image = await fetch(`/api/profileimages?clientUID=${uID}`, {
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        method: 'GET'
+		}).then(res =>
+			res.json());
+		console.log("IMAGE: ", image);
+
+		let url = '';
+		if( image.imageURL )
+		{
+			console.log("Made it into request");
+			var params = {
+				Bucket: bucketName,
+				Key: image.imageURL
+			};
+
+			url = s3.getSignedUrl('getObject', params)
+		}
+		console.log("URL: ", url);
+	  this.setState({
+        imagePreviewUrl: url,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+	});
+	return url;
+  }
+
   componentWillMount() {
     let result = this.getData().then((user) => {
       console.log("will mount here", user)
@@ -153,8 +190,17 @@ class Home extends Component {
       }, () => {
         this.setState({loaded: true})
       });
-    })
-  };
+  }).then(() => {
+	  this.getProfileImage().then((image) => {
+		  this.setState({
+			 	imagePreviewUrl: image.imageURL,
+				loaded: false
+		  }, () => {
+			  this.setState({loaded: true})
+		  });
+	  });
+  });
+};
 
   handleFilter(subject, e) {
 	  e.preventDefault();
@@ -164,7 +210,14 @@ class Home extends Component {
   render() {
 
     if (this.state.user && this.state.loaded) {
+		let $imageURL;
 
+		this.state.imagePreviewUrl ? <figure style={{ margin: "auto" }} className="image is-128x128">
+										<img src={this.state.imagePreviewUrl} alt={profImage} />
+									</figure>
+									: <figure style={{ margin: "auto" }} className="image is-128x128">
+				  						<img src={profImage} />
+									   </figure>
       return (
         <div>
         <section className="headerSection">
@@ -176,15 +229,13 @@ class Home extends Component {
         </section>
 
         <div className="block">
-          <section className="hero is-light">
-            <div className="hero-body">
+          <section className="hero" id="profile-data">
+            <div className="hero-body" id="profile-body">
 
                 <div className="columns is-centered">
                   <div className="column is-3 has-text-centered">
-					<figure style={{ margin: "auto" }} className="image is-128x128">
-  						<img src={profImage} />
-					</figure>
-					<h2 style= {{fontSize: "22px" }} className="subtitle">
+					{$imageURL}
+					<h2 style= {{fontSize: "22px", color: "white" }} className="subtitle">
                     {this.state.user.fname}{" "}{this.state.user.lname}</h2>
                   </div>
 
@@ -200,7 +251,7 @@ class Home extends Component {
 				</div>
 				<div className="column">
 
-        <Link className="button" to="/EditProfile">Edit Profile</Link>
+        <Link className="button" to="/EditProfile" id="edit-button">Edit Profile</Link>
 
 
                   </div>
@@ -235,7 +286,7 @@ class Home extends Component {
 						  <br/>
 
                           <p><button className="button">
-                            <Link to="">View Past Submissions</Link>
+                            <Link to='/Dashboard'>View Past Submissions</Link>
                           </button></p>
 
 						  </div></div>
