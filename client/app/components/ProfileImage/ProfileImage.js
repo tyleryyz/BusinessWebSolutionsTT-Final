@@ -199,6 +199,7 @@ class ProfileImage extends React.Component {
     extension = extension.pop();    // feel free to tack .toLowerCase() here if you want
     uploadName = uploadName+'.'+extension;
     var keyName;
+	var deleteKey = this.props.user.uid + '.*';
 	extension = extension.toLowerCase();
 
     if(extension==="png" || extension==="jpg" || extension==="jpeg")
@@ -206,7 +207,23 @@ class ProfileImage extends React.Component {
         keyName = "ProfileImages/";
     }
 
-    var params = {
+	var params = {
+		Bucket: bucketName,
+		Key: deleteKey
+	};
+
+	s3.deleteObject(params, function(err, data) {
+		if (err)
+        {
+          console.log(err)
+        }
+        else
+        {
+          console.log("Successfully uploaded data to " + bucketName + keyName + uploadName);
+        }
+	})
+
+    params = {
       Bucket: bucketName,
       Key: keyName+uploadName,
       Body: file

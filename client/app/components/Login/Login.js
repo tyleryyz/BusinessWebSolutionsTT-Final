@@ -114,17 +114,19 @@ class LogIn extends Component {
   render() {
     if (this.state.loaded){
     return (<div className="container">
+			<div style={{ textAlign: "center"}} className="block">
+
+			  <h1 className="title">Tailored Tutoring Co.</h1>
+			  <h2 className="subtitle"><i>"Your homework - explained."</i></h2>
+			</div>
 			<div className="columns">
 				<div className="column"><span /></div>
 				<div className="column has-text-centered">
-					<img src={fbBtn} onClick={this.handleFacebookLogin} width={250}/>
-				    {this.state.facebookError?<p style={{color: 'red'}}>{this.state.facebookError}</p>:<p></p>}
+
 				    <br />
-				    <p>Or email and password</p>
 				    <br />
 						  <form onSubmit={this.handleLogIn}>
 					        <div className="container">
-					        {this.state.fbError?<p style={{color: 'red'}}>{this.state.fbError}</p>:<p></p>}
 
 					          <div className="box">
 					            <div className="field">
@@ -147,11 +149,17 @@ class LogIn extends Component {
 					              </p>
 					            </div>
 					          </div>
-					          {
-					            <Link to="/SignUp">
-					                Sign Up!
-					              </Link>
-					          }
+
+							  <br/><p>or sign in with Facebook</p>
+
+							  <img src={fbBtn} onClick={this.handleFacebookLogin} width={250}/>
+		  				    {this.state.facebookError?<p style={{color: 'red'}}>{this.state.facebookError}</p>:<p></p>}
+							<br/>
+							{
+							  <Link to="/SignUp">
+								  Don't have a profile? Sign Up!
+								</Link>
+							}
 
 					        </div>
 					      </form>
