@@ -13,7 +13,6 @@ var AWS = require('aws-sdk');
 var uuid = require('node-uuid');
 var firebase = require('firebase');
 
-
 // Init variables for the S3 object
 var accessKey;
 var secretAccess;
@@ -69,8 +68,7 @@ var keyName = 'hello_world.txt';
 let file;
 var filename;
 
-function sendTheEmail()
-{
+function sendTheEmail() {
 
   const ses = new AWS.SES();
 
@@ -82,17 +80,11 @@ function sendTheEmail()
       Body: {
         Html: {
           Charset: 'UTF-8',
-          Data:
-            '<strong>First Name:</strong> ' + firstname +
-            '<br><strong>Last Name:</strong> ' + lastname +
-            '<br><strong>Email to:</strong> ' + email +
-            '<br>Subject: '+ subject +
-            '<br>Message: ' + message
+          Data: '<strong>First Name:</strong> ' + firstname + '<br><strong>Last Name:</strong> ' + lastname + '<br><strong>Email to:</strong> ' + email + '<br>Subject: ' + subject + '<br>Message: ' + message
         },
         Text: {
           Charset: 'UTF-8',
-          Data: 'First Name: ' + firstname + '\nLast Name: ' + lastname +
-            '\nEmail to: ' + email + '\nSubject: ' + subject + '\nMessage: ' + message
+          Data: 'First Name: ' + firstname + '\nLast Name: ' + lastname + '\nEmail to: ' + email + '\nSubject: ' + subject + '\nMessage: ' + message
         }
       },
       Subject: {
@@ -105,10 +97,11 @@ function sendTheEmail()
   };
 
   ses.sendEmail(params, (err, data) => {
-      if (err) console.log(err, err.stack)
-      else console.log(data)
-    }
-  );
+    if (err)
+      console.log(err, err.stack)
+    else
+      console.log(data)
+  });
 }
 
 // Will render a profile image, user name, user class list, user school,
@@ -121,17 +114,26 @@ class Home extends Component {
       user: null,
       loaded: false,
       courses: null,
-	  clicked: false
+      clicked: false,
+      submitImageSubject: null
     };
     this.getData = this.getData.bind(this);
-	this.handleFilter = this.handleFilter.bind(this);
-	this.handleClick = this.handleClick.bind(this);
+    this.handleFilter = this.handleFilter.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+    this.handleClose = this.handleClose.bind(this);
   }
 
-  handleClick() {
-    this.setState({
-      clicked: !(this.state.clicked)
-    });
+  handleClick(e, subject) {
+    e.preventDefault();
+
+    if (this.state.clicked) {
+      this.setState({submitImageSubject: subject});
+    } else {
+      this.setState({
+        clicked: !(this.state.clicked),
+        submitImageSubject: subject
+      });
+    }
   }
 
   getData() {
@@ -150,7 +152,7 @@ class Home extends Component {
       console.log("will mount here", user)
       this.setState({
         user: user,
-		courses: user.courses,
+        courses: user.courses,
         loaded: false
       }, () => {
         this.setState({loaded: true})
@@ -158,22 +160,25 @@ class Home extends Component {
     })
   };
 
-  handleFilter(subject, e) {
-	  e.preventDefault();
-	  this.props.filter(subject);
+  handleFilter(e, subject) {
+    e.preventDefault();
+    this.props.filterCallBack(subject);
+  }
+
+  handleClose(e, subject) {
+    e.preventDefault();
+    this.setState({clicked: false, submitImageSubject: null});
   }
 
   render() {
 
     if (this.state.user && this.state.loaded) {
 
-      return (
-        <div>
+      return (<div>
         <section className="hero" id="title-hero">
-          <div style={{ textAlign: "center"}} className="block">
-            {/*<img src={testimage} />*/}
-            <h1 className="title">Tailored Tutoring Co.</h1>
-            {/*<h2 className="subtitle">roblokken@tailoredtutoringco.com</h2>*/}
+           <div style={{ textAlign: "center"}} className="block">
+             <h1 className="title">Tailored Tutoring Co.</h1>
+            {/* <h2 className="subtitle">roblokken@tailoredtutoringco.com</h2> */}
           </div>
         </section>
 
@@ -189,8 +194,7 @@ class Home extends Component {
 					</figure>
 					<h2 style= {{fontSize: "22px", color: "white" }} className="subtitle">
                     {this.state.user.fname}{" "}{this.state.user.lname}</h2>
-                  </div>
-
+                </div>
 
                   <div className="column is-8">
 				  <br></br>
@@ -200,59 +204,71 @@ class Home extends Component {
                     <p key={index}>{subject}</p>
                     ))}
 
+
+
 				</div>
-  				<div className="column">
-
-          <Link className="button" id="editButton" to="/EditProfile">Edit Profile</Link>
 
 
-                    </div>
-                  </div> {/* close columns */}
+
+                <div className="column">
+                <div className="button" id="editButton">
+                  <Link to="/EditProfile">Edit Profile</Link>
+                  </div>
+
+                </div>
+              </div>
+              {/* close columns */}
 
             </div>
           </section>
           {/* use to end "block" div here */}
 
         <div className="block" id="bottomBlock">
+
           <section className="subjectSection">
-              <div className="container">
-                <h2 className="subtitle has-text-centered">My Subjects</h2>
-                  <div className="columns is-centered">
-                  {/* My For-Loop essentially */}
-                    {this.state.user.courses.map((subject, index) => (
-                        <div key={index} className="column has-text-centered is-3">
-
-
-						<div className="card"><div className="card-content is-centered">
-
-						  <p><a className="subtitle is-text-dark" onClick={(e) => this.handleFilter(subject, e)}>
-						  	<Link to='/Dashboard'>{subject}</Link>
-						  </a></p>
-
-						  <br/>
-
-						  <p><button className="button" onClick={this.handleClick}>
-                            <Link to="">Submit Assignment</Link>
-                          </button></p>
-
-						  <br/>
-
-                          <p><button className="button">
-                            <Link to='/Dashboard'>View Past Submissions</Link>
-                          </button></p>
-
-						  </div></div>
+            <div className="container">
+              <h1 className="subtitle has-text-centered">My Subjects</h1>
+              <div className="columns is-centered">
+                {/* My For-Loop essentially */}
+                {
+                  this.state.user.courses.map((subject, index) => (<div key={index} className="column has-text-centered is-3">
+                    <div className="card">
+                      <div className="card-content is-centered">
+                        <div className="control subtitle is-text-dark" onClick={(e) => this.handleFilter(e, subject)}>
+                          <Link to='/Dashboard'>{subject}</Link>
                         </div>
-                    ))}
-                  </div>
-				  {this.state.clicked ? <ImageUpload user={this.props.user}/> : null}
-              </div> {/* close container, adds a margin */}
+                        <br/>
+                        <p>
+                          <button className="button" onClick={(e) => this.handleClick(e, subject)}>
+                            <Link to="">Submit Assignment</Link>
+                          </button>
+                        </p>
+                        <br/>
+                        <div className="button">
+                          <Link to="/dashboard">View Past Submissions</Link>
+                        </div>
+                      </div>
+
+                    </div>
+                    {
+
+                      (this.state.clicked && this.state.submitImageSubject === subject)
+                        ? (<div className="is-centered">
+                          <br/>
+                          <ImageUpload user={this.props.user}/>
+                          <br />
+                            <a onClick={this.handleClose} className="button">Close</a>
+                          </div>)
+                        : <p></p>
+                    }
+                  </div>))
+                }
+              </div>
+            </div>
+            {/* close container, adds a margin */}
           </section>
         </div>
-      </div> //close container
-
-
-      )
+      </div>)
     } else {
       return (<div>
         <h1>Please wait</h1>
@@ -261,7 +277,6 @@ class Home extends Component {
 
   }
 }
-
 
 // <div id="editProfileButton">
 // <div className="control">

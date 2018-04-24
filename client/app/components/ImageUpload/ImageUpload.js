@@ -269,9 +269,8 @@ class ImageUpload extends React.Component {
         <input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/><br /><br />
         <div className="imgPreview image is-128x128">
           {$imagePreview}
-        </div><br /><br />
-        <button className="button" style={{ backgroundColor: "#22d0b2"}} type="submit">Upload Image</button>
-        <p>Select course tag below:</p>
+          </div><br />
+          <p>Select course tag below:</p>
         <div className="select">
           <select name="course">
           <option value="select">Select</option>
@@ -287,6 +286,7 @@ class ImageUpload extends React.Component {
             <input className="input" name="comments" type="text" placeholder="Comments"/>
           </div>
         </div>
+        <button className="button" style={{ backgroundColor: "#22d0b2"}} type="submit">Upload Image</button>
       </form>
     </div>
   </div>)

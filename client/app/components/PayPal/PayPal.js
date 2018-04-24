@@ -9,7 +9,7 @@ var paypal = require('paypal-checkout');
 // Everything works, one issue though is that we may want to include a description
 // As the Paypal receipt gives no information as to Why or what the transaction was for.
 class PayPal extends React.Component{
-
+  
     render(){
 
         let client = {
@@ -28,8 +28,8 @@ class PayPal extends React.Component{
                     ]
                 }
             })
-        };
-
+        };	
+		
         let onAuthorize = (data, actions) => {
 			// return [Some kind of function that gives authorization to a video]
             return actions.payment.execute().then(console.log("Payment Success!"));
@@ -38,6 +38,7 @@ class PayPal extends React.Component{
         let PayPalButton = paypal.Button.driver('react', { React, ReactDOM });
 
         return (<div className='shoppingCart'>
+            <p>Buy <strong>Full Body Lobster Onesie - $0.01</strong> now!</p>
             <PayPalButton
                 client={client}
                 payment={payment}
