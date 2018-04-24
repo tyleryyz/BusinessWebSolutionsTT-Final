@@ -177,7 +177,7 @@ class Home extends Component {
           </div>
         </section>
 
-        <div className="block">
+
           {/*section gets Whole Background: */}
           <section className="hero" id="profile-data">
             <div className="hero-body" id="profile-body">
@@ -201,22 +201,22 @@ class Home extends Component {
                     ))}
 
 				</div>
-				<div className="column">
+  				<div className="column">
 
-        <Link className="button" to="/EditProfile">Edit Profile</Link>
+          <Link className="button" id="editButton" to="/EditProfile">Edit Profile</Link>
 
 
-                  </div>
-                </div> {/* close columns */}
+                    </div>
+                  </div> {/* close columns */}
 
             </div>
           </section>
-        </div>
+          {/* use to end "block" div here */}
 
-        <div className="block">
+        <div className="block" id="bottomBlock">
           <section className="subjectSection">
               <div className="container">
-                <h1 className="subtitle has-text-centered">My Subjects</h1>
+                <h2 className="subtitle has-text-centered">My Subjects</h2>
                   <div className="columns is-centered">
                   {/* My For-Loop essentially */}
                     {this.state.user.courses.map((subject, index) => (

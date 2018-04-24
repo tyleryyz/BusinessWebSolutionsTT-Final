@@ -25,5 +25,19 @@
 }
 
 #title-hero{
-	background-color: Lightgrey;
+	background-color: #F5F5F5; /* color here #D7D9D7 #CDCDCD */
+}
+
+#bottomBlock{
+	background-color: #F5F5F5; /* color here */
+	padding-bottom:  225px;
+	padding-top: 25px;
+}
+
+#editButton{
+	margin-right: 25px;
+}
+
+#imageComp{
+	border:
 }

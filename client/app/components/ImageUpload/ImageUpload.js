@@ -256,6 +256,7 @@ class ImageUpload extends React.Component {
         <div className="previewText" style={{ width: "170%"}}>
           <p>Please upload your Homework Image File.</p>
           <p><i>(Acceptable formats are: .jpg, .jpeg, .png)</i></p>
+          <p>1 Minute of Video Solution = $1 cost</p>
       </div>);
     }
 
