@@ -8,13 +8,13 @@ module.exports = (app) => {
   app.get('/api/profileimages', function(req, res, next) {
 
 	  if(req.query.clientUID && req.query.imageURL){
-		  ProfileImage.find({clientUID: req.qeury.clientUID, imageURL: req.query.imageURL}).exec().then((profileImage) => res.json(profileImage)).catch((err) => next(err));
+		  ProfileImage.find({clientUID: req.query.clientUID, imageURL: req.query.imageURL}).exec().then((profileImage) => res.json(profileImage)).catch((err) => next(err));
 	  }
 	  else if(req.query.clientUID){
-		  ProfileImage.find({clientUID: req.qeury.clientUID}).exec().then((profileImage) => res.json(profileImage)).catch((err) => next(err));
+		  ProfileImage.find({clientUID: req.query.clientUID}).exec().then((profileImage) => res.json(profileImage)).catch((err) => next(err));
 	  }
 	  else if(req.query.imageURL){
-		  ProfileImage.find({imageURL: req.qeury.imageURL}).exec().then((profileImage) => res.json(profileImage)).catch((err) => next(err));
+		  ProfileImage.find({imageURL: req.query.imageURL}).exec().then((profileImage) => res.json(profileImage)).catch((err) => next(err));
 	  }
 	  else{
 		  ProfileImage.find().exec().then((profileImage) => res.json(profileImage)).catch((err) => next(err));

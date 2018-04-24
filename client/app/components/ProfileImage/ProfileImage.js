@@ -136,25 +136,27 @@ class ProfileImage extends React.Component {
 	  let uID = this.props.user.uid;
 	  let url;
       console.log(uID)
-      let image = fetch(`/api/profileimages?clientUID=${uID}`, {
+      fetch(`/api/profileimages?clientUID=${uID}`, {
         headers: {
           "Content-Type": "Application/json"
         },
         method: 'GET'
-	}).then(res => res.json()).then(() => {
+	}).then(res => res.json()).then((res) => {
+		console.log("RES: ", res);
 		var params = {
 			Bucket: bucketName,
-			Key: image.imageURL
+			Key: res[0].imageURL
 		};
 		url = s3.getSignedUrl('getObject', params)
-	})
-		console.log("IMAGE: ", image);
+		console.log("IMAGE: ", res[0]);
 		console.log("URL: ", url);
-	  this.setState({
-        imagePreviewUrl: url,
-        loaded: false
-      }, () => {
-        this.setState({loaded: true})
+	}).then(() => {
+		this.setState({
+          imagePreviewUrl: url,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+  		})
 	});
 	return url;
   }
@@ -223,7 +225,7 @@ class ProfileImage extends React.Component {
     })
 
     let image = fetch(`/api/profileimages`, { //new place to store these?
-      method: 'POST',
+      method: 'PUT',
       headers: {
         "Content-Type": "Application/json"
       },
@@ -257,7 +259,7 @@ class ProfileImage extends React.Component {
     let $imagePreview = null;
 
     if (imagePreviewUrl) {
-      $imagePreview = (<div className="imgPreview image is-128x128"><img src={imagePreviewUrl}/></div>)
+      $imagePreview = (<div className="imgPreview image"><img src={imagePreviewUrl}/></div>)
     } else {
       $imagePreview = (<div className="previewText">Please upload your profile image!
       (Acceptable formats: .jpg, .jpeg, .png)</div>);
@@ -270,13 +272,20 @@ class ProfileImage extends React.Component {
       <div className="container">
       <div className="previewComponent">
       <form onSubmit={this.handleSubmit}>
-        <div>
+        <div className="columns" height={250} width={250}>
+			<div className="column is-one-third">
           {$imagePreview}
+		  	</div>
+			<div className="column is-one-third has-text-centered">
+			<br/>
+				<div className="previewText">Please upload your profile image!
+		        (Acceptable formats: .jpg, .jpeg, .png)</div>
+				<br/>
+				<input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/>
+				<br/><br/>
+	        	<button className="button submitButton" type="submit">Upload Image</button>
+			</div>
         </div>
-		<br/>
-		<input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/>
-		<br /><br />
-        <button className="button submitButton" type="submit">Upload Image</button>
 
       </form>
     </div>

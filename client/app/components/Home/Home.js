@@ -149,33 +149,29 @@ class Home extends Component {
 
   async getProfileImage(){
 	  let uID = this.props.user.uid;
-      console.log("Client UID on fetch", uID)
-      let image = await fetch(`/api/profileimages?clientUID=${uID}`, {
+	  let url;
+      console.log(uID)
+      fetch(`/api/profileimages?clientUID=${uID}`, {
         headers: {
           "Content-Type": "Application/json"
         },
         method: 'GET'
-		}).then(res =>
-			res.json());
-		console.log("IMAGE: ", image);
-
-		let url = '';
-		if( image.imageURL )
-		{
-			console.log("Made it into request");
-			var params = {
-				Bucket: bucketName,
-				Key: image.imageURL
-			};
-
-			url = s3.getSignedUrl('getObject', params)
-		}
+	}).then(res => res.json()).then((res) => {
+		console.log("RES: ", res);
+		var params = {
+			Bucket: bucketName,
+			Key: res[0].imageURL
+		};
+		url = s3.getSignedUrl('getObject', params)
+		console.log("IMAGE: ", res[0]);
 		console.log("URL: ", url);
-	  this.setState({
-        imagePreviewUrl: url,
-        loaded: false
-      }, () => {
-        this.setState({loaded: true})
+	}).then(() => {
+		this.setState({
+          imagePreviewUrl: url,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+  		})
 	});
 	return url;
   }
@@ -192,6 +188,7 @@ class Home extends Component {
       });
   }).then(() => {
 	  this.getProfileImage().then((image) => {
+		  console.log("IMAGE BACK: ", image);
 		  this.setState({
 			 	imagePreviewUrl: image.imageURL,
 				loaded: false
@@ -210,14 +207,19 @@ class Home extends Component {
   render() {
 
     if (this.state.user && this.state.loaded) {
-		let $imageURL;
+		let {imagePreviewUrl} = this.state;
+	    let $imagePreview = null;
 
-		this.state.imagePreviewUrl ? <figure style={{ margin: "auto" }} className="image is-128x128">
-										<img src={this.state.imagePreviewUrl} alt={profImage} />
-									</figure>
-									: <figure style={{ margin: "auto" }} className="image is-128x128">
-				  						<img src={profImage} />
-									   </figure>
+	    if (imagePreviewUrl) {
+	      $imagePreview = ( <a href={imagePreviewUrl} download="download"><img
+                         src={imagePreviewUrl}
+                         height={250} width={250} className="imgPreview is-128x128" /></a>)
+	    } else {
+	      $imagePreview = (<figure style={{ margin: "auto" }} className="image is-128x128">
+							  <img src={profImage} />
+							 </figure>);
+	    }
+
       return (
         <div>
         <section className="headerSection">
@@ -234,7 +236,7 @@ class Home extends Component {
 
                 <div className="columns is-centered">
                   <div className="column is-3 has-text-centered">
-					{$imageURL}
+					{$imagePreview}
 					<h2 style= {{fontSize: "22px", color: "white" }} className="subtitle">
                     {this.state.user.fname}{" "}{this.state.user.lname}</h2>
                   </div>
