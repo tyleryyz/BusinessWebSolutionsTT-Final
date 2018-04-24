@@ -3,8 +3,10 @@ import 'whatwg-fetch';
 import {Link, Route, Switch, Router} from 'react-router-dom';
 
 import ImageUpload from '../ImageUpload/ImageUpload';
+import '../../styles/styles.css';
 const testimage = require("../../../public/assets/img/poster.png")
 const profImage = require("../../../public/assets/img/profile.png")
+const ttcLogo = require("../../../public/assets/img/ttcLogo.png")
 
 // Load the SDK and UUID
 var AWS = require('aws-sdk');
@@ -124,10 +126,8 @@ class Home extends Component {
   handleClick(e, subject) {
     e.preventDefault();
 
-    if (this.state.clicked){
-      this.setState({
-        submitImageSubject: subject
-      });
+    if (this.state.clicked) {
+      this.setState({submitImageSubject: subject});
     } else {
       this.setState({
         clicked: !(this.state.clicked),
@@ -167,10 +167,7 @@ class Home extends Component {
 
   handleClose(e, subject) {
     e.preventDefault();
-    this.setState({
-      clicked: false,
-      submitImageSubject: null
-    });
+    this.setState({clicked: false, submitImageSubject: null});
   }
 
   render() {
@@ -178,30 +175,23 @@ class Home extends Component {
     if (this.state.user && this.state.loaded) {
 
       return (<div>
-        <section className="headerSection">
-          <div style={{
-              textAlign: "center"
-            }} className="block">
-            {/* <img src={testimage} /> */}
-            <h1 className="title">Tailored Tutoring Co.</h1>
+        <section className="hero" id="title-hero">
+           <div style={{ textAlign: "center"}} className="block">
+             <h1 className="title">Tailored Tutoring Co.</h1>
             {/* <h2 className="subtitle">roblokken@tailoredtutoringco.com</h2> */}
           </div>
         </section>
 
         <div className="block">
-          <section className="hero is-light">
-            <div className="hero-body">
+        <section className="hero" id="profile-data">
+          <div className="hero-body" id="profile-body">
 
               <div className="columns is-centered">
                 <div className="column is-3 has-text-centered">
-                  <figure style={{
-                      margin: "auto"
-                    }} className="image is-128x128">
+                  <figure className="image is-128x128">
                     <img src={profImage}/>
                   </figure>
-                  <h2 style={{
-                      fontSize: "22px"
-                    }} className="subtitle">
+                  <h2 style= {{fontSize: "22px", color: "white" }} className="subtitle">
                     {this.state.user.fname}{" "}{this.state.user.lname}</h2>
                 </div>
 
@@ -213,8 +203,9 @@ class Home extends Component {
 
                 </div>
                 <div className="column">
-
-                  <Link className="button" to="/EditProfile">Edit Profile</Link>
+                <div className="button">
+                  <Link to="/EditProfile">Edit Profile</Link>
+                  </div>
 
                 </div>
               </div>
@@ -232,46 +223,35 @@ class Home extends Component {
                 {/* My For-Loop essentially */}
                 {
                   this.state.user.courses.map((subject, index) => (<div key={index} className="column has-text-centered is-3">
-
                     <div className="card">
                       <div className="card-content is-centered">
-
-
-
-                          <div className="control subtitle is-text-dark" onClick={(e) => this.handleFilter(e, subject)}>
-                            <Link to='/Dashboard'>{subject}</Link>
-                          </div>
-
-
-
+                        <div className="control subtitle is-text-dark" onClick={(e) => this.handleFilter(e, subject)}>
+                          <Link to='/Dashboard'>{subject}</Link>
+                        </div>
                         <br/>
-
                         <p>
                           <button className="button" onClick={(e) => this.handleClick(e, subject)}>
                             <Link to="">Submit Assignment</Link>
                           </button>
-
                         </p>
-
                         <br/>
-
-                        <p>
-                          <button className="button">
-                            <Link to="">View Past Submissions</Link>
-                          </button>
-                        </p>
-
-                        {
-                          (this.state.clicked && this.state.submitImageSubject === subject)
-                            ? <div><ImageUpload user={this.props.user}/><a onClick={this.handleClose} className="button">Close</a></div>
-                            : <p></p>
-                        }
-
+                        <div className="button">
+                          <Link to="/dashboard">View Past Submissions</Link>
+                        </div>
                       </div>
 
                     </div>
+                    {
 
-
+                      (this.state.clicked && this.state.submitImageSubject === subject)
+                        ? (<div className="is-centered">
+                          <br/>
+                          <ImageUpload user={this.props.user}/>
+                          <br />
+                            <a onClick={this.handleClose} className="button">Close</a>
+                          </div>)
+                        : <p></p>
+                    }
                   </div>))
                 }
               </div>
@@ -279,8 +259,8 @@ class Home extends Component {
             {/* close container, adds a margin */}
           </section>
         </div>
-      </div>
-    )} else {
+      </div>)
+    } else {
       return (<div>
         <h1>Please wait</h1>
       </div>)

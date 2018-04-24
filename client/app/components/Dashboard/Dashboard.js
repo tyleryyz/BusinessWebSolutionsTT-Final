@@ -1212,10 +1212,14 @@ async viewAll(type){
 
 checkForVid(index){
   if (this.state.vidURL!=null && this.state.vidURL[index]){
-    return (
+    return (<div>
       <Player>
         <source src={this.state.vidURL[index]} />
       </Player>
+      <button onClick={(e) => this.setPurchased(e, image)} className="button">Pay with Credit Card</button>
+      <PayPal />
+      </div>
+
     )} else { return (<p>Video in production</p>)}
 }
 
@@ -1319,9 +1323,7 @@ checkForVid(index){
                           <p className="subtitle is-6">{image.course}</p>
                           <p>{image.comment}</p>
 						  <br />
-						  <button onClick={(e) => this.setPurchased(e, image)} className="button">Pay with Credit Card</button>
 						  <br /><br />
-  						  <PayPal />
                         </div>
                       </div> {/* close column*/}
 
