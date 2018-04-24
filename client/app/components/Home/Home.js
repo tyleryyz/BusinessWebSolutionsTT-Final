@@ -148,32 +148,14 @@ class Home extends Component {
   }
 
   async getProfileImage(){
-	  let uID = this.props.user.uid;
-	  let url;
-      console.log(uID)
-      fetch(`/api/profileimages?clientUID=${uID}`, {
-        headers: {
-          "Content-Type": "Application/json"
-        },
-        method: 'GET'
-	}).then(res => res.json()).then((res) => {
-		console.log("RES: ", res);
-		var params = {
-			Bucket: bucketName,
-			Key: res[0].imageURL
-		};
-		url = s3.getSignedUrl('getObject', params)
-		console.log("IMAGE: ", res[0]);
-		console.log("URL: ", url);
-	}).then(() => {
-		this.setState({
-          imagePreviewUrl: url,
-          loaded: false
-        }, () => {
-          this.setState({loaded: true})
-  		})
-	});
-	return url;
+
+	  var url;
+	  var params = {
+		  Bucket: bucketName,
+		  Key: this.state.user.imageURL
+	  };
+	  url = s3.getSignedUrl('getObject', params);
+	  return url;
   }
 
   componentWillMount() {
@@ -187,15 +169,14 @@ class Home extends Component {
         this.setState({loaded: true})
       });
   }).then(() => {
-	  this.getProfileImage().then((image) => {
-		  console.log("IMAGE BACK: ", image);
-		  this.setState({
-			 	imagePreviewUrl: image.imageURL,
-				loaded: false
-		  }, () => {
-			  this.setState({loaded: true})
-		  });
-	  });
+	  this.getProfileImage().then((url) => {
+		 this.setState({
+   		   imagePreviewUrl: url,
+           loaded: false
+         }, () => {
+           this.setState({loaded: true})
+         });
+	  })
   });
 };
 

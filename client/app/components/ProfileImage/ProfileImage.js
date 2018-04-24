@@ -133,32 +133,14 @@ class ProfileImage extends React.Component {
   }
 
   async getProfileImage(){
-	  let uID = this.props.user.uid;
-	  let url;
-      console.log(uID)
-      fetch(`/api/profileimages?clientUID=${uID}`, {
-        headers: {
-          "Content-Type": "Application/json"
-        },
-        method: 'GET'
-	}).then(res => res.json()).then((res) => {
-		console.log("RES: ", res);
-		var params = {
-			Bucket: bucketName,
-			Key: res[0].imageURL
-		};
-		url = s3.getSignedUrl('getObject', params)
-		console.log("IMAGE: ", res[0]);
-		console.log("URL: ", url);
-	}).then(() => {
-		this.setState({
-          imagePreviewUrl: url,
-          loaded: false
-        }, () => {
-          this.setState({loaded: true})
-  		})
-	});
-	return url;
+
+	  var url;
+	  var params = {
+		  Bucket: bucketName,
+		  Key: this.state.user.imageURL
+	  };
+	  url = s3.getSignedUrl('getObject', params);
+	  return url;
   }
 
   componentWillMount() {
@@ -166,23 +148,22 @@ class ProfileImage extends React.Component {
       console.log("will mount here", user)
       this.setState({
         user: user,
+		courses: user.courses,
         loaded: false
       }, () => {
         this.setState({loaded: true})
-      })
+      });
   }).then(() => {
-	  let image = this.getProfileImage();
-	  if(image.imageURL)
-	  {
-		  this.setState({
-			  profileImage: image,
-			  loaded: false
-		  }, () => {
-			  this.setState({loaded: true})
-		  });
-	  }
-	})
-  }
+	  this.getProfileImage().then((url) => {
+		 this.setState({
+   		   imagePreviewUrl: url,
+           loaded: false
+         }, () => {
+           this.setState({loaded: true})
+         });
+	  })
+  });
+};
 
 
   // When the Upload image button is clicked
@@ -191,6 +172,7 @@ class ProfileImage extends React.Component {
 
     filename = this.state.file.name;
     var uploadName = this.props.user.uid;
+	var uID = this.props.user.uid;
 
     var extension = filename.split(".");
     if( extension.length === 1 || ( extension[0] === "" && extension.length === 2 ) ) {
@@ -212,7 +194,7 @@ class ProfileImage extends React.Component {
 		Key: deleteKey
 	};
 
-	s3.deleteObject(params, function(err, data) {
+	s3.deleteObject(params, ((err, data) => {
 		if (err)
         {
           console.log(err)
@@ -220,41 +202,42 @@ class ProfileImage extends React.Component {
         else
         {
           console.log("Successfully uploaded data to " + bucketName + keyName + uploadName);
+
+		  params = {
+  	      Bucket: bucketName,
+  	      Key: keyName+uploadName,
+  	      Body: file
+  	    	};
+
+	  	    let key = keyName+uploadName;
+	  	    s3.putObject(params, ((err, data) => {
+	  	      if (err)
+	  	      {
+	  	        console.log(err)
+	  	      }
+	  	      else
+	  	      {
+	  	        console.log("Successfully uploaded data to " + bucketName + keyName + uploadName);
+				let email = this.state.user.email;
+
+				fetch(`/api/users?email=${email}`, { //new place to store these?
+			      method: 'PUT',
+			      headers: {
+			        "Content-Type": "Application/json"
+			      },
+			      body: JSON.stringify({
+					  imageURL: key})
+			    }).then((image) => {
+
+					console.log(image)
+					//console.log('Handling uploading, data presented: ', this.state.file);
+					NotificationManager.success('Your image was successfully uploaded!', 'Success!'); //what does this do?
+			});
+	  	      }
+		  }))
         }
-	})
-
-    params = {
-      Bucket: bucketName,
-      Key: keyName+uploadName,
-      Body: file
-    };
-
-    let key = keyName+uploadName;
-    s3.putObject(params, function(err, data) {
-      if (err)
-      {
-        console.log(err)
-      }
-      else
-      {
-        console.log("Successfully uploaded data to " + bucketName + keyName + uploadName);
-      }
-    })
-
-    let image = fetch(`/api/profileimages`, { //new place to store these?
-      method: 'PUT',
-      headers: {
-        "Content-Type": "Application/json"
-      },
-      body: JSON.stringify({
-		  clientUID: this.state.user.uID,
-		  imageURL: key})
-    });
-
-    console.log(image)
-    console.log('Handling uploading, data presented: ', this.state.file);
-    NotificationManager.success('Your image was successfully uploaded!', 'Success!'); //what does this do?
-  }
+	}));
+}
 
   // This changes the 'Please select an Image for Preview'
   _handleImageChange(e) {
@@ -277,9 +260,6 @@ class ProfileImage extends React.Component {
 
     if (imagePreviewUrl) {
       $imagePreview = (<div className="imgPreview image"><img src={imagePreviewUrl}/></div>)
-    } else {
-      $imagePreview = (<div className="previewText">Please upload your profile image!
-      (Acceptable formats: .jpg, .jpeg, .png)</div>);
     }
 	console.log("Image preview: ", imagePreviewUrl);
 

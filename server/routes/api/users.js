@@ -25,6 +25,7 @@ module.exports = (app) => {
     user.courses=req.body.courses;
     user.uID = req.body.uID;
     user.permission = req.body.permission;
+	user.imageURL = req.body.imageURL
     user.save().then(() => res.json(user)).catch((err) => next(err));
   });
 
@@ -48,7 +49,10 @@ module.exports = (app) => {
     }
     if (req.body.school && req.body.courses){
       User.updateOne({email: req.query.email}, {$set: {school: req.body.school, courses: req.body.courses}}).then((user) => res.json()).catch((err) => next(err));
-  }
+  	}
+  	if (req.body.imageURL){
+	  User.updateOne({email: req.query.email}, {$set: {imageURL: req.body.imageURL}}).then((user) => res.json()).catch((err) => next(err));
+	}
   })
 
 };
