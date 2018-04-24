@@ -66,7 +66,7 @@ var filename;
 
 var client = {
 			// DELETE THESE BEFORE PUSHING IF MAKING ANY CHANGES TO THIS FILE
-      
+
         };
 
 var env = 'sandbox';
@@ -215,7 +215,7 @@ class Dashboard extends Component {
       this.setState({
         user: user,
         courses: user.courses,
-		filterVal: this.props.filter,
+        filterVal: this.props.filterVal,
         loaded: false
       }, () => {
         this.setState({loaded: true})
@@ -253,8 +253,10 @@ class Dashboard extends Component {
               this.setState({loaded: true})
             });
           });
-	  }).then(()=>{
-		  if(this.props.filter != 'select'){
+	       })
+      })
+  	}).then(()=>{
+		  if(this.props.filterVal != 'select'){
 			  console.log("Made it INOT HERE");
 			  this.filterImages().then(() => {
 		        this.filterStatus().then(() => {
@@ -272,8 +274,6 @@ class Dashboard extends Component {
 		    })
 		  }
 	  })
-      })
-  	});
 
   };
 
@@ -1210,6 +1210,19 @@ async viewAll(type){
 })
 }
 
+checkForVid(index){
+  if (this.state.vidURL!=null && this.state.vidURL[index]){
+    return (<div>
+      <Player>
+        <source src={this.state.vidURL[index]} />
+      </Player>
+      <button onClick={(e) => this.setPurchased(e, image)} className="button">Pay with Credit Card</button>
+      <PayPal />
+      </div>
+
+    )} else { return (<p>Video in production</p>)}
+}
+
 
   render() {
     let $url;
@@ -1310,18 +1323,13 @@ async viewAll(type){
                           <p className="subtitle is-7">{image.clientUID}</p>
                           <p>{image.comment}</p>
 						  <br />
-						  <button onClick={(e) => this.setPurchased(e, image)} className="button">Pay with Credit Card</button>
 						  <br /><br />
-  						  <PayPal />
                         </div>
                       </div> {/* close column*/}
 
                       <div className="column has-text-centered">
                         <div className="content">
-                    {this.state.vidURL[index] ? $url =(
-		                  	<Player>
-	    						<source src={this.state.vidURL[index]} />
-	    					</Player>) : $url = <p>Video currently in production</p>}
+                    {this.checkForVid(index)}
                         </div>
                       </div> {/* close column*/}
                     </div>
