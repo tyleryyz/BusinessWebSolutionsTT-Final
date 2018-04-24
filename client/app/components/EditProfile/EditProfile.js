@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
+import ProfileImage from '../ProfileImage/ProfileImage';
 var firebase = require('firebase');
 var firebaseui = require('firebaseui');
 
@@ -26,7 +27,8 @@ class EditProfile extends Component {
       passwordError2: false,
       coursesError: false,
       schoolError: false,
-      selectedCourses: []
+      selectedCourses: [],
+	  imageUploadClicked: false
     };
     this.getData = this.getData.bind(this);
     this.handleEditProfile = this.handleEditProfile.bind(this);
@@ -38,6 +40,7 @@ class EditProfile extends Component {
     this.coursesDeselect = this.coursesDeselect.bind(this);
     this.handleSchoolChange = this.handleSchoolChange.bind(this);
     this.addOneClass = this.addOneClass.bind(this);
+	this.toggleImageUpload = this.toggleImageUpload.bind(this);
 
   }
   getData() {
@@ -332,6 +335,16 @@ class EditProfile extends Component {
   }
   }
 
+  toggleImageUpload(e){
+	  e.preventDefault();
+	  this.setState({
+		  imageUploadClicked: !(this.state.imageUploadClicked),
+		  loaded: false
+	  }, () => {
+		  this.setState({loaded: true})
+	  });
+  }
+
   render() {
     let $courseData;
       if (this.state.selectedSchool != "select" && this.state.courses) {
@@ -458,6 +471,11 @@ class EditProfile extends Component {
             </div>
           </form>
         </div>
+
+		<div className="box">
+			{this.state.imageUploadClicked ? <ProfileImage user={this.props.user} /> : <button className="button" onClick={this.toggleImageUpload}>Change Profile Picture</button> }
+		</div>
+
         <div id="cancelButton">
           <div className="control">
             <Link to="/">Cancel</Link>

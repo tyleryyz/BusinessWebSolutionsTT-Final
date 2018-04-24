@@ -1306,8 +1306,8 @@ async viewAll(type){
 
                       <div className="column is-centered">
                         <div className="media-content">
-                          <p className="title is-5">{image.clientUID}</p>
-                          <p className="subtitle is-6">{image.course}</p>
+						<p className="title is-5">{image.course}</p>
+                          <p className="subtitle is-7">{image.clientUID}</p>
                           <p>{image.comment}</p>
 						  <br />
 						  <button onClick={(e) => this.setPurchased(e, image)} className="button">Pay with Credit Card</button>
@@ -1319,9 +1319,9 @@ async viewAll(type){
                       <div className="column has-text-centered">
                         <div className="content">
                     {this.state.vidURL[index] ? $url =(
-		                  <Player>
-		        						<source src={this.state.vidURL[index]} />
-		        					</Player>) : $url = <p></p>}
+		                  	<Player>
+	    						<source src={this.state.vidURL[index]} />
+	    					</Player>) : $url = <p>Video currently in production</p>}
                         </div>
                       </div> {/* close column*/}
                     </div>

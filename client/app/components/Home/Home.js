@@ -3,8 +3,11 @@ import 'whatwg-fetch';
 import {Link, Route, Switch, Router} from 'react-router-dom';
 
 import ImageUpload from '../ImageUpload/ImageUpload';
+import '../../styles/styles.css';
+
 const testimage = require("../../../public/assets/img/poster.png")
 const profImage = require("../../../public/assets/img/profile.png")
+const ttcLogo = require("../../../public/assets/img/ttcLogo.png")
 
 // Load the SDK and UUID
 var AWS = require('aws-sdk');
@@ -124,6 +127,7 @@ class Home extends Component {
     this.getData = this.getData.bind(this);
 	this.handleFilter = this.handleFilter.bind(this);
 	this.handleClick = this.handleClick.bind(this);
+	this.getProfileImage = this.getProfileImage.bind(this);
   }
 
   handleClick() {
@@ -143,6 +147,35 @@ class Home extends Component {
     }).then(res => res.json()));
   }
 
+  async getProfileImage(){
+	  let uID = this.props.user.uid;
+	  let url;
+      console.log(uID)
+      fetch(`/api/profileimages?clientUID=${uID}`, {
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        method: 'GET'
+	}).then(res => res.json()).then((res) => {
+		console.log("RES: ", res);
+		var params = {
+			Bucket: bucketName,
+			Key: res[0].imageURL
+		};
+		url = s3.getSignedUrl('getObject', params)
+		console.log("IMAGE: ", res[0]);
+		console.log("URL: ", url);
+	}).then(() => {
+		this.setState({
+          imagePreviewUrl: url,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+  		})
+	});
+	return url;
+  }
+
   componentWillMount() {
     let result = this.getData().then((user) => {
       console.log("will mount here", user)
@@ -153,8 +186,18 @@ class Home extends Component {
       }, () => {
         this.setState({loaded: true})
       });
-    })
-  };
+  }).then(() => {
+	  this.getProfileImage().then((image) => {
+		  console.log("IMAGE BACK: ", image);
+		  this.setState({
+			 	imagePreviewUrl: image.imageURL,
+				loaded: false
+		  }, () => {
+			  this.setState({loaded: true})
+		  });
+	  });
+  });
+};
 
   handleFilter(subject, e) {
 	  e.preventDefault();
@@ -164,6 +207,18 @@ class Home extends Component {
   render() {
 
     if (this.state.user && this.state.loaded) {
+		let {imagePreviewUrl} = this.state;
+	    let $imagePreview = null;
+
+	    if (imagePreviewUrl) {
+	      $imagePreview = ( <a href={imagePreviewUrl} download="download"><img
+                         src={imagePreviewUrl}
+                         height={250} width={250} className="imgPreview is-128x128" /></a>)
+	    } else {
+	      $imagePreview = (<figure style={{ margin: "auto" }} className="image is-128x128">
+							  <img src={profImage} />
+							 </figure>);
+	    }
 
       return (
         <div>
@@ -176,15 +231,13 @@ class Home extends Component {
         </section>
 
         <div className="block">
-          <section className="hero is-light">
-            <div className="hero-body">
+          <section className="hero" id="profile-data">
+            <div className="hero-body" id="profile-body">
 
                 <div className="columns is-centered">
                   <div className="column is-3 has-text-centered">
-					<figure style={{ margin: "auto" }} className="image is-128x128">
-  						<img src={profImage} />
-					</figure>
-					<h2 style= {{fontSize: "22px" }} className="subtitle">
+					{$imagePreview}
+					<h2 style= {{fontSize: "22px", color: "white" }} className="subtitle">
                     {this.state.user.fname}{" "}{this.state.user.lname}</h2>
                   </div>
 
@@ -200,7 +253,7 @@ class Home extends Component {
 				</div>
 				<div className="column">
 
-        <Link className="button" to="/EditProfile">Edit Profile</Link>
+        <Link className="button" to="/EditProfile" id="edit-button">Edit Profile</Link>
 
 
                   </div>
@@ -235,7 +288,7 @@ class Home extends Component {
 						  <br/>
 
                           <p><button className="button">
-                            <Link to="">View Past Submissions</Link>
+                            <Link to='/Dashboard'>View Past Submissions</Link>
                           </button></p>
 
 						  </div></div>

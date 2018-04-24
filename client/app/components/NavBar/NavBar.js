@@ -52,14 +52,27 @@ class NavBar extends Component {
 		  </div>
         </nav>)
     } else {
-      return (<div className="navbar-item">
-        <Link className="navbar-item" to="/signup">
-          Sign Up
-        </Link>
-        <Link className="navbar-item" to="/login">
-          Log In
-        </Link>
-      </div>)
+      return (
+		  <nav className="navbar" aria-label="main navigation">
+		  <div className="navbar-brand">
+
+		  	<img style={{height: 60}} src={ttcLogo} />
+
+            <button className="button navbar-burger">
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
+		<div className="navbar-menu">
+	        <Link className="navbar-item" to="/signup">
+	          Sign Up
+	        </Link>
+	        <Link className="navbar-item" to="/login">
+	          Log In
+	        </Link>
+      </div>
+  		</nav>)
     }
     return null;
   }
