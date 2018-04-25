@@ -361,7 +361,7 @@ class Dashboard extends Component {
   if(image.purchased==1){
 		url = s3.getSignedUrl('getObject', params);
 	} else {
-		url = "https://www.youtube.com/embed/Wl2Q_MceIUc";
+		url = null;
 	}
 	vidUrlArray.push(url)
     console.log(url);
@@ -1210,14 +1210,15 @@ async viewAll(type){
 })
 }
 
-checkForVid(index){
+checkForVid(index, image){
   if (this.state.vidURL!=null && this.state.vidURL[index]){
-    return (<div>
-      <Player>
-        <source src={this.state.vidURL[index]} />
-      </Player>
-      <button onClick={(e) => this.setPurchased(e, image)} className="button">Pay with Credit Card</button>
-      <PayPal />
+    return (
+      <div>
+        <Player>
+          <source src={this.state.vidURL[index]} />
+        </Player>
+        <button onClick={(e) => this.setPurchased(e, image)} className="button">Pay with Credit Card</button>
+        <PayPal image={image.imageURL}/>
       </div>
 
     )} else { return (<p>Video in production</p>)}
@@ -1329,7 +1330,7 @@ checkForVid(index){
 
                       <div className="column has-text-centered">
                         <div className="content">
-                    {this.checkForVid(index)}
+                    {this.checkForVid(index, image)}
                         </div>
                       </div> {/* close column*/}
                     </div>
