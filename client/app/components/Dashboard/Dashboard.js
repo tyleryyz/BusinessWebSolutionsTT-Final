@@ -1210,19 +1210,31 @@ async viewAll(type){
 })
 }
 
-checkForVid(index, image){
-  if (this.state.vidURL!=null && this.state.vidURL[index]){
-    return (
-      <div>
-        <Player>
-          <source src={this.state.vidURL[index]} />
-        </Player>
-        <button onClick={(e) => this.setPurchased(e, image)} className="button">Pay with Credit Card</button>
-        <PayPal image={image.imageURL}/>
-      </div>
-
-    )} else { return (<p>Video in production</p>)}
-}
+	checkForVid(index, image){
+		console.log("Image purchased:", image.purchased)
+		console.log("vidURL:", this.state.vidURL)
+		console.log("vidURL Index:", this.state.vidURL[index])
+		if (image.status === "completed"){
+			if (image.purchased === 0){
+				return (
+				<div>
+					<p>Video is ready for PURCHASE!</p>
+					<Player><source src={'#'} /></Player>
+					<button onClick={(e) => this.setPurchased(e, image)} className="button">Pay with Credit Card</button>
+					<PayPal image={image.imageURL}/>
+				</div>
+				)
+			} else {
+				return (
+				<div>
+					<Player>
+						<source src={this.state.vidURL[index]} />
+					</Player>
+					
+				</div>)
+			}
+		} else { return (<p>Video in production</p>)}
+	}
 
 
   render() {
