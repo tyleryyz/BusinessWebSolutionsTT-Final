@@ -299,8 +299,9 @@ class Claims extends Component {
     reader.onloadend = () => {
       this.setState({file: file, imagePreviewUrl: reader.result});
     }
+	
+	reader.readAsDataURL(file);
 
-    reader.readAsDataURL(file)
   }
 
   submitVideo(e, image) {
@@ -366,6 +367,15 @@ class Claims extends Component {
         };
 
         const imageURL = image.imageURL;
+		
+		var video = document.createElement('video');
+		var duration = 0;
+		video.addEventListener('loadedmetadata', event => {
+			console.log(video.duration);
+			duration = video.duration;
+		})
+		
+		video.src = URL.createObjectURL(file)
 
         s3.putObject(params, ((err, data) => {
           if (err) {
@@ -378,7 +388,7 @@ class Claims extends Component {
               headers: {
                 "Content-Type": "Application/json"
               },
-              body: JSON.stringify({videoURL: uploadName, status: "completed"})
+              body: JSON.stringify({videoURL: uploadName, status: "completed", duration: duration})
             }).then((image) => {
               this.getImageData().then((images) => {
 
@@ -628,7 +638,7 @@ class Claims extends Component {
                       : <p></p>
                   }
 
-                  <input className="fileInput" type="file" onChange={(e) => this._handleFileChange(e)}/><br/>
+                  <input className="fileInput" type="file" id="fileUp" onChange={(e) => this._handleFileChange(e)}/><br/>
                   <button className="button is-success" onClick={(e) => this.submitVideo(e, image)}>submit video</button>
                 </form>
                 <button onClick={() => this.handleReport(image)} className="button is-warning">Report Image</button>

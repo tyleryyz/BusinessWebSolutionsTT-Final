@@ -375,7 +375,6 @@ class Dashboard extends Component {
 	e.preventDefault();
 	const imageURL = image.imageURL;
 	const isPurchased = image.purchased;
-	console.log(isPurchased);
 	if(isPurchased==0){
 		fetch(`/api/images?imageURL=${imageURL}`, {
 			  method: 'PUT',
@@ -423,9 +422,8 @@ class Dashboard extends Component {
 
 			})
 		  })
-		console.log("Video Un-purchased!");
 	}
-
+	window.location.reload();
   }
 
   handleClaim(e, image) {
@@ -1211,24 +1209,34 @@ async viewAll(type){
 }
 
 	checkForVid(index, image){
-		console.log("Image purchased:", image.purchased)
-		console.log("vidURL:", this.state.vidURL)
-		console.log("vidURL Index:", this.state.vidURL[index])
+		// Calculate Video Cost
+		let cost;
+		cost = Math.round(image.duration/60, 0);
+		if(cost<0.5){ cost = 1.00; }
+		// Clear that pesky 'Cannot read property 0 from null' error
+		let indexedURL;
+		try{
+			indexedURL = this.state.vidURL[index];
+		}
+		catch(TypeError){
+			indexedURL = null;
+		}
 		if (image.status === "completed"){
 			if (image.purchased === 0){
 				return (
 				<div>
 					<p>Video is ready for PURCHASE!</p>
-					<Player><source src={'#'} /></Player>
+					<Player><source src={'/'}/></Player>
+					<strong> Video Cost = ${cost}.00 USD</strong>
 					<button onClick={(e) => this.setPurchased(e, image)} className="button">Pay with Credit Card</button>
-					<PayPal image={image.imageURL}/>
+					<PayPal image={image.imageURL} cost={cost}/>
 				</div>
 				)
 			} else {
 				return (
 				<div>
 					<Player>
-						<source src={this.state.vidURL[index]} />
+						<source src={indexedURL} />
 					</Player>
 					
 				</div>)

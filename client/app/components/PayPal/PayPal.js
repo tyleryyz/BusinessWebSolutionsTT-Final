@@ -43,8 +43,8 @@ class PayPal extends React.Component {
 
     let client = {
       // DELETE THESE BEFORE PUSHING IF MAKING ANY CHANGES TO THIS FILE
-      sandbox: '',
-      production: ''
+		sandbox: '',
+		production: ''
     };
 
     let payment = (data, actions) => {
@@ -53,7 +53,7 @@ class PayPal extends React.Component {
           transactions: [
             {
               amount: {
-                total: 0.01,
+                total: this.props.cost,
                 currency: 'USD'
               }
             }
@@ -70,10 +70,12 @@ class PayPal extends React.Component {
     let PayPalButton = paypal.Button.driver('react', {React, ReactDOM});
 
     return (<div className='shoppingCart'>
-      <p>Buy
-        <strong>Full Body Lobster Onesie - $0.01</strong>
-        now!</p>
-      <PayPalButton client={client} payment={payment} commit={true} env='sandbox' onAuthorize={onAuthorize}/>
+      <PayPalButton
+		client={client}
+		commit={true}
+		env='sandbox'
+		onAuthorize={onAuthorize}
+		payment={payment}/>
     </div>);
   }
 };

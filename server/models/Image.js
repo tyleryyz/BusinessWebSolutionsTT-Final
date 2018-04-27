@@ -37,6 +37,9 @@ const ImageSchema = new mongoose.Schema({
   },
   comment: {
     type: String
+  },
+  duration: {
+	  type: Number
   }
 });
 

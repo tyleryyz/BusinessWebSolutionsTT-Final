@@ -98,6 +98,7 @@ module.exports = (app) => {
     image.purchased = req.body.purchased;
     image.school = req.body.school;
     image.comment = req.body.comment;
+	image.duration = 0;
     image.reportComment = "";
     image.reportReason = "";
 
@@ -114,27 +115,26 @@ module.exports = (app) => {
 
   app.put('/api/images', function(req, res, next) {
     if(req.body.reportComment && req.body.status && req.body.reportReason && req.body.tutorUID){
-      Image.updateOne({imageURL: req.query.imageURL}, {$set: { reportComment: req.body.reportComment, status: req.body.status, reportReason: req.body.reportReason, tutorUID: req.body.tutorUID }}).then((image) => res.json()).catch((err) => next(err));
+		Image.updateOne({imageURL: req.query.imageURL}, {$set: { reportComment: req.body.reportComment, status: req.body.status, reportReason: req.body.reportReason, tutorUID: req.body.tutorUID }}).then((image) => res.json()).catch((err) => next(err));
     }
-
     if(req.body.reportComment && req.body.status && req.body.reportReason){
-      Image.updateOne({imageURL: req.query.imageURL}, {$set: { reportComment: req.body.reportComment, status: req.body.status, reportReason: req.body.reportReason }}).then((image) => res.json()).catch((err) => next(err));
+		Image.updateOne({imageURL: req.query.imageURL}, {$set: { reportComment: req.body.reportComment, status: req.body.status, reportReason: req.body.reportReason }}).then((image) => res.json()).catch((err) => next(err));
     }
     if (req.body.status && req.body.reportReason){
-      Image.updateOne({imageURL: req.query.imageURL}, {$set: { status: req.body.status, reportReason: req.body.reportReason }}).then((image) => res.json()).catch((err) => next(err));
+		Image.updateOne({imageURL: req.query.imageURL}, {$set: { status: req.body.status, reportReason: req.body.reportReason }}).then((image) => res.json()).catch((err) => next(err));
     }
     if (req.body.status){
-      Image.updateOne({imageURL: req.query.imageURL}, {$set: { status: req.body.status}}).then((image) => res.json()).catch((err) => next(err));
+		Image.updateOne({imageURL: req.query.imageURL}, {$set: { status: req.body.status}}).then((image) => res.json()).catch((err) => next(err));
     }
     if (req.body.tutorUID){
-      Image.updateOne({imageURL: req.query.imageURL}, {$set: { tutorUID: req.body.tutorUID}}).then((image) => res.json()).catch((err) => next(err));
+		Image.updateOne({imageURL: req.query.imageURL}, {$set: { tutorUID: req.body.tutorUID}}).then((image) => res.json()).catch((err) => next(err));
     }
-   if (req.body.videoURL){
-	     Image.updateOne({imageURL: req.query.imageURL}, {$set: { videoURL: req.body.videoURL}}).then((image) => res.json()).catch((err) => next(err));
+	if (req.body.videoURL && req.body.duration){
+		Image.updateOne({imageURL: req.query.imageURL}, {$set: { videoURL: req.body.videoURL, duration: req.body.duration }}).then((image) => res.json()).catch((err) => next(err));
     }
-   if (req.body.purchased){
+	if (req.body.purchased){
 		Image.updateOne({imageURL: req.query.imageURL}, {$set: { purchased: req.body.purchased}}).then((image) => res.json()).catch((err) => next(err));
-  }
+	}
 
   })
 
