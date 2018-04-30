@@ -26,7 +26,6 @@ class PayPal extends React.Component {
         },
         body: JSON.stringify({purchased: 1})
       })
-      console.log("Video Purchased!");
     } else {
       fetch(`/api/images?imageURL=${imageURL}`, {
         method: 'PUT',
@@ -35,7 +34,6 @@ class PayPal extends React.Component {
         },
         body: JSON.stringify({purchased: 0})
       })
-      console.log("Video Un-purchased!");
     }
   }
 

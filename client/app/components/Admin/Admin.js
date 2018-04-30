@@ -393,7 +393,6 @@ class Admin extends Component {
       },
       body: JSON.stringify({name: school, course: course})
     }).then((school) => {
-      console.log(school)
       this.setState({
         courseError2: false,
         loaded: false

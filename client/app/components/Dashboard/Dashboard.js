@@ -85,7 +85,7 @@ var payment = (data, actions) => {
 
 var onAuthorize = (data, actions) => {
 	// return [Some kind of function that gives authorization to a video]
-	return actions.payment.execute().then(console.log("Payment success!"));
+	return actions.payment.execute().then(NotificationManager.success('Payment received. Video is now available.', 'Payment received!'));
 };
 
 var PayPalButton = paypal.Button.driver('react', { React, ReactDOM });
@@ -257,11 +257,9 @@ class Dashboard extends Component {
       })
   	}).then(()=>{
 		  if(this.props.filterVal != 'select'){
-			  console.log("Made it INOT HERE");
 			  this.filterImages().then(() => {
 		        this.filterStatus().then(() => {
 		        this.getImageURL(this.state.images).then((urlArray) => {
-		          console.log("after get image?", urlArray)
 		          this.setState({
 		            downloadURL: urlArray,
 		            loaded: false
@@ -364,7 +362,6 @@ class Dashboard extends Component {
 		url = null;
 	}
 	vidUrlArray.push(url)
-    console.log(url);
 
     })
   return vidUrlArray
@@ -386,7 +383,6 @@ class Dashboard extends Component {
 			  this.filterImages().then(() => {
 				this.filterStatus().then(() => {
 				this.getImageURL(this.state.images).then((urlArray) => {
-				  console.log("after get image?", urlArray)
 				  this.setState({
 					downloadURL: urlArray,
 					loaded: false
@@ -398,7 +394,6 @@ class Dashboard extends Component {
 
 			})
 		  })
-		console.log("Video Purchased!");
 	} else {
 		fetch(`/api/images?imageURL=${imageURL}`, {
 			  method: 'PUT',
@@ -410,7 +405,6 @@ class Dashboard extends Component {
 			  this.filterImages().then(() => {
 				this.filterStatus().then(() => {
 				this.getImageURL(this.state.images).then((urlArray) => {
-				  console.log("after get image?", urlArray)
 				  this.setState({
 					downloadURL: "",
 					loaded: false
@@ -801,7 +795,7 @@ class Dashboard extends Component {
       s3.deleteObject(params, ((err, data) =>{
         if (err)
         {
-          console.log("error:",err)
+            NotificationManager.error('Error deleting image, try again later', 'Error');
         }
         else
         {
@@ -1238,7 +1232,7 @@ async viewAll(type){
 					<Player>
 						<source src={indexedURL} />
 					</Player>
-					
+
 				</div>)
 			}
 		} else { return (<p>Video in production</p>)}
@@ -1269,7 +1263,6 @@ async viewAll(type){
             this.state.images.map((image, index) => (<div key={index}>
               <div className="card">
                 <div className="columns">
-                  {console.log("renderImage", this.state.downloadURL[index])}
                   <div className="column is-half">
                     <div className="card-content">
                       <a href={this.state.downloadURL[index]} download="download"><img

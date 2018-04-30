@@ -138,7 +138,6 @@ class Home extends Component {
 
   getData() {
     let uID = this.props.user.uid;
-    console.log(uID)
     return (fetch(`/api/users?uID=${uID}`, {
       headers: {
         "Content-Type": "Application/json"
@@ -149,7 +148,6 @@ class Home extends Component {
 
   componentWillMount() {
     let result = this.getData().then((user) => {
-      console.log("will mount here", user)
       this.setState({
         user: user,
         courses: user.courses,

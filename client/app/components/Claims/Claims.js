@@ -299,7 +299,7 @@ class Claims extends Component {
     reader.onloadend = () => {
       this.setState({file: file, imagePreviewUrl: reader.result});
     }
-	
+
 	reader.readAsDataURL(file);
 
   }
@@ -367,21 +367,19 @@ class Claims extends Component {
         };
 
         const imageURL = image.imageURL;
-		
+
 		var video = document.createElement('video');
 		var duration = 0;
 		video.addEventListener('loadedmetadata', event => {
-			console.log(video.duration);
 			duration = video.duration;
 		})
-		
+
 		video.src = URL.createObjectURL(file)
 
         s3.putObject(params, ((err, data) => {
           if (err) {
             console.log(err)
           } else {
-            console.log("Successfully uploaded data to: " + bucketName + "/" + uploadName);
 
             fetch(`/api/images?imageURL=${imageURL}`, {
               method: 'PUT',
@@ -417,7 +415,6 @@ class Claims extends Component {
           }
         }))
 
-        console.log('Handling uploading, data presented: ', this.state.file);
       }
     }
 }
