@@ -1242,7 +1242,8 @@ checkForVid(index){
               {this.state.user.courses.map((course, index) => (<option key={index}>{course}</option>))}
             </select>
           </div>
-
+          <br/>
+          <br/>
           {
             // ******** Main Section to Style **********
             this.state.images.map((image, index) => (<div key={index}>
@@ -1254,6 +1255,9 @@ checkForVid(index){
                       <a href={this.state.downloadURL[index]} download="download"><img
                         src={this.state.downloadURL[index]} height={250} width={250}/></a>
     		            </div>
+                    <div className="content">
+                      <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
+                    </div>
                     <button onClick={(e) => this.handleClaim(e, image)} className="button is-success">Claim image</button>
                     <button onClick={() => this.handleReport(image)} className="button is-warning">Report Image</button>
                     { this.renderReportForm(image) }
@@ -1263,14 +1267,14 @@ checkForVid(index){
                       <p className="title is-4">{image.clientUID}</p>
                       <p className="subtitle is-6">{image.course}</p>
                     </div>
-                    <div className="content">
-                      <p>Date uploaded: {$date = this.getDateInformation(image.timestamp)}</p>
-                    </div>
+
                   </div> {/* close column */}
                 </div> {/* close card */}
                   <br/>
                 </div> {/* close columns */}
+                  <br />
             </div>))
+
           }
         </div>)
       } else if (this.state.user.permission === "Student" && this.state.images && this.state.courses && this.state.downloadURL) {

@@ -189,35 +189,30 @@ class Home extends Component {
 
                 <div className="columns is-centered">
                   <div className="column is-3 has-text-centered">
-					<figure style={{ margin: "auto" }} className="image is-128x128">
-  						<img src={profImage} />
-					</figure>
-					<h2 style= {{fontSize: "22px", color: "white" }} className="subtitle">
-                    {this.state.user.fname}{" "}{this.state.user.lname}</h2>
-                </div>
+					             <figure style={{ margin: "auto" }} className="image is-128x128">
+  						               <img src={profImage} />
+					             </figure>
+					             <h2 style= {{fontSize: "22px", color: "white" }} className="subtitle">
+                       {this.state.user.fname}{" "}{this.state.user.lname}</h2>
+                  </div>
 
                   <div className="column is-8">
-				  <br></br>
+				             <br></br>
 
                     <p className="heading">{this.state.user.school.name}</p>
                     {this.state.user.courses.map((subject, index) => (
                     <p key={index}>{subject}</p>
                     ))}
 
+				          </div>
 
-
-				</div>
-
-
-
-                <div className="column">
-                <div className="button" id="editButton">
-                  <Link to="/EditProfile">Edit Profile</Link>
+                  <div className="column">
+                    <div className="button">
+                      <Link to="/EditProfile">Edit Profile</Link>
+                    </div>
                   </div>
 
-                </div>
-              </div>
-              {/* close columns */}
+              </div>{/* close columns */}
 
             </div>
           </section>
