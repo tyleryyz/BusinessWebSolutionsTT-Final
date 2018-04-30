@@ -64,8 +64,7 @@ var keyName = 'hello_world.txt';
 let file;
 var filename;
 
-function sendTheEmail()
-{
+function sendTheEmail() {
 
   const ses = new AWS.SES();
 
@@ -77,17 +76,11 @@ function sendTheEmail()
       Body: {
         Html: {
           Charset: 'UTF-8',
-          Data:
-            '<strong>First Name:</strong> ' + firstname +
-            '<br><strong>Last Name:</strong> ' + lastname +
-            '<br><strong>Email to:</strong> ' + email +
-            '<br>Subject: '+ subject +
-            '<br>Message: ' + message
+          Data: '<strong>First Name:</strong> ' + firstname + '<br><strong>Last Name:</strong> ' + lastname + '<br><strong>Email to:</strong> ' + email + '<br>Subject: ' + subject + '<br>Message: ' + message
         },
         Text: {
           Charset: 'UTF-8',
-          Data: 'First Name: ' + firstname + '\nLast Name: ' + lastname +
-            '\nEmail to: ' + email + '\nSubject: ' + subject + '\nMessage: ' + message
+          Data: 'First Name: ' + firstname + '\nLast Name: ' + lastname + '\nEmail to: ' + email + '\nSubject: ' + subject + '\nMessage: ' + message
         }
       },
       Subject: {
@@ -100,10 +93,11 @@ function sendTheEmail()
   };
 
   ses.sendEmail(params, (err, data) => {
-      if (err) console.log(err, err.stack)
-      else console.log(data)
-    }
-  );
+    if (err)
+      console.log(err, err.stack)
+    else
+      console.log(data)
+  });
 }
 
 class ImageUpload extends React.Component {
@@ -115,7 +109,8 @@ class ImageUpload extends React.Component {
       user: null,
       loaded: false,
       courses: null,
-      comment: ""
+      comment: "",
+      courseSelectError: false
     };
     this.getData = this.getData.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -123,7 +118,6 @@ class ImageUpload extends React.Component {
 
   getData() {
     let uID = this.props.user.uid;
-    console.log(uID)
     return (fetch(`/api/users?uID=${uID}`, {
       headers: {
         "Content-Type": "Application/json"
@@ -134,7 +128,6 @@ class ImageUpload extends React.Component {
 
   componentWillMount() {
     let result = this.getData().then((user) => {
-      console.log("will mount here", user)
       this.setState({
         user: user,
         courses: user.courses,
@@ -142,91 +135,108 @@ class ImageUpload extends React.Component {
       }, () => {
         this.setState({loaded: true})
       })
-      })
+    })
   }
-
 
   // When the Upload image button is clicked
   handleSubmit(e) {
     let comments;
     e.preventDefault();
     const course = e.target.elements.course.value;
-    if (!e.target.elements.comments.value){
+    if (!e.target.elements.comments.value) {
       comments = "";
     } else {
       comments = e.target.elements.comments.value;
     }
-    console.log(comments)
-    if (!(course==="select")){
-    filename = this.state.file.name;
-    var d = new Date();
-    var timestamp = d.getTime();
-    var uploadName = this.props.user.uid+'-'+timestamp;
-    email = this.props.user.email;
+    if (!file) {
+      this.setState({
+        imageNullError: true,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      })
+    }
 
-    var extension = filename.split(".");
-    if( extension.length === 1 || ( extension[0] === "" && extension.length === 2 ) ) {
+    if (course === "select") {
+      this.setState({
+        courseSelectError: true,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      })
+    }
+    if (!(course === "select") && (file)) {
+      filename = this.state.file.name;
+      var d = new Date();
+      var timestamp = d.getTime();
+      var uploadName = this.props.user.uid + '-' + timestamp;
+      email = this.props.user.email;
+
+      var extension = filename.split(".");
+      if (extension.length === 1 || (extension[0] === "" && extension.length === 2)) {
         return "";
-    }
-    extension = extension.pop();    // feel free to tack .toLowerCase() here if you want
-    uploadName = uploadName+'.'+extension;
-    var keyName;
-	extension = extension.toLowerCase();
+      }
+      extension = extension.pop(); // feel free to tack .toLowerCase() here if you want
+      uploadName = uploadName + '.' + extension;
+      var keyName;
+      extension = extension.toLowerCase();
 
-    if(extension==="png" || extension==="jpg" || extension==="jpeg")
-    {
+      if (extension === "png" || extension === "jpg" || extension === "jpeg") {
         keyName = "Images/";
-    } else if (extension==="mp4" || extension==="wmv" || extension==="flv" || extension==="avi")
-    {
+      } else if (extension === "mp4" || extension === "wmv" || extension === "flv" || extension === "avi") {
         keyName = "Videos/"
+      }
+
+      var params = {
+        Bucket: bucketName,
+        Key: keyName + uploadName,
+        Body: file
+      };
+
+      let key = keyName + uploadName;
+      s3.putObject(params, function(err, data) {
+        if (err) {
+          console.log(err)
+        } else {
+          firstname = "this.props.user.firstname";
+          lastname = "this.props.user.lastname";
+          subject = "Submission Received!";
+          message = "We have received your image submission of: " + filename + "!";
+          sendTheEmail();
+
+        }
+      })
+
+      let image = fetch(`/api/images`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        body: JSON.stringify({
+          clientUID: this.state.user.uID,
+          imageURL: key,
+          status: "open",
+          tutorUID: null,
+          course: course,
+          comment: comments,
+          school: this.state.user.school.name,
+          timestamp: timestamp,
+          videoURL: null,
+          purchased: 0
+        })
+      });
+      this.setState({
+        courseSelectError: false,
+        imageNullError: false,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      }).then(() => {
+        NotificationManager.success('Your image was successfully uploaded!', 'Success!');
+
+      })
+
     }
-
-    var params = {
-      Bucket: bucketName,
-      Key: keyName+uploadName,
-      Body: file
-    };
-
-    let key = keyName+uploadName;
-    s3.putObject(params, function(err, data) {
-      if (err)
-      {
-        console.log(err)
-      }
-      else
-      {
-        console.log("Successfully uploaded data to " + bucketName + "Images/" + uploadName);
-        firstname = "this.props.user.firstname";
-        lastname = "this.props.user.lastname";
-        subject = "Submission Received!";
-        message = "We have received your image submission of: "+filename+"!";
-        sendTheEmail();
-
-      }
-    })
-
-    let image = fetch(`/api/images`, {
-      method: 'POST',
-      headers: {
-        "Content-Type": "Application/json"
-      },
-      body: JSON.stringify({
-		  clientUID: this.state.user.uID,
-		  imageURL: key,
-		  status: "open",
-		  tutorUID: null,
-		  course: course,
-      comment: comments,
-      school: this.state.user.school.name,
-		  timestamp: timestamp,
-		  videoURL: null,
-		  purchased: 0})
-    });
-
-    console.log(image)
-    console.log('Handling uploading, data presented: ', this.state.file);
-    NotificationManager.success('Your image was successfully uploaded!', 'Success!');
-  } else console.log("enter a course tag")
 
   }
 
@@ -252,51 +262,71 @@ class ImageUpload extends React.Component {
     if (imagePreviewUrl) {
       $imagePreview = (<img src={imagePreviewUrl}/>)
     } else {
-      $imagePreview = (
-        <div className="previewText" style={{ width: "170%"}}>
-          <p>Please upload your Homework Image File.</p>
-          <p><i>(Acceptable formats are: .jpg, .jpeg, .png)</i></p>
-          <p>1 Minute of Video Solution = $1 cost</p>
+      $imagePreview = (<div className="previewText" style={{
+          width: "170%"
+        }}>
+        <p>Please upload your Homework Image File.</p>
+        <p>
+          <i>(Acceptable formats are: .jpg, .jpeg, .png)</i>
+        </p>
+        <p>1 Minute of Video Solution = $1 cost</p>
       </div>);
     }
 
     let $pageData;
-    if (this.state.courses){
-    $pageData = (
-      <div className="block">
-      <div className="previewComponent">
-      <form onSubmit={this.handleSubmit}>
-        <input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/><br /><br />
-        <div className="imgPreview image is-128x128">
-          {$imagePreview}
-          </div><br />
-          <p>Select course tag below:</p>
-        <div className="select">
-          <select name="course">
-          <option value="select">Select</option>
-          {this.state.user.courses.map((course, index) => (
-            <option key={index}>{course}</option>
-          ))}
-          </select>
-          <br />
+    if (this.state.courses) {
+      $pageData = (<div className="block">
+        <div className="previewComponent">
+          <form onSubmit={this.handleSubmit}>
+            {
+              this.state.imageNullError
+                ? <p style={{
+                      color: 'red'
+                    }}>Please select an image before proceeding</p>
+                : <p></p>
+            }
+            <input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/><br/><br/>
+            <div className="imgPreview image is-128x128">
+              {$imagePreview}
+            </div><br/>
+            <p>Select course tag below:</p>
+            {
+              this.state.courseSelectError
+                ? <p style={{
+                      color: 'red'
+                    }}>Please enter a course tag before submitting an image</p>
+                : <p></p>
+            }
+            <div className="select">
+              <select name="course">
+                <option value="select">Select</option>
+                {this.state.user.courses.map((course, index) => (<option key={index}>{course}</option>))}
+              </select>
+              <br/>
+            </div>
+            <div className="field">
+              <label className="label">Comments (optional)</label>
+              <div className="control">
+                <input className="input" name="comments" type="text" placeholder="Comments"/>
+              </div>
+            </div>
+            <button className="button" style={{
+                backgroundColor: "#22d0b2"
+              }} type="submit">Upload Image</button>
+          </form>
         </div>
-        <div className="field">
-          <label className="label">Comments (optional)</label>
-          <div className="control">
-            <input className="input" name="comments" type="text" placeholder="Comments"/>
-          </div>
-        </div>
-        <button className="button" style={{ backgroundColor: "#22d0b2"}} type="submit">Upload Image</button>
-      </form>
-    </div>
-  </div>)
-  } else {$pageData = (<p>Please Wait</p>)}
-    if (this.state.user && this.state.user && this.state.courses){
-    return (<div>
-      {$pageData}
-    </div>)
-  } else {return (<p>Please Wait</p>)}
-}
+      </div>)
+    } else {
+      $pageData = (<p>Please Wait</p>)
+    }
+    if (this.state.user && this.state.user && this.state.courses) {
+      return (<div>
+        {$pageData}
+      </div>)
+    } else {
+      return (<p>Please Wait</p>)
+    }
+  }
 }
 
 export default ImageUpload;
