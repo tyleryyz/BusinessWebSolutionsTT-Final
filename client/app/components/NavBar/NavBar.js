@@ -88,7 +88,7 @@ class NavBar extends Component {
 			</section>
 			)
 	    }
-		else if(!this.state.mobileClicked)
+		else if(!this.state.burgerClicked)
 		{
 
 			return (
