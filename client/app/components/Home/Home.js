@@ -147,6 +147,17 @@ class Home extends Component {
     }).then(res => res.json()));
   }
 
+  async getProfileImage(){
+
+	  var url;
+	  var params = {
+		  Bucket: bucketName,
+		  Key: this.state.user.imageURL
+	  };
+	  url = s3.getSignedUrl('getObject', params);
+	  return url;
+  }
+
   componentWillMount() {
     let result = this.getData().then((user) => {
       console.log("will mount here", user)
@@ -157,8 +168,17 @@ class Home extends Component {
       }, () => {
         this.setState({loaded: true})
       });
-    })
-  };
+  }).then(() => {
+	  this.getProfileImage().then((url) => {
+		 this.setState({
+   		   imagePreviewUrl: url,
+           loaded: false
+         }, () => {
+           this.setState({loaded: true})
+         });
+	  })
+  });
+};
 
   handleFilter(e, subject) {
     e.preventDefault();
@@ -173,6 +193,18 @@ class Home extends Component {
   render() {
 
     if (this.state.user && this.state.loaded) {
+		let {imagePreviewUrl} = this.state;
+	    let $imagePreview = null;
+
+	    if (imagePreviewUrl) {
+	      $imagePreview = ( <a href={imagePreviewUrl} download="download"><img
+                         src={imagePreviewUrl}
+                         height={250} width={250} className="imgPreview is-128x128" /></a>)
+	    } else {
+	      $imagePreview = (<figure style={{ margin: "auto" }} className="image is-128x128">
+							  <img src={profImage} />
+							 </figure>);
+	    }
 
       return (<div>
         <section className="hero" id="title-hero">

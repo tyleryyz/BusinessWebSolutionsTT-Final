@@ -1323,8 +1323,8 @@ checkForVid(index){
 
                       <div className="column is-centered">
                         <div className="media-content">
-                          <p className="title is-5">{image.clientUID}</p>
-                          <p className="subtitle is-6">{image.course}</p>
+						<p className="title is-5">{image.course}</p>
+                          <p className="subtitle is-7">{image.clientUID}</p>
                           <p>{image.comment}</p>
 						  <br />
 						  <br /><br />

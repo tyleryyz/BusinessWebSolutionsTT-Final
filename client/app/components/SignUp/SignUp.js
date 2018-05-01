@@ -327,6 +327,11 @@ class SignUp extends Component {
           }
         }
         return (<div className="container">
+		<div style={{ textAlign: "center"}} className="block">
+		  {/*<img src={testimage} />*/}
+		  <h1 className="title">Tailored Tutoring Co.</h1>
+		  {/*<h2 className="subtitle">roblokken@tailoredtutoringco.com</h2>*/}
+		</div>
           <form onSubmit={this.handleSignUp}>
             <p>
               Tell us which school you go to</p>
@@ -363,7 +368,13 @@ class SignUp extends Component {
           </div>
         </div>)
       } else if (!this.state.nextPage) {
-        return (<form onSubmit={this.handleFormData}>
+        return (<div className="container">
+	          <div style={{ textAlign: "center"}} className="block">
+
+	            <h1 className="title">Tailored Tutoring Co.</h1>
+				<h2 className="subtitle"><i>"Your homework - explained."</i></h2>
+	          </div>
+			<form onSubmit={this.handleFormData}>
           <div className="container">
             <div className="box">
               <div className="field">
@@ -446,7 +457,8 @@ class SignUp extends Component {
               </div>
             </div>
           </div>
-        </form>);
+        </form>
+	</div>);
       } else {
         return (<p>Please Wait</p>)
       }
