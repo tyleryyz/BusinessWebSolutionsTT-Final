@@ -22,7 +22,10 @@ const UserSchema = new mongoose.Schema({
 
   permission: {
     type: String
-}
+  },
+  imageURL: {
+	  type: String
+  }
 });
 
 module.exports = mongoose.model('User', UserSchema);

@@ -146,6 +146,17 @@ class Home extends Component {
     }).then(res => res.json()));
   }
 
+  async getProfileImage(){
+
+	  var url;
+	  var params = {
+		  Bucket: bucketName,
+		  Key: this.state.user.imageURL
+	  };
+	  url = s3.getSignedUrl('getObject', params);
+	  return url;
+  }
+
   componentWillMount() {
     let result = this.getData().then((user) => {
       this.setState({
@@ -155,8 +166,17 @@ class Home extends Component {
       }, () => {
         this.setState({loaded: true})
       });
-    })
-  };
+  }).then(() => {
+	  this.getProfileImage().then((url) => {
+		 this.setState({
+   		   imagePreviewUrl: url,
+           loaded: false
+         }, () => {
+           this.setState({loaded: true})
+         });
+	  })
+  });
+};
 
   handleFilter(e, subject) {
     e.preventDefault();
@@ -171,6 +191,18 @@ class Home extends Component {
   render() {
 
     if (this.state.user && this.state.loaded) {
+		let {imagePreviewUrl} = this.state;
+	    let $imagePreview = null;
+
+	    if (imagePreviewUrl) {
+	      $imagePreview = ( <a href={imagePreviewUrl} download="download"><img
+                         src={imagePreviewUrl}
+                         height={250} width={250} className="imgPreview is-128x128" /></a>)
+	    } else {
+	      $imagePreview = (<figure style={{ margin: "auto" }} className="image is-128x128">
+							  <img src={profImage} />
+							 </figure>);
+	    }
 
       return (<div>
         <section className="hero" id="title-hero">
@@ -187,35 +219,30 @@ class Home extends Component {
 
                 <div className="columns is-centered">
                   <div className="column is-3 has-text-centered">
-					<figure style={{ margin: "auto" }} className="image is-128x128">
-  						<img src={profImage} />
-					</figure>
-					<h2 style= {{fontSize: "22px", color: "white" }} className="subtitle">
-                    {this.state.user.fname}{" "}{this.state.user.lname}</h2>
-                </div>
+					             <figure style={{ margin: "auto" }} className="image is-128x128">
+  						               <img src={profImage} />
+					             </figure>
+					             <h2 style= {{fontSize: "22px", color: "white" }} className="subtitle">
+                       {this.state.user.fname}{" "}{this.state.user.lname}</h2>
+                  </div>
 
                   <div className="column is-8">
-				  <br></br>
+				             <br></br>
 
                     <p className="heading">{this.state.user.school.name}</p>
                     {this.state.user.courses.map((subject, index) => (
                     <p key={index}>{subject}</p>
                     ))}
 
+				          </div>
 
-
-				</div>
-
-
-
-                <div className="column">
-                <div className="button" id="editButton">
-                  <Link to="/EditProfile">Edit Profile</Link>
+                  <div className="column">
+                    <div className="button">
+                      <Link to="/EditProfile">Edit Profile</Link>
+                    </div>
                   </div>
 
-                </div>
-              </div>
-              {/* close columns */}
+              </div>{/* close columns */}
 
             </div>
           </section>
