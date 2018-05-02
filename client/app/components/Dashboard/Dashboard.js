@@ -150,7 +150,8 @@ class Dashboard extends Component {
       deleteID: null,
       reportError: false,
       commentError: false,
-      students: null
+      students: null,
+      tutors: null
     };
     this.getData = this.getData.bind(this);
     this.getImageData = this.getImageData.bind(this);
@@ -180,11 +181,12 @@ class Dashboard extends Component {
     this.renderDeleteConfirmation = this.renderDeleteConfirmation.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.confirmDelete = this.confirmDelete.bind(this);
-    this.getStudentData = this.getStudentData.bind(this);
+    this.getUserData = this.getUserData.bind(this);
     this.handleStudentData = this.handleStudentData.bind(this);
+    this.handleTutorData = this.handleTutorData.bind(this);
   }
 
-  getStudentData(studentUID){
+  getUserData(studentUID){
     return (fetch(`/api/users?uID=${studentUID}`, {
       headers: {
         "Content-Type": "Application/json"
@@ -228,6 +230,14 @@ class Dashboard extends Component {
         this.handleStudentData(images).then((students)=>{
           this.setState({
             students: students,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+        this.handleTutorData(images).then((tutors)=>{
+          this.setState({
+            tutors: tutors,
             loaded: false
           }, () => {
             this.setState({loaded: true})
@@ -476,6 +486,14 @@ class Dashboard extends Component {
             this.setState({loaded: true})
           })
         });
+        this.handleTutorData(images).then((tutors)=>{
+          this.setState({
+            tutors: tutors,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
         this.setState({
           loaded: false,
           images: images,
@@ -567,6 +585,14 @@ class Dashboard extends Component {
             this.setState({loaded: true})
           })
         });
+        this.handleTutorData(images).then((tutors)=>{
+          this.setState({
+            tutors: tutors,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
         this.setState({
           loaded: false,
           images: images,
@@ -730,6 +756,14 @@ class Dashboard extends Component {
             this.setState({loaded: true})
           })
         });
+        this.handleTutorData(images).then((tutors)=>{
+          this.setState({
+            tutors: tutors,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
         this.setState({
           loaded: false,
           images: images,
@@ -833,7 +867,7 @@ class Dashboard extends Component {
         }
         else
         {
-          this.getStudentData(image.clientUID).then((user)=>{
+          this.getUserData(image.clientUID).then((user)=>{
 
             firstname = user.fname;
             lastname = user.lname;
@@ -1152,6 +1186,14 @@ class Dashboard extends Component {
           this.setState({loaded: true})
         })
       });
+      this.handleTutorData(images).then((tutors)=>{
+        this.setState({
+          tutors: tutors,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+        })
+      })
       this.setState({
         loaded: false,
         images: images
@@ -1190,6 +1232,14 @@ async viewReports() {
         this.setState({loaded: true})
       })
     });
+    this.handleTutorData(images).then((tutors)=>{
+      this.setState({
+        tutors: tutors,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      })
+    })
     this.setState({
       loaded: false,
       images: images
@@ -1234,6 +1284,14 @@ async viewAll(type){
         this.setState({loaded: true})
       })
     });
+    this.handleTutorData(images).then((tutors)=>{
+      this.setState({
+        tutors: tutors,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      })
+    })
     this.setState({
       loaded: false,
       images: images
@@ -1299,21 +1357,39 @@ async viewAll(type){
   async handleStudentData(images){
     let students = new Array();
     images.map((image, index) =>{
-      this.getStudentData(image.clientUID).then((student)=>{
+      this.getUserData(image.clientUID).then((student)=>{
         students.push(student);
       })
     })
-    console.log("handelStudentData", students)
+    console.log("handleStudentData", students)
     return(students)
+  }
+
+  async handleTutorData(images){
+    let tutors = new Array();
+    images.map((image, index) =>{
+      if (image.tutorUID){
+        this.getUserData(image.tutorUID).then((tutor)=>{
+          tutors.push(tutor);
+        })
+      }
+      else {
+        tutors.push(null)
+      }
+
+    })
+    return(tutors)
   }
 
   render() {
     let $url;
     let $courseData;
+    let $studentData;
+        console.log(this.state.tutors)
     if (this.state.user) {
       let $image;
       let $date;
-      if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses && this.state.downloadURL && this.state.students[0] && this.state.loaded) {
+    if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses && this.state.downloadURL && this.state.loaded) {
         //*** Tutor View ****
         return (<div className="container">
           <Link to="/Claims">View claimed clients</Link>
@@ -1348,7 +1424,8 @@ async viewAll(type){
                     <div className="media-content">
                     {console.log(this.state.students)}
                     {console.log(this.state.students[index])}
-                      <p className="title is-4">{this.state.students[index].fname} {this.state.students[index].lname}</p>
+                    {this.state.students[index]?<p className="title is-4">{this.state.students[index].fname}</p>:<p></p>}
+
                       <p className="subtitle is-6">{image.course}</p>
                       <p>comments: {image.comment}</p>
                     </div>
@@ -1426,8 +1503,9 @@ async viewAll(type){
             </div>))
           }
         </div>);
-      } else if (this.state.user.permission === "Admin" && this.state.images && this.state.schools && this.state.downloadURL && this.state.students[0]) {
+      } else if (this.state.user.permission === "Admin" && this.state.images && this.state.schools && this.state.downloadURL && this.state.tutors) {
         //*** Admin View ****
+
         if (this.state.schoolVal!="select"){
           $courseData = (
             <div className="select">
@@ -1478,7 +1556,8 @@ async viewAll(type){
 
                 <div className="column">
                   <div className="media-content">
-                    <p className="title is-4">{this.getStudentData(image.clientUID)}</p>
+                    {this.state.students[index]?<p className="title is-4">{this.state.students[index].fname}</p>: <p></p>}
+                    {this.state.students[index]?<p className="subtitle is-6">{this.state.students[index].email}</p>: <p></p>}
                     <p className="subtitle is-6">{image.course}</p>
                     <br />
                   </div>
@@ -1492,7 +1571,7 @@ async viewAll(type){
                 </div> {/* close column */}
 
               </div> {/* close columns*/}
-              {image.tutorUID && <p>Tutor UID: {image.tutorUID}</p>}
+              {this.state.tutors[index]?<p>Tutor UID: {this.state.tutors[index].fname}</p>: <p>No tutor has claimed this image yet</p>}
               <p>school: {image.school}</p>
               {image.comment?<p>comment: {image.comment}</p> : <p></p>}
               {this.checkReport(image)}
