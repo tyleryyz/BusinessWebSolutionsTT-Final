@@ -110,7 +110,8 @@ class Claims extends Component {
       videoError1: false,
       videoError2: false,
       reportError: false,
-      commentError: false
+      commentError: false,
+      students: null
     };
     this.getData = this.getData.bind(this);
     this.getImageData = this.getImageData.bind(this);
@@ -124,7 +125,26 @@ class Claims extends Component {
     this.reportImage = this.reportImage.bind(this);
     this.cancelReport = this.cancelReport.bind(this);
     this.enterComment = this.enterComment.bind(this);
+    this.handleStudentData = this.handleStudentData.bind(this)
   }
+
+  async getUserData(UID){
+
+    return(fetch(`/api/users?uID=${UID}`, {
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        method: 'GET'
+      }).then(res => res.json()));
+  }
+
+  async handleStudentData(images){
+    let students = await Promise.all(images.map(async image =>{
+      return await this.getUserData(image.clientUID)
+    }))
+    return(students)
+  }
+
 
   getData() {
     let uID = this.props.user.uid;
@@ -154,6 +174,14 @@ class Claims extends Component {
         }, () => {
           this.setState({loaded: true})
         })
+        this.handleStudentData(images).then((students)=>{
+          this.setState({
+            students: students,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
         this.getImageURL(images).then((urlArray) => {
           this.setState({
             downloadURL: urlArray,
@@ -177,7 +205,7 @@ class Claims extends Component {
   }
 
   getImageData() {
-    return (fetch(`/api/images?tutorUID=${this.state.user.uID}&status=${ 'claimed'}`, {
+    return (fetch(`/api/images?tutorUID=${this.state.user.uID}&status=${'claimed'}`, {
       headers: {
         "Content-Type": "Application/json"
       },
@@ -261,6 +289,14 @@ class Claims extends Component {
         }, () => {
           this.setState({loaded: true})
         })
+        this.handleStudentData(images).then((students)=>{
+          this.setState({
+            students: students,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
         this.getImageURL(images).then((urlArray) => {
           this.setState({
             downloadURL: urlArray,
@@ -271,14 +307,13 @@ class Claims extends Component {
         })
       });
     } else {
-      return (fetch(`/api/images?course=${course}&tutorUID=${this.state.user.uID}`, {
+      fetch(`/api/images?course=${course}&tutorUID=${this.state.user.uID}&status=${'claimed'}`, {
         headers: {
           "Content-Type": "Application/json"
         },
         method: 'GET'
       }).then(res => res.json()).then((images) => {
         images.sort(this.compare);
-
         this.setState({
           loaded: false,
           images: images,
@@ -286,7 +321,15 @@ class Claims extends Component {
         }, () => {
           this.setState({loaded: true})
         })
-      }));
+        this.handleStudentData(images).then((students)=>{
+          this.setState({
+            students: students,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+      });
     }
   }
 
@@ -389,13 +432,21 @@ class Claims extends Component {
               body: JSON.stringify({videoURL: uploadName, status: "completed", duration: duration})
             }).then((image) => {
               this.getImageData().then((images) => {
-
+                images.sort(this.compare)
                 this.setState({
                   images: images,
                   loaded: false
                 }, () => {
                   this.setState({loaded: true})
                 });
+                this.handleStudentData(images).then((students)=>{
+                  this.setState({
+                    students: students,
+                    loaded: false
+                  }, () => {
+                    this.setState({loaded: true})
+                  })
+                })
                 this.getImageURL(images).then((urlArray) => {
                   this.setState({
                     downloadURL: urlArray,
@@ -590,7 +641,7 @@ class Claims extends Component {
   render() {
 
     if (this.state.user && this.state.loaded) {
-      if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses && this.state.downloadURL) {
+      if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses && this.state.downloadURL && this.state.students) {
         let $image;
         let $date;
         return (<div className="container">
@@ -603,6 +654,8 @@ class Claims extends Component {
               {this.state.courses.map((course, index) => (<option key={index}>{course}</option>))}
             </select>
           </div>
+          <br />
+          <br />
 
           {
             this.state.images.map((image, index) => (<div key={index}>
@@ -614,7 +667,7 @@ class Claims extends Component {
                     <a href={this.state.downloadURL[index]} download="download">click here to download image</a>
                   </div>
                   <div className="media-content">
-                    <p className="title is-4">{image.clientUID}</p>
+                    {this.state.students[index]?<p className="title is-4">{this.state.students[index].fname}</p>:<p></p>}
                     <p className="subtitle is-6">{image.course}</p>
                   </div>
                   <div className="content">

@@ -21,6 +21,10 @@ module.exports = (app) => {
       Image.find({course: req.query.course, clientUID: req.query.clientUID, school: req.query.school}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
 
+    else if (req.query.course && req.query.tutorUID && req.query.status){
+      Image.find({course: req.query.course, tutorUID: req.query.tutorUID, status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
+    }
+
     else if (req.query.school && req.query.course && req.query.status){
       Image.find({course: req.query.course, school: req.query.school, status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
@@ -30,11 +34,6 @@ module.exports = (app) => {
     }
     else if(req.query.school && req.query.status){
       Image.find({school: req.query.school, status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
-
-    }
-    else if(req.query.school){
-      Image.find({school: req.query.school}).exec().then((image) => res.json(image)).catch((err) => next(err));
-
     }
     else if (req.query.course && req.query.clientUID){
       Image.find({course: req.query.course, clientUID: req.query.clientUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
@@ -48,12 +47,11 @@ module.exports = (app) => {
         Image.find({status: req.query.status, clientUID: req.query.clientUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
       }
     }
-
-    else if (req.query.clientUID){
-      Image.find({clientUID: req.query.clientUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
-    }
     else if (req.query.course && req.query.tutorUID){
       Image.find({course: req.query.course, tutorUID: req.query.tutorUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
+    }
+    else if (req.query.tutorUID && req.query.status){
+      Image.find({tutorUID: req.query.tutorUID, status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
     else if (req.query.course && req.query.status){
 
@@ -64,13 +62,13 @@ module.exports = (app) => {
         Image.find({course: req.query.course, status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
       }
     }
-
+    else if (req.query.clientUID){
+      Image.find({clientUID: req.query.clientUID}).exec().then((image) => res.json(image)).catch((err) => next(err));
+    }
     else if (req.query.course){
       Image.find({course: req.query.course}).exec().then((image) => res.json(image)).catch((err) => next(err));
     }
-    else if (req.query.tutorUID && req.query.status){
-      Image.find({tutorUID: req.query.tutorUID, status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
-    }
+
     else if (req.query.status){
 
       if (req.query.status === "open"){
@@ -79,6 +77,11 @@ module.exports = (app) => {
       else {
         Image.find({status: req.query.status}).exec().then((image) => res.json(image)).catch((err) => next(err));
       }
+    }
+
+    else if(req.query.school){
+      Image.find({school: req.query.school}).exec().then((image) => res.json(image)).catch((err) => next(err));
+
     }
 
     else {
