@@ -545,7 +545,7 @@ class Dashboard extends Component {
       let url;
       if (status === "all") {
         if (this.state.user.permission === "Tutor"){
-          url= `/api/images?course=${course}&school=${this.state.user.school.name}&status=${'open'}`
+          url= `/api/images?course=${this.state.filterVal}&school=${this.state.user.school.name}&status=${'open'}`
         } else if (this.state.user.permission === "Student"){
         url = `/api/images?course=${this.state.filterVal}&clientUID=${this.state.user.uID}`
       } else {
