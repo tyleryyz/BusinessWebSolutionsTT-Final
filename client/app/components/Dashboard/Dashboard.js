@@ -186,13 +186,33 @@ class Dashboard extends Component {
     this.handleTutorData = this.handleTutorData.bind(this);
   }
 
-  getUserData(studentUID){
-    return (fetch(`/api/users?uID=${studentUID}`, {
-      headers: {
-        "Content-Type": "Application/json"
-      },
-      method: 'GET'
-    }).then(res => res.json()));
+  async getUserData(UID){
+
+    return(fetch(`/api/users?uID=${UID}`, {
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        method: 'GET'
+      }).then(res => res.json()));
+  }
+
+  async handleStudentData(images){
+    let students = await Promise.all(images.map(async image =>{
+      return await this.getUserData(image.clientUID)
+    }))
+    return(students)
+  }
+
+  async handleTutorData(images){
+    let tutors = await Promise.all(images.map(async image =>{
+      if (image.tutorUID){
+        return await this.getUserData(image.tutorUID)
+      } else {
+        return null
+      }
+    }))
+
+    return(tutors)
   }
 
   getData() {
@@ -227,6 +247,13 @@ class Dashboard extends Component {
     }).then(() => {
       this.getImageData(this.state.user.permission, this.state.user.uID, this.state.statusVal).then((images) => {
         images.sort(this.compare);
+
+        this.setState({
+          loaded: false,
+          images: images
+        }, () => {
+          this.setState({loaded: true})
+        })
         this.handleStudentData(images).then((students)=>{
           this.setState({
             students: students,
@@ -234,7 +261,7 @@ class Dashboard extends Component {
           }, () => {
             this.setState({loaded: true})
           })
-        })
+        }).then(()=>{
         this.handleTutorData(images).then((tutors)=>{
           this.setState({
             tutors: tutors,
@@ -243,11 +270,6 @@ class Dashboard extends Component {
             this.setState({loaded: true})
           })
         })
-        this.setState({
-          loaded: false,
-          images: images
-        }, () => {
-          this.setState({loaded: true})
         })
         this.getImageURL(images).then((urlArray) => {
           this.setState({
@@ -485,7 +507,7 @@ class Dashboard extends Component {
           }, () => {
             this.setState({loaded: true})
           })
-        });
+        }).then(()=>{
         this.handleTutorData(images).then((tutors)=>{
           this.setState({
             tutors: tutors,
@@ -494,6 +516,7 @@ class Dashboard extends Component {
             this.setState({loaded: true})
           })
         })
+      })
         this.setState({
           loaded: false,
           images: images,
@@ -538,7 +561,23 @@ class Dashboard extends Component {
         method: 'GET'
       }).then(res => res.json()).then((images) => {
         images.sort(this.compare);
-
+        this.handleStudentData(images).then((students)=>{
+          this.setState({
+            students: students,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        }).then(()=>{
+        this.handleTutorData(images).then((tutors)=>{
+          this.setState({
+            tutors: tutors,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+      })
         this.setState({
           loaded: false,
           images: images,
@@ -584,7 +623,7 @@ class Dashboard extends Component {
           }, () => {
             this.setState({loaded: true})
           })
-        });
+        }).then(()=>{
         this.handleTutorData(images).then((tutors)=>{
           this.setState({
             tutors: tutors,
@@ -593,6 +632,7 @@ class Dashboard extends Component {
             this.setState({loaded: true})
           })
         })
+      })
         this.setState({
           loaded: false,
           images: images,
@@ -633,7 +673,23 @@ class Dashboard extends Component {
         method: 'GET'
       }).then(res => res.json()).then((images) => {
         images.sort(this.compare);
-
+        this.handleStudentData(images).then((students)=>{
+          this.setState({
+            students: students,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        }).then(()=>{
+        this.handleTutorData(images).then((tutors)=>{
+          this.setState({
+            tutors: tutors,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+      })
         this.setState({
           loaded: false,
           images: images,
@@ -677,6 +733,23 @@ class Dashboard extends Component {
         method: 'GET'
       }).then(res => res.json())).then((images) => {
         images.sort(this.compare);
+        this.handleStudentData(images).then((students)=>{
+          this.setState({
+            students: students,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        }).then(()=>{
+        this.handleTutorData(images).then((tutors)=>{
+          this.setState({
+            tutors: tutors,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+      })
         this.setState({
           loaded: false,
           images: images,
@@ -709,6 +782,23 @@ class Dashboard extends Component {
         method: 'GET'
       }).then(res => res.json())).then((images) => {
         images.sort(this.compare);
+        this.handleStudentData(images).then((students)=>{
+          this.setState({
+            students: students,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        }).then(()=>{
+        this.handleTutorData(images).then((tutors)=>{
+          this.setState({
+            tutors: tutors,
+            loaded: false
+          }, () => {
+            this.setState({loaded: true})
+          })
+        })
+      })
         this.setState({
           loaded: false,
           images: images,
@@ -755,7 +845,7 @@ class Dashboard extends Component {
           }, () => {
             this.setState({loaded: true})
           })
-        });
+        }).then(()=>{
         this.handleTutorData(images).then((tutors)=>{
           this.setState({
             tutors: tutors,
@@ -764,6 +854,7 @@ class Dashboard extends Component {
             this.setState({loaded: true})
           })
         })
+      })
         this.setState({
           loaded: false,
           images: images,
@@ -798,6 +889,23 @@ class Dashboard extends Component {
       method: 'GET'
     }).then(res => res.json())).then((images) => {
       images.sort(this.compare);
+      this.handleStudentData(images).then((students)=>{
+        this.setState({
+          students: students,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+        })
+      }).then(()=>{
+      this.handleTutorData(images).then((tutors)=>{
+        this.setState({
+          tutors: tutors,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+        })
+      })
+    })
       this.setState({
         images: images,
         schoolVal: school,
@@ -1185,7 +1293,7 @@ class Dashboard extends Component {
         }, () => {
           this.setState({loaded: true})
         })
-      });
+      }).then(()=>{
       this.handleTutorData(images).then((tutors)=>{
         this.setState({
           tutors: tutors,
@@ -1194,6 +1302,7 @@ class Dashboard extends Component {
           this.setState({loaded: true})
         })
       })
+    })
       this.setState({
         loaded: false,
         images: images
@@ -1231,7 +1340,7 @@ async viewReports() {
       }, () => {
         this.setState({loaded: true})
       })
-    });
+    }).then(()=>{
     this.handleTutorData(images).then((tutors)=>{
       this.setState({
         tutors: tutors,
@@ -1240,6 +1349,7 @@ async viewReports() {
         this.setState({loaded: true})
       })
     })
+  })
     this.setState({
       loaded: false,
       images: images
@@ -1283,7 +1393,7 @@ async viewAll(type){
       }, () => {
         this.setState({loaded: true})
       })
-    });
+    }).then(()=>{
     this.handleTutorData(images).then((tutors)=>{
       this.setState({
         tutors: tutors,
@@ -1292,6 +1402,7 @@ async viewAll(type){
         this.setState({loaded: true})
       })
     })
+  })
     this.setState({
       loaded: false,
       images: images
@@ -1354,42 +1465,14 @@ async viewAll(type){
 		} else { return (<p>Video in production</p>)}
 	}
 
-  async handleStudentData(images){
-    let students = new Array();
-    images.map((image, index) =>{
-      this.getUserData(image.clientUID).then((student)=>{
-        students.push(student);
-      })
-    })
-    console.log("handleStudentData", students)
-    return(students)
-  }
-
-  async handleTutorData(images){
-    let tutors = new Array();
-    images.map((image, index) =>{
-      if (image.tutorUID){
-        this.getUserData(image.tutorUID).then((tutor)=>{
-          tutors.push(tutor);
-        })
-      }
-      else {
-        tutors.push(null)
-      }
-
-    })
-    return(tutors)
-  }
-
   render() {
     let $url;
     let $courseData;
     let $studentData;
-        console.log(this.state.tutors)
     if (this.state.user) {
       let $image;
       let $date;
-    if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses && this.state.downloadURL && this.state.loaded) {
+    if (this.state.user.permission === "Tutor" && this.state.images && this.state.courses && this.state.downloadURL && this.state.students && this.state.tutors && this.state.loaded) {
         //*** Tutor View ****
         return (<div className="container">
           <Link to="/Claims">View claimed clients</Link>
@@ -1427,7 +1510,7 @@ async viewAll(type){
                     {this.state.students[index]?<p className="title is-4">{this.state.students[index].fname}</p>:<p></p>}
 
                       <p className="subtitle is-6">{image.course}</p>
-                      <p>comments: {image.comment}</p>
+                      {image.comment?<p>Student comments: {image.comment}</p>:<p></p>}
                     </div>
                   </div> {/* close column */}
                 </div> {/* close card */}
@@ -1486,7 +1569,7 @@ async viewAll(type){
                         <div className="media-content">
 						<p className="title is-5">{image.course}</p>
                           <p className="subtitle is-7">{image.clientUID}</p>
-                          <p>comments: {image.comment}</p>
+                          {image.comment?<p>comments: {image.comment}</p>:<p></p>}
 						  <br />
 						  <br /><br />
                         </div>
@@ -1503,9 +1586,9 @@ async viewAll(type){
             </div>))
           }
         </div>);
-      } else if (this.state.user.permission === "Admin" && this.state.images && this.state.schools && this.state.downloadURL && this.state.tutors) {
+      } else if (this.state.user.permission === "Admin" && this.state.images && this.state.schools && this.state.downloadURL && this.state.students && this.state.tutors && this.state.loaded) {
         //*** Admin View ****
-
+        console.log("render", this.state.students)
         if (this.state.schoolVal!="select"){
           $courseData = (
             <div className="select">
@@ -1556,25 +1639,25 @@ async viewAll(type){
 
                 <div className="column">
                   <div className="media-content">
-                    {this.state.students[index]?<p className="title is-4">{this.state.students[index].fname}</p>: <p></p>}
+                    {this.state.students[index]?<p className="title is-4">{this.state.students[index].fname} {this.state.students[index].lname}</p>: <p></p>}
                     {this.state.students[index]?<p className="subtitle is-6">{this.state.students[index].email}</p>: <p></p>}
+                    <p className="subtitle is-6">school: {image.school}</p>
                     <p className="subtitle is-6">{image.course}</p>
+                    {image.comment?<p className="subtitle is-6">Student comment: {image.comment}</p> : <p></p>}
+
                     <br />
                   </div>
                 </div> {/* close column */}
                 <div className="column">
                   <div className="content">
                     <p>Status: {image.status}</p>
-                    {image.tutorUID && <p>Tutor UID: {image.tutorUID}</p>}
-                    <p>school: {image.school}</p>
+                    {this.checkReport(image)}
                   </div>
                 </div> {/* close column */}
 
               </div> {/* close columns*/}
-              {this.state.tutors[index]?<p>Tutor UID: {this.state.tutors[index].fname}</p>: <p>No tutor has claimed this image yet</p>}
-              <p>school: {image.school}</p>
-              {image.comment?<p>comment: {image.comment}</p> : <p></p>}
-              {this.checkReport(image)}
+              {this.state.tutors[index]?<p>Tutor name: {this.state.tutors[index].fname} {this.state.tutors[index].lname}</p>: <p>No tutor has claimed this image yet</p>}
+              {this.state.tutors[index]?<p>Tutor email: {this.state.tutors[index].email}</p>: <p></p>}
               <br />
             </div> {/* close card*/}
               <br/>
