@@ -1505,8 +1505,6 @@ async viewAll(type){
                   </div> {/* close column */}
                   <div className="column is-half">
                     <div className="media-content">
-                    {console.log(this.state.students)}
-                    {console.log(this.state.students[index])}
                     {this.state.students[index]?<p className="title is-4">{this.state.students[index].fname}</p>:<p></p>}
 
                       <p className="subtitle is-6">{image.course}</p>
@@ -1588,7 +1586,6 @@ async viewAll(type){
         </div>);
       } else if (this.state.user.permission === "Admin" && this.state.images && this.state.schools && this.state.downloadURL && this.state.students && this.state.tutors && this.state.loaded) {
         //*** Admin View ****
-        console.log("render", this.state.students)
         if (this.state.schoolVal!="select"){
           $courseData = (
             <div className="select">

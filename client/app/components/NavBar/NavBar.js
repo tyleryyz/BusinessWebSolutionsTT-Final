@@ -28,20 +28,17 @@ class NavBar extends Component {
 
   handleBurger(e){
 	  e.preventDefault();
-	  console.log("Toggling");
 	  this.setState({
 		  burgerClicked: !this.state.burgerClicked,
 		  loaded: false
 	  }, () => {
 		  this.setState({loaded: true})
-		  console.log("Burger clicked ", this.state.burgerClicked);
 	  });
   }
 
   render() {
     if (this.props.auth) {
       // User is signed in.
-	  console.log("Burger clicked ", this.state.burgerClicked);
 
 	  if(this.state.burgerClicked)
 	  {
