@@ -247,11 +247,12 @@ class Home extends Component {
             </div>
           </section>
           {/* use to end "block" div here */}
-
+  {this.state.user.permission !="Admin"?
         <div className="block" id="bottomBlock">
 
           <section className="subjectSection">
             <div className="container">
+
               <h1 className="subtitle has-text-centered">My Subjects</h1>
               <div className="columns is-centered">
                 {/* My For-Loop essentially */}
@@ -287,12 +288,14 @@ class Home extends Component {
                         : <p></p>
                     }
                   </div>))
-                }
+              }
               </div>
+
             </div>
             {/* close container, adds a margin */}
           </section>
         </div>
+      :<p></p>}
       </div>)
     } else {
       return (<div>
