@@ -28,7 +28,7 @@ class App extends Component {
 
     super(props);
 	   this.state = {
-		filterVal: 'select',
+		filterVal: this.props.filterVal,
     loaded: true
 	}
     this.children = this.props.children;

@@ -18,13 +18,6 @@ var accessKey;
 var secretAccess;
 var regionArea;
 
-// Init variables
-var firstname;
-var lastname;
-var email;
-var message;
-var subject;
-
 fetchTextFile('http://localhost:8080/keys.txt', function(data) {
   updateVars(data)
 });
@@ -59,50 +52,12 @@ AWS.config.update({accessKeyId: accessKey.trim(), secretAccessKey: secretAccess.
 
 // Create an S3 client
 var s3 = new AWS.S3();
-var ses = new AWS.SES();
 
 // Create a bucket and upload something into it
 //var bucketName = 'jjg297-' + uuid.v4();
 var bucketName = 'tailored-tutoring';
-var keyName = 'hello_world.txt';
-let file;
-var filename;
 
-function sendTheEmail() {
 
-  const ses = new AWS.SES();
-
-  const params = {
-    Destination: {
-      ToAddresses: [email]
-    },
-    Message: {
-      Body: {
-        Html: {
-          Charset: 'UTF-8',
-          Data: '<strong>First Name:</strong> ' + firstname + '<br><strong>Last Name:</strong> ' + lastname + '<br><strong>Email to:</strong> ' + email + '<br>Subject: ' + subject + '<br>Message: ' + message
-        },
-        Text: {
-          Charset: 'UTF-8',
-          Data: 'First Name: ' + firstname + '\nLast Name: ' + lastname + '\nEmail to: ' + email + '\nSubject: ' + subject + '\nMessage: ' + message
-        }
-      },
-      Subject: {
-        Charset: 'UTF-8',
-        Data: subject
-      }
-    },
-    ReturnPath: 'jjg297@nau.edu',
-    Source: 'jjg297@nau.edu'
-  };
-
-  ses.sendEmail(params, (err, data) => {
-    if (err)
-      console.log(err, err.stack)
-    else
-      console.log(data)
-  });
-}
 
 // Will render a profile image, user name, user class list, user school,
 class Home extends Component {
@@ -305,15 +260,5 @@ class Home extends Component {
 
   }
 }
-
-// <div id="editProfileButton">
-// <div className="control">
-//   <Link to="/EditProfile">Edit Profile</Link>
-// </div>
-// <p>{this.state.user.fname}</p>
-// <p>{this.state.user.school.name}</p>
-// <ul>
-// {this.state.user.courses.map((course, index) => (<li key={index}>{course}</li>))}
-// </ul>
 
 export default Home;

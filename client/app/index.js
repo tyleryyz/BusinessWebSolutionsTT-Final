@@ -28,10 +28,12 @@ class Index extends Component {
     super(props);
     this.state = {
       user: null,
+      filterVal: 'select',
       loaded: false
     };
     this.setAuthState = this.setAuthState.bind(this)
     this.logout = this.logout.bind(this)
+    this.setFilter = this.setFilter.bind(this);
   }
 
   logout() {
@@ -49,6 +51,15 @@ class Index extends Component {
     }, () => {
       this.setState({loaded: true})
     })
+  }
+
+  setFilter(subject) {
+    this.setState({
+      filterVal: subject,
+      loaded: false
+    }, () => {
+      this.setState({loaded: true});
+  	});
   }
 
   componentWillMount() {
@@ -79,8 +90,8 @@ class Index extends Component {
 
         <Router>
         <div>
-          <NavBar auth={this.state.user} logout={this.logout}/>
-          <App user={this.state.user}/>
+          <NavBar auth={this.state.user} logout={this.logout} filterCallBack={this.setFilter}/>
+          <App filterVal={this.state.filterVal} user={this.state.user}/>
         </div>
       </Router>
     </div>)
