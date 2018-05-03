@@ -36,7 +36,6 @@ class NavBar extends Component {
   }
 
   handleFilter(e) {
-    e.preventDefault();
     let subject = 'select'
     this.props.filterCallBack(subject);
   }
@@ -66,9 +65,7 @@ class NavBar extends Component {
                 <Link className="navbar-item" to="/">
                   Home
                 </Link>
-                <div className="navbar-item" onClick={(e) => this.handleFilter(e)}>
-                  <Link to='/Dashboard'>Assignments</Link>
-                </div>
+                  <Link className="navbar-item" onClick={(e) => this.handleFilter(e)} to='/Dashboard'>Assignments</Link>
                 <button style={{
                     margin: 15
                   }} className="navbar-item button" onClick={this.handleSignOut}>Sign Out</button>
@@ -77,9 +74,7 @@ class NavBar extends Component {
                 <Link className="navbar-item" to="/">
                   Home
                 </Link>
-                <div className="navbar-item" onClick={(e) => this.handleFilter(e)}>
-                  <Link to='/Dashboard'>Assignments</Link>
-                </div>
+                  <Link className="navbar-item" onClick={(e) => this.handleFilter(e)} to='/Dashboard'>Assignments</Link>
               </div>
 
             </div>
@@ -113,9 +108,8 @@ class NavBar extends Component {
                 <Link className="navbar-item" to="/">
                   Home
                 </Link>
-                <div className="navbar-item" onClick={(e) => this.handleFilter(e)}>
-                  <Link to='/Dashboard'>Assignments</Link>
-                </div>
+                  <Link className="navbar-item" onClick={(e) => this.handleFilter(e)} to='/Dashboard'>Assignments</Link>
+
                 <button style={{
                     margin: 15
                   }} className="navbar-item button" onClick={this.handleSignOut}>Sign Out</button>
@@ -124,9 +118,7 @@ class NavBar extends Component {
                 <Link className="navbar-item" to="/">
                   Home
                 </Link>
-                <div className="navbar-item" onClick={(e) => this.handleFilter(e)}>
-                  <Link to='/Dashboard'>Assignments</Link>
-                </div>
+                  <Link className="navbar-item" onClick={(e) => this.handleFilter(e)} to='/Dashboard'>Assignments</Link>
               </div>
 
             </div>
