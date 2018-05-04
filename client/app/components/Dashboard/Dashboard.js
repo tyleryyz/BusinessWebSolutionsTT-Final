@@ -144,7 +144,7 @@ class Dashboard extends Component {
       courseVal: 'select',
       reportID: null,
       reportVal: 'select',
-      reportComment: '',
+      reportComment: "",
       available: false,
       reported: false,
       deleteID: null,
@@ -1156,7 +1156,8 @@ class Dashboard extends Component {
       })
     }
 
-    if (this.state.reportComment != "" && this.state.reportVal!='select'){
+    if (!(this.state.reportComment === "") && this.state.reportVal === 'Other'){
+      console.log("passing when it shouldnt")
       const comment = this.state.reportComment;
       const imageURL = image.imageURL;
       fetch(`/api/images?imageURL=${imageURL}`, {
@@ -1186,7 +1187,8 @@ class Dashboard extends Component {
     }).then(()=>{
       NotificationManager.success('Report was sent to site admin.', 'Report success');
     })
-  } else if (this.state.reportVal !='select') {
+  } else if (this.state.reportVal !='select' && this.state.reportVal !='Other' ) {
+    console.log("here")
     const imageURL = image.imageURL;
     fetch(`/api/images?imageURL=${imageURL}`, {
       method: 'PUT',

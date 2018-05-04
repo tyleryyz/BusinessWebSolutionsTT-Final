@@ -106,7 +106,7 @@ class Claims extends Component {
       downloadURL: null,
       reportID: null,
       reportVal: 'select',
-      reportComment: '',
+      reportComment: "",
       videoError1: false,
       videoError2: false,
       reportError: false,
@@ -577,7 +577,7 @@ class Claims extends Component {
         this.setState({loaded: true})
       })
     }
-    if (this.state.reportComment != "" && this.state.reportVal != 'select') {
+    if (this.state.reportComment != "" && this.state.reportVal === 'Other') {
       const comment = this.state.reportComment;
       const imageURL = image.imageURL;
       fetch(`/api/images?imageURL=${imageURL}`, {
@@ -605,7 +605,7 @@ class Claims extends Component {
       }).then(() => {
         NotificationManager.success('Report was sent to site admin.', 'Report success');
       })
-    } else if (this.state.reportVal != 'select') {
+    } else if (this.state.reportVal != 'select' && this.state.reportVal != 'Other') {
       const imageURL = image.imageURL;
       fetch(`/api/images?imageURL=${imageURL}`, {
         method: 'PUT',
