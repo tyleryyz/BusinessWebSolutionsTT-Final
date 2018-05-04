@@ -8,11 +8,9 @@ import App from './components/App/App';
 import NotFound from './components/App/NotFound';
 import NavBar from './components/NavBar/NavBar'
 import Home from './components/Home/Home';
-import Emailing from './components/Emailing/Emailing';
 import Login from './components/Login/Login';
 import SignUp from './components/SignUp/SignUp';
 import ImageUpload from './components/ImageUpload/ImageUpload';
-import VideoPlayer from './components/VideoPlayer/VideoPlayer';
 
 import 'react-notifications/lib/notifications.css';
 import './styles/styles.scss';

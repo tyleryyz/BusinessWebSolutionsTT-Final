@@ -192,18 +192,21 @@ class Home extends Component {
 				          </div>
 
                   <div className="column">
-                    <div className="button">
-                      <Link to="/EditProfile">Edit Profile</Link>
-                    </div>
+
                   </div>
 
               </div>{/* close columns */}
+
 
             </div>
           </section>
           {/* use to end "block" div here */}
   {this.state.user.permission !="Admin"?
         <div className="block" id="bottomBlock">
+        <Link id="linkTo" to="/EditProfile">Edit Profile</Link>
+
+
+
 
           <section className="subjectSection">
             <div className="container">

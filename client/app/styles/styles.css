@@ -17,7 +17,7 @@
 	height: 100%;
 	width: 100%;
 	z-index: -10;
-	
+
 }
 
 #profile-body{
@@ -37,7 +37,7 @@
 #bottomBlock{
 	background-color: #F5F5F5; /* color here */
 	padding-bottom:  225px;
-	padding-top: 25px;
+	padding-top: 10px;
 }
 
 #editButton{
@@ -47,4 +47,8 @@
 
 #imageComp{
 	border:
+}
+
+#linkTo {
+	padding-left: 25px;
 }
