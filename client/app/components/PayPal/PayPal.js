@@ -5,9 +5,7 @@ import 'whatwg-fetch';
 var firebase = require('firebase');
 var paypal = require('paypal-checkout');
 
-// Will create a PayPal CHeckout button for 0.01 to Tailored Tutoring Co. LLC
-// Everything works, one issue though is that we may want to include a description
-// As the Paypal receipt gives no information as to Why or what the transaction was for.
+
 class PayPal extends React.Component {
 
   constructor(props) {

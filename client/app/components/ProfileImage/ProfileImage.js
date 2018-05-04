@@ -64,47 +64,6 @@ var keyName = 'hello_world.txt';
 let file;
 var filename;
 
-// function sendTheEmail()
-// {
-//
-//   const ses = new AWS.SES();
-//
-//   const params = {
-//     Destination: {
-//       ToAddresses: [email]
-//     },
-//     Message: {
-//       Body: {
-//         Html: {
-//           Charset: 'UTF-8',
-//           Data:
-//             '<strong>First Name:</strong> ' + firstname +
-//             '<br><strong>Last Name:</strong> ' + lastname +
-//             '<br><strong>Email to:</strong> ' + email +
-//             '<br>Subject: '+ subject +
-//             '<br>Message: ' + message
-//         },
-//         Text: {
-//           Charset: 'UTF-8',
-//           Data: 'First Name: ' + firstname + '\nLast Name: ' + lastname +
-//             '\nEmail to: ' + email + '\nSubject: ' + subject + '\nMessage: ' + message
-//         }
-//       },
-//       Subject: {
-//         Charset: 'UTF-8',
-//         Data: subject
-//       }
-//     },
-//     ReturnPath: 'jjg297@nau.edu',
-//     Source: 'jjg297@nau.edu'
-//   };
-//
-//   ses.sendEmail(params, (err, data) => {
-//       if (err) console.log(err, err.stack)
-//       else console.log(data)
-//     }
-//   );
-// }
 
 class ProfileImage extends React.Component {
   constructor(props) {
@@ -123,7 +82,6 @@ class ProfileImage extends React.Component {
 
   getData() {
     let uID = this.props.user.uid;
-    console.log(uID)
     return (fetch(`/api/users?uID=${uID}`, {
       headers: {
         "Content-Type": "Application/json"
@@ -145,7 +103,6 @@ class ProfileImage extends React.Component {
 
   componentWillMount() {
     let result = this.getData().then((user) => {
-      console.log("will mount here", user)
       this.setState({
         user: user,
 		courses: user.courses,
@@ -164,8 +121,6 @@ class ProfileImage extends React.Component {
 	  })
   });
 };
-
-
   // When the Upload image button is clicked
   handleSubmit(e) {
     e.preventDefault();
@@ -201,7 +156,6 @@ class ProfileImage extends React.Component {
         }
         else
         {
-          console.log("Successfully uploaded data to " + bucketName + keyName + uploadName);
 
 		  params = {
   	      Bucket: bucketName,
@@ -229,7 +183,6 @@ class ProfileImage extends React.Component {
 					  imageURL: key})
 			    }).then((image) => {
 
-					console.log(image)
 					//console.log('Handling uploading, data presented: ', this.state.file);
 					NotificationManager.success('Your image was successfully uploaded!', 'Success!'); //what does this do?
 			});
@@ -261,7 +214,6 @@ class ProfileImage extends React.Component {
     if (imagePreviewUrl) {
       $imagePreview = (<div className="imgPreview image"><img src={imagePreviewUrl}/></div>)
     }
-	console.log("Image preview: ", imagePreviewUrl);
 
     let $pageData;
     if (this.state.user){

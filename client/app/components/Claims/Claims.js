@@ -635,9 +635,6 @@ class Claims extends Component {
     }
   }
 
-  // BUG: If there are more than one images with differing courses,
-  // The first image will populate the image space as opposed to the
-  // proper image that regards to that case.
   render() {
 
     if (this.state.user && this.state.loaded) {
