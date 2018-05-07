@@ -65,7 +65,7 @@ class Home extends Component {
     super(props);
     this.state = {
       file: '',
-      imagePreviewUrl: '',
+      imagePreviewUrl: null,
       user: null,
       loaded: false,
       courses: null,
@@ -146,12 +146,11 @@ class Home extends Component {
   render() {
 
     if (this.state.user && this.state.loaded) {
-		let {imagePreviewUrl} = this.state;
 	    let $imagePreview = null;
 
-	    if (imagePreviewUrl) {
-	      $imagePreview = ( <a href={imagePreviewUrl} download="download"><img
-                         src={imagePreviewUrl}
+	    if (this.state.imagePreviewUrl) {
+	      $imagePreview = ( <a href={this.state.imagePreviewUrl} download="download"><img
+                         src={this.state.imagePreviewUrl}
                          height={250} width={250} className="imgPreview is-128x128" /></a>)
 	    } else {
 	      $imagePreview = (<figure style={{ margin: "auto" }} className="image is-128x128">
@@ -175,7 +174,7 @@ class Home extends Component {
                 <div className="columns is-centered">
                   <div className="column is-3 has-text-centered">
 					             <figure style={{ margin: "auto" }} className="image is-128x128">
-  						               <img src={profImage} />
+  						               {$imagePreview}
 					             </figure>
 					             <h2 style= {{fontSize: "22px", color: "white" }} className="subtitle">
                        {this.state.user.fname}{" "}{this.state.user.lname}</h2>
@@ -253,7 +252,8 @@ class Home extends Component {
             {/* close container, adds a margin */}
           </section>
         </div>
-      :<p></p>}
+      :<p>        <Link id="linkTo" to="/EditProfile">Edit Profile</Link>
+</p>}
       </div>)
     } else {
       return (<div>

@@ -110,20 +110,21 @@ class ImageUpload extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      file: '',
-      imagePreviewUrl: '',
-      user: null,
-      loaded: false,
-      courses: null,
-      comment: ""
-    };
+        file: '',
+        imagePreviewUrl: '',
+        user: null,
+        loaded: false,
+        courses: null,
+        comment: "",
+        courseSelectError: false,
+        imageNullError: false
+  };
     this.getData = this.getData.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   getData() {
     let uID = this.props.user.uid;
-    console.log(uID)
     return (fetch(`/api/users?uID=${uID}`, {
       headers: {
         "Content-Type": "Application/json"
@@ -134,7 +135,6 @@ class ImageUpload extends React.Component {
 
   componentWillMount() {
     let result = this.getData().then((user) => {
-      console.log("will mount here", user)
       this.setState({
         user: user,
         courses: user.courses,
@@ -156,8 +156,24 @@ class ImageUpload extends React.Component {
     } else {
       comments = e.target.elements.comments.value;
     }
-    console.log(comments)
-    if (!(course==="select")){
+    if (!file) {
+   this.setState({
+     imageNullError: true,
+     loaded: false
+   }, () => {
+     this.setState({loaded: true})
+   })
+ }
+
+ if (course === "select") {
+   this.setState({
+     courseSelectError: true,
+     loaded: false
+   }, () => {
+     this.setState({loaded: true})
+   })
+}
+    if (!(course==="select")&&(file)){
     filename = this.state.file.name;
     var d = new Date();
     var timestamp = d.getTime();
@@ -188,45 +204,52 @@ class ImageUpload extends React.Component {
     };
 
     let key = keyName+uploadName;
-    s3.putObject(params, function(err, data) {
+    s3.putObject(params, ((err, data) =>{
       if (err)
       {
-        console.log(err)
+        NotificationManager.error('Error uploading image, please try again later', 'Error');
       }
       else
       {
-        console.log("Successfully uploaded data to " + bucketName + "Images/" + uploadName);
+        console.log("Successfully uploaded data to " + bucketName + " Images/" + uploadName);
         firstname = "this.props.user.firstname";
         lastname = "this.props.user.lastname";
         subject = "Submission Received!";
         message = "We have received your image submission of: "+filename+"!";
         sendTheEmail();
 
+        let image = fetch(`/api/images`, {
+          method: 'POST',
+          headers: {
+            "Content-Type": "Application/json"
+          },
+          body: JSON.stringify({
+          clientUID: this.state.user.uID,
+          imageURL: key,
+          status: "open",
+          tutorUID: null,
+          course: course,
+          comment: comments,
+          school: this.state.user.school.name,
+          timestamp: timestamp,
+          videoURL: null,
+          purchased: 0})
+        });
+
+      this.setState({
+       courseSelectError: false,
+       imageNullError: false,
+       loaded: false
+     }, () => {
+       this.setState({loaded: true})
+     })
+     NotificationManager.success('Your image was successfully uploaded!', 'Success!');
+
       }
-    })
+    }))
 
-    let image = fetch(`/api/images`, {
-      method: 'POST',
-      headers: {
-        "Content-Type": "Application/json"
-      },
-      body: JSON.stringify({
-		  clientUID: this.state.user.uID,
-		  imageURL: key,
-		  status: "open",
-		  tutorUID: null,
-		  course: course,
-      comment: comments,
-      school: this.state.user.school.name,
-		  timestamp: timestamp,
-		  videoURL: null,
-		  purchased: 0})
-    });
 
-    console.log(image)
-    console.log('Handling uploading, data presented: ', this.state.file);
-    NotificationManager.success('Your image was successfully uploaded!', 'Success!');
-  } else console.log("enter a course tag")
+    }
 
   }
 
@@ -266,10 +289,24 @@ class ImageUpload extends React.Component {
       <div className="block">
       <div className="previewComponent">
       <form onSubmit={this.handleSubmit}>
+      {
+              this.state.imageNullError
+                ? <p style={{
+                      color: 'red'
+                    }}>Please select an image before proceeding</p>
+                : <p></p>
+}
         <input className="fileInput" type="file" onChange={(e) => this._handleImageChange(e)}/><br /><br />
         <div className="imgPreview image is-128x128">
           {$imagePreview}
           </div><br />
+          {
+            this.state.courseSelectError
+              ? <p style={{
+                    color: 'red'
+                  }}>Please enter a course tag before submitting an image</p>
+              : <p></p>
+}
           <p>Select course tag below:</p>
         <div className="select">
           <select name="course">

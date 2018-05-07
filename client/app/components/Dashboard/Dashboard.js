@@ -1157,7 +1157,6 @@ class Dashboard extends Component {
     }
 
     if (!(this.state.reportComment === "") && this.state.reportVal === 'Other'){
-      console.log("passing when it shouldnt")
       const comment = this.state.reportComment;
       const imageURL = image.imageURL;
       fetch(`/api/images?imageURL=${imageURL}`, {
@@ -1188,7 +1187,6 @@ class Dashboard extends Component {
       NotificationManager.success('Report was sent to site admin.', 'Report success');
     })
   } else if (this.state.reportVal !='select' && this.state.reportVal !='Other' ) {
-    console.log("here")
     const imageURL = image.imageURL;
     fetch(`/api/images?imageURL=${imageURL}`, {
       method: 'PUT',
