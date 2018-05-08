@@ -70,12 +70,18 @@ class Home extends Component {
       loaded: false,
       courses: null,
       clicked: false,
+      schools: [],
       submitImageSubject: null
     };
     this.getData = this.getData.bind(this);
     this.handleFilter = this.handleFilter.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleClose = this.handleClose.bind(this);
+    this.handleFacebookNewUser = this.handleFacebookNewUser.bind(this);
+    this.coursesSelect = this.coursesSelect.bind(this);
+    this.coursesDeselect = this.coursesDeselect.bind(this);
+    this.getSchools = this.getSchools.bind(this);
+    this.schoolSelect = this.schoolSelect.bind(this);
   }
 
   handleClick(e, subject) {
@@ -130,6 +136,14 @@ class Home extends Component {
            this.setState({loaded: true})
          });
 	  })
+  })
+  this.getSchools().then((schools) => {
+    this.setState({
+      schools: schools,
+      loaded: false
+    }, () => {
+      this.setState({loaded: true})
+    });
   });
 };
 
@@ -143,7 +157,233 @@ class Home extends Component {
     this.setState({clicked: false, submitImageSubject: null});
   }
 
+
+    async schoolSelect(e) {
+      let value = e.target.value;
+
+      if (value != "select") {
+        var school = JSON.parse(value);
+      } else {
+        var school = value;
+      }
+      this.setState({
+        selectedSchool: school,
+        courses: school.courses,
+        selectedCourses: [],
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      });
+    }
+
+    getSchools() {
+      return (fetch(`/api/schools`, {
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        method: 'GET'
+      }).then(res => res.json()));
+    }
+
+    coursesDeselect(e) {
+      e.preventDefault();
+      let courses = e.target;
+      let value = this.state.selectedCourses;
+      for (let i = 0; i < courses.length; i++) {
+        if (courses[i].selected) {
+          if (value.length === 1) {
+            value = [];
+          } else {
+            value.splice(i, 1);
+          }
+
+        }
+      }
+      this.setState({
+        selectedCourses: value,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      });
+    }
+
+    coursesSelect(e) {
+      e.preventDefault();
+      let courses = e.target;
+      let value = this.state.selectedCourses;
+      for (let i = 0; i < courses.length; i++) {
+        if (courses[i].selected && !(this.state.selectedCourses.includes(courses[i].value))) {
+          value.push(courses[i].value);
+        }
+      }
+      this.setState({
+        selectedCourses: value,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      });
+    }
+
+    handleBack(e) {
+      e.preventDefault();
+      this.setState({
+        newUser: false,
+        loaded: false
+      }, () => {
+        this.setState({loaded: true})
+      });
+    }
+
+    handleFacebookNewUser(e) {
+      e.preventDefault();
+      let user = this.props.user
+      const nameArray = user.displayName.split(" ");
+      const school = this.state.selectedSchool;
+      const courses = this.state.selectedCourses;
+      const fname = nameArray[0];
+      const lname = nameArray[1];
+      const email = user.email;
+      const uID = user.uid;
+
+      if (courses.length === 0) {
+
+        this.setState({
+          coursesError: true,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+        });
+      }
+
+      if (school === 'select') {
+        this.setState({
+          schoolError: true,
+          loaded: false
+        }, () => {
+          this.setState({loaded: true})
+        });
+      }
+
+      if (school != "select" && courses.length >= 1 && fname && lname && email) {
+        fetch('/api/users', {
+          method: 'POST',
+          headers: {
+            "Content-Type": "Application/json"
+          },
+          body: JSON.stringify({
+            fname: fname,
+            lname: lname,
+            email: email,
+            uID: uID,
+            school: school,
+            courses: courses,
+            permission: "Student"
+          })
+        }).then(()=>{
+          let result = this.getData().then((user) => {
+            this.setState({
+              user: user,
+              courses: user.courses,
+              loaded: false
+            }, () => {
+              this.setState({loaded: true})
+            });
+        })
+      })
+
+    }
+  }
+
+
+
   render() {
+    let $courseData
+
+    if (!this.state.user){
+      if (this.state.selectedSchool != "select" && this.state.courses) {
+        if (this.state.courses.length === 1) {
+          $courseData = (<div>
+            <p>Only one class available for that University</p>
+            <br/>
+            <p>{this.state.courses}
+              <a onClick={this.addOneClass} className="button">Add Class</a>
+            </p>
+            <p>Your course list</p>
+            <div className="select is-multiple">
+              <select multiple="multiple" size="3" onChange={this.coursesDeselect} value={this.state.selectedCourses}>
+                {this.state.selectedCourses.map((course, index) => (<option value={course} key={index}>{course}</option>))}
+              </select>
+            </div>
+
+          </div>)
+        } else if (this.state.courses.length > 1) {
+          $courseData = (<div>
+            <p>Select multiple classes that you are in</p>
+            <br/>
+            <p>Available courses</p>
+            <div className="select is-multiple">
+              <select multiple="multiple" size="3" id="courses" onChange={this.coursesSelect} value={this.state.selectedSchool.courses}>
+                {this.state.selectedSchool.courses.map((course, index) => (<option value={course} key={index}>{course}</option>))}
+              </select>
+            </div>
+            <p>Your course list</p>
+            <div className="select is-multiple">
+              <select multiple="multiple" size="3" onChange={this.coursesDeselect} value={this.state.selectedCourses}>
+                {this.state.selectedCourses.map((course, index) => (<option value={course} key={index}>{course}</option>))}
+              </select>
+            </div>
+          </div>)
+        } else {
+          $courseData = (<p></p>)
+        }
+      }
+      return (<div className="container">
+        <div style={{
+            textAlign: "center"
+          }} className="block">
+          {/* <img src={testimage} /> */}
+          <h1 className="title">Tailored Tutoring Co.</h1>
+          {/* <h2 className="subtitle">roblokken@tailoredtutoringco.com</h2> */}
+        </div>
+        <form onSubmit={this.handleFacebookNewUser}>
+        <h2>You appear to be a new user, please fill out some information below before continuing</h2>
+        <br />
+          <p>
+            Tell us which school you go to</p>
+          {
+            this.state.schoolError
+              ? <p style={{
+                    color: 'red'
+                  }}>Please select a school</p>
+              : <p></p>
+          }
+          <div className="select">
+            <select onChange={this.schoolSelect} value={JSON.stringify(this.state.selectedSchool)}>
+              <option value="select">Select</option>
+              {this.state.schools.map((school, index) => (<option value={JSON.stringify(school)} key={index}>{school.name}</option>))}
+            </select>
+          </div>
+          <br/> {
+            this.state.coursesError
+              ? <p style={{
+                    color: 'red'
+                  }}>Please sign up for at least one course you are in</p>
+              : <p></p>
+          }
+          {$courseData}
+
+          <div className="control">
+            <button className="button">Submit</button>
+          </div>
+        </form>
+        <div className="control">
+          <button className="button" onClick={this.handleBack} id="cancelButton">
+            Go Back
+          </button>
+        </div>
+      </div>)
+    }
+
 
     if (this.state.user && this.state.loaded) {
 	    let $imagePreview = null;

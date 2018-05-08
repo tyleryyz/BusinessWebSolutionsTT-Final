@@ -16,11 +16,16 @@ class LogIn extends Component {
       emailError: false,
       passwordError: false,
       facebookError: null,
-      loaded: true
+      selectedSchool: 'select',
+      newUser: false,
+      selectedCourses: null,
+      loaded: true,
+      schools: []
     }
     this.handleLogIn = this.handleLogIn.bind(this);
     this.handleFacebookLogin = this.handleFacebookLogin.bind(this);
   }
+
 
   handleLogIn(e) {
     e.preventDefault();
@@ -28,20 +33,20 @@ class LogIn extends Component {
     const password = e.target.elements.password.value;
     let errorCode;
     let errorMessage;
-    if (!email){
+    if (!email) {
       this.setState({
         emailError: true,
         loaded: false
       }, () => {
-        loaded: true
+        loaded : true
       });
     }
-    if (!password){
+    if (!password) {
       this.setState({
         passwordError: true,
         loaded: false
       }, () => {
-        loaded: true
+        loaded : true
       });
     }
 
@@ -57,7 +62,7 @@ class LogIn extends Component {
       });
     });
     let user = firebase.auth().currentUser
-    this.props.update(user);
+    //this.props.update(user);
 
   }
 
@@ -69,25 +74,6 @@ class LogIn extends Component {
       var token = result.credential.accessToken;
       // The signed-in user info.
       var user = result.user;
-      const email = user.email;
-      const uID = user.uid;
-      const nameArray = user.displayName.split(" ");
-      const fname = nameArray[0];
-      const lname = nameArray[1];
-      const permission = "Student"
-      const school = null;
-      const classList = null;
-
-      if (result.additionalUserInfo.isNewUser){
-        fetch('/api/users', {
-          method: 'POST',
-          headers: {
-            "Content-Type": "Application/json"
-          },
-          body: JSON.stringify({fname: fname, lname: lname, email: email, uID: uID, school: school, permission: "Student"})
-        });
-      }
-      this.props.update(user);
 
     }).catch((error) => {
 
@@ -99,7 +85,6 @@ class LogIn extends Component {
       // The firebase.auth.AuthCredential type that was used.
       var credential = error.credential;
 
-
       this.setState({
         facebookError: errorMessage,
         loaded: false
@@ -107,69 +92,99 @@ class LogIn extends Component {
         this.setState({loaded: true})
       });
 
-
     });
 
   }
   render() {
-    if (this.state.loaded){
-    return (<div className="container">
-			<div style={{ textAlign: "center"}} className="block">
+    let $courseData;
+    if (this.state.loaded) {
+        return (<div className="container">
+          <div style={{
+              textAlign: "center"
+            }} className="block">
 
-			  <h1 className="title">Tailored Tutoring Co.</h1>
-			  <h2 className="subtitle"><i>"Your homework - explained."</i></h2>
-			</div>
-			<div className="columns">
-				<div className="column"><span /></div>
-				<div className="column has-text-centered">
+            <h1 className="title">Tailored Tutoring Co.</h1>
+            <h2 className="subtitle">
+              <i>"Your homework - explained."</i>
+            </h2>
+          </div>
+          <div className="columns">
+            <div className="column"><span/></div>
+            <div className="column has-text-centered">
 
-				    <br />
-				    <br />
-						  <form onSubmit={this.handleLogIn}>
-					        <div className="container">
+              <br/>
+              <br/>
+              <div className="container">
 
-					          <div className="box">
-					            <div className="field">
-					            {this.state.emailError?<p style={{color: 'red'}}>Please enter an email</p>:<p></p>}
-					              <p className="control">
-					                <input className="input" name="email" type="email" placeholder="Email"/>
-					              </p>
-					            </div>
-					            <div className="field">
-					            {this.state.passwordError?<p style={{color: 'red'}}>Please enter a password</p>:<p></p>}
-					              <p className="control">
-					                <input className="input" name="password" type="password" placeholder="Password"/>
-					              </p>
-					            </div>
-					            <div className="field">
-					              <p className="control">
-					                <button className="button is-success">
-					                  Login
-					                </button>
-					              </p>
-					            </div>
-					          </div>
+              <form onSubmit={this.handleLogIn}>
+                  {
+                    this.state.fbError
+                      ? <p style={{
+                            color: 'red'
+                          }}>{this.state.fbError}</p>
+                      : <p></p>
+                  }
+                  <div className="box">
+                    <div className="field">
+                      {
+                        this.state.emailError
+                          ? <p style={{
+                                color: 'red'
+                              }}>Please enter an email</p>
+                          : <p></p>
+                      }
+                      <p className="control">
+                        <input className="input" name="email" type="email" placeholder="Email"/>
+                      </p>
+                    </div>
+                    <div className="field">
+                      {
+                        this.state.passwordError
+                          ? <p style={{
+                                color: 'red'
+                              }}>Please enter a password</p>
+                          : <p></p>
+                      }
+                      <p className="control">
+                        <input className="input" name="password" type="password" placeholder="Password"/>
+                      </p>
+                    </div>
+                    <div className="field">
+                      <p className="control">
+                        <button className="button is-success">
+                          Login
+                        </button>
+                      </p>
+                    </div>
+                  </div>
 
-							  <br/><p>or sign in with Facebook</p>
+                  <br/>
 
-							  <img src={fbBtn} onClick={this.handleFacebookLogin} width={250}/>
-		  				    {this.state.facebookError?<p style={{color: 'red'}}>{this.state.facebookError}</p>:<p></p>}
-							<br/>
-							{
-							  <Link to="/SignUp">
-								  Don't have a profile? Sign Up!
-								</Link>
-							}
+              </form>
+              <p>or sign in with Facebook</p>
 
-					        </div>
-					      </form>
-				    </div>
-					<div className="column is-2"><span /></div>
-	  			</div>
+              <img src={fbBtn} onClick={this.handleFacebookLogin} width={250}/> {
+                this.state.facebookError
+                  ? <p style={{
+                        color: 'red'
+                      }}>{this.state.facebookError}</p>
+                  : <p></p>
+              }
+              <br/> {
+                <Link to="/SignUp">
+                  Don't have a profile? Sign Up!
+                </Link>
+              }
+              </div>
+            </div>
+            <div className="column is-2"><span/></div>
+          </div>
 
-    </div>);
-} else {return (<p>Please Wait</p>)}
-  }
+        </div>);
+      } else {
+        return (<p>Please Wait</p>)
+      }
+    } 
 }
 
 export default LogIn;
