@@ -18,7 +18,7 @@ var accessKey;
 var secretAccess;
 var regionArea;
 
-fetchTextFile('http://localhost:8080/keys.txt', function(data) {
+fetchTextFile('keys.txt', function(data) {
   updateVars(data)
 });
 
@@ -54,8 +54,7 @@ AWS.config.update({accessKeyId: accessKey.trim(), secretAccessKey: secretAccess.
 var s3 = new AWS.S3();
 
 // Create a bucket and upload something into it
-//var bucketName = 'jjg297-' + uuid.v4();
-var bucketName = 'tailored-tutoring';
+var bucketName = 'tailored-tutoring-co';
 
 
 

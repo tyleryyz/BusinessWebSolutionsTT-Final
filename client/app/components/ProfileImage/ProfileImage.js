@@ -21,7 +21,7 @@ var email;
 var message;
 var subject;
 
-fetchTextFile('http://localhost:8080/keys.txt', function(data) {
+fetchTextFile('keys.txt', function(data) {
   updateVars(data)
 });
 
@@ -59,7 +59,7 @@ var s3 = new AWS.S3();
 
 // Create a bucket and upload something into it
 //var bucketName = 'jjg297-' + uuid.v4();
-var bucketName = 'tailored-tutoring'; //make a new bucket? container? Ask Jesus
+var bucketName = 'tailored-tutoring-co';
 var keyName = 'hello_world.txt';
 let file;
 var filename;

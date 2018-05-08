@@ -18,7 +18,7 @@ var email;
 var message;
 var subject;
 
-fetchTextFile('http://localhost:8080/keys.txt', function(data) {
+fetchTextFile('keys.txt', function(data) {
   updateVars(data)
 });
 
@@ -52,7 +52,7 @@ AWS.config.update({accessKeyId: accessKey.trim(), secretAccessKey: secretAccess.
 var s3 = new AWS.S3();
 var ses = new AWS.SES();
 
-var bucketName = 'tailored-tutoring';
+var bucketName = 'tailored-tutoring-co';
 var keyName;
 let file;
 var filename;
